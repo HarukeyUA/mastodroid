@@ -91,6 +91,8 @@ fun StatusListItem(item: StatusListItemModel, onUrlClicked: (url: String) -> Uni
     StatusCard(fullAccountName = item.authorDisplayName,
         accountUserName = item.authorAccountHandle,
         accountAvatarUrl = item.authorAvatarUrl,
+        updatedTime = item.lastUpdate,
+        isEdited = item.edited,
         content = {
             StatusTextContent(text = contentText) { url ->
                 onUrlClicked(url)

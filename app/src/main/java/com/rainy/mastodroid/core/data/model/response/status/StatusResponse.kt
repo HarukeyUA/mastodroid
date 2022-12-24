@@ -2,6 +2,7 @@ package com.rainy.mastodroid.core.data.model.response.status
 
 import com.rainy.mastodroid.core.data.model.response.CustomEmojiResponse
 import com.rainy.mastodroid.core.data.model.response.Visibility
+import com.rainy.mastodroid.core.data.model.response.mediaAttachment.MediaAttachmentResponse
 import com.rainy.mastodroid.core.data.model.response.user.AccountResponse
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
@@ -25,8 +26,8 @@ data class StatusResponse(
     val sensitive: Boolean?,
     @SerialName("spoiler_text")
     val spoilerText: String?,
-    //@SerialName("media_attachments")
-    //val mediaAttachments: List<Unit>, // TODO: https://docs.joinmastodon.org/entities/MediaAttachment/
+    @SerialName("media_attachments")
+    val mediaAttachments: List<MediaAttachmentResponse>?,
     @SerialName("application") // Optional
     val application: StatusApplicationResponse?,
     @SerialName("mentions")

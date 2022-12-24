@@ -2,6 +2,7 @@ package com.rainy.mastodroid.features.home.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -94,9 +95,13 @@ fun StatusListItem(item: StatusListItemModel, onUrlClicked: (url: String) -> Uni
         updatedTime = item.lastUpdate,
         isEdited = item.edited,
         content = {
-            StatusTextContent(text = contentText) { url ->
-                onUrlClicked(url)
+            Column {
+                StatusTextContent(text = contentText) { url ->
+                    onUrlClicked(url)
+                }
+                StatusAttachmentsPreview(item.attachments)
             }
+
         }
 
     )

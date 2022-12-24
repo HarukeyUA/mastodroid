@@ -2,9 +2,16 @@ package com.rainy.mastodroid.core.domain.model.status
 
 import com.rainy.mastodroid.core.data.model.response.CustomEmojiResponse
 import com.rainy.mastodroid.core.data.model.response.Visibility
+import com.rainy.mastodroid.core.data.model.response.mediaAttachment.AudioAttachmentResponse
+import com.rainy.mastodroid.core.data.model.response.mediaAttachment.GifvAttachmentResponse
+import com.rainy.mastodroid.core.data.model.response.mediaAttachment.ImageAttachmentResponse
+import com.rainy.mastodroid.core.data.model.response.mediaAttachment.UnknownAttachmentResponse
+import com.rainy.mastodroid.core.data.model.response.mediaAttachment.VideoAttachmentResponse
 import com.rainy.mastodroid.core.data.model.response.status.StatusMentionResponse
 import com.rainy.mastodroid.core.data.model.response.status.StatusResponse
 import com.rainy.mastodroid.core.data.model.response.status.StatusTagResponse
+import com.rainy.mastodroid.core.domain.model.mediaAttachment.MediaAttachment
+import com.rainy.mastodroid.core.domain.model.mediaAttachment.toDomain
 import com.rainy.mastodroid.core.domain.model.user.CustomEmoji
 import com.rainy.mastodroid.core.domain.model.user.User
 import com.rainy.mastodroid.core.domain.model.user.toDomain
@@ -40,6 +47,7 @@ data class Status(
     val muted: Boolean,
     val bookmarked: Boolean,
     val pinned: Boolean,
+    val mediaAttachments: List<MediaAttachment>
 )
 
 fun StatusResponse.toDomain(): Status? {
@@ -76,6 +84,15 @@ fun StatusResponse.toDomain(): Status? {
         reblogged = reblogged ?: false,
         muted = muted ?: false,
         bookmarked = bookmarked ?: false,
-        pinned = pinned ?: false
+        pinned = pinned ?: false,
+        mediaAttachments = mediaAttachments?.mapNotNull {
+            when (it) {
+                is GifvAttachmentResponse -> null
+                is ImageAttachmentResponse -> it.toDomain()
+                UnknownAttachmentResponse -> null
+                is VideoAttachmentResponse -> null
+                is AudioAttachmentResponse -> null
+            }
+        } ?: listOf()
     )
 }

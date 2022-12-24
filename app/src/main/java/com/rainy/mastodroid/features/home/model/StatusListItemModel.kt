@@ -1,10 +1,11 @@
 package com.rainy.mastodroid.features.home.model
 
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
+import com.rainy.mastodroid.core.domain.model.mediaAttachment.ImageAttachment
 import com.rainy.mastodroid.core.domain.model.status.Status
 import kotlinx.datetime.Instant
 
-@Immutable
+@Stable
 data class StatusListItemModel(
     val id: String,
     val authorDisplayName: String,
@@ -12,7 +13,8 @@ data class StatusListItemModel(
     val authorAvatarUrl: String,
     val content: String,
     val lastUpdate: Instant?,
-    val edited: Boolean
+    val edited: Boolean,
+    val attachments: List<MediaAttachmentItemModel>
 )
 
 fun Status.toStatusListItemModel(): StatusListItemModel {
@@ -23,6 +25,11 @@ fun Status.toStatusListItemModel(): StatusListItemModel {
         authorAvatarUrl = account.avatarUrl,
         content = content,
         lastUpdate = editedAt ?: createdAt,
-        edited = editedAt != null
+        edited = editedAt != null,
+        attachments = mediaAttachments.map {
+            when (it) {
+                is ImageAttachment -> it.toItemModel()
+            }
+        }
     )
 }

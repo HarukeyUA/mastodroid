@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -20,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
@@ -32,6 +35,8 @@ fun HomeScreen(
     statusesPagingList: LazyPagingItems<StatusListItemModel>,
     isRefreshing: Boolean,
     modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState(),
+    exoPlayer: ExoPlayer? = null,
     onRefreshInvoked: () -> Unit,
     onUrlClicked: (url: String) -> Unit
 ) {
@@ -42,7 +47,7 @@ fun HomeScreen(
     Box(
         modifier = modifier.pullRefresh(pullRefreshState)
     ) {
-        Timeline(statusesPagingList, onUrlClicked)
+        Timeline(statusesPagingList, lazyListState, exoPlayer, onUrlClicked)
         PullRefreshIndicator(
             isRefreshing,
             pullRefreshState,
@@ -57,16 +62,20 @@ fun HomeScreen(
 @Composable
 fun Timeline(
     statusesPagingList: LazyPagingItems<StatusListItemModel>,
+    lazyListState: LazyListState = rememberLazyListState(),
+    exoPlayer: ExoPlayer? = null,
     onUrlClicked: (url: String) -> Unit
 ) {
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxSize()
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        state = lazyListState,
+        modifier = Modifier.fillMaxSize()
     ) {
         items(statusesPagingList, key = { status ->
             status.id
         }) { item ->
             item?.also {
-                StatusListItem(item, onUrlClicked)
+                StatusListItem(item, exoPlayer, onUrlClicked)
             }
         }
 
@@ -83,7 +92,7 @@ fun Timeline(
 }
 
 @Composable
-fun StatusListItem(item: StatusListItemModel, onUrlClicked: (url: String) -> Unit) {
+fun StatusListItem(item: StatusListItemModel, exoPlayer: ExoPlayer? = null, onUrlClicked: (url: String) -> Unit) {
     val contentText by remember {
         derivedStateOf {
             item.content.annotateMastodonContent()
@@ -99,7 +108,7 @@ fun StatusListItem(item: StatusListItemModel, onUrlClicked: (url: String) -> Uni
                 StatusTextContent(text = contentText) { url ->
                     onUrlClicked(url)
                 }
-                StatusAttachmentsPreview(item.attachments)
+                StatusAttachmentsPreview(item.attachments, exoPlayer)
             }
 
         }

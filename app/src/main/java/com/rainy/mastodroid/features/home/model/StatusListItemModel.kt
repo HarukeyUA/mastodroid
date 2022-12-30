@@ -2,6 +2,7 @@ package com.rainy.mastodroid.features.home.model
 
 import androidx.compose.runtime.Stable
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.ImageAttachment
+import com.rainy.mastodroid.core.domain.model.mediaAttachment.VideoAttachment
 import com.rainy.mastodroid.core.domain.model.status.Status
 import kotlinx.datetime.Instant
 
@@ -29,6 +30,7 @@ fun Status.toStatusListItemModel(): StatusListItemModel {
         attachments = mediaAttachments.map {
             when (it) {
                 is ImageAttachment -> it.toItemModel()
+                is VideoAttachment -> it.toItemModel()
             }
         }
     )

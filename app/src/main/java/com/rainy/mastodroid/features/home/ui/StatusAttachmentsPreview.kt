@@ -13,14 +13,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
+import androidx.media3.exoplayer.ExoPlayer
 import com.rainy.mastodroid.extensions.ifNotNull
 import com.rainy.mastodroid.features.home.model.ImageAttachmentItemModel
 import com.rainy.mastodroid.features.home.model.MediaAttachmentItemModel
+import com.rainy.mastodroid.features.home.model.VideoAttachmentItemModel
 import com.rainy.mastodroid.ui.elements.AsyncBlurImage
 import com.rainy.mastodroid.ui.elements.MediaPreviewGrid
+import com.rainy.mastodroid.ui.elements.VideoPlayer
 
 @Composable
-fun StatusAttachmentsPreview(attachments: List<MediaAttachmentItemModel>) {
+fun StatusAttachmentsPreview(
+    attachments: List<MediaAttachmentItemModel>,
+    exoPlayer: ExoPlayer? = null
+) {
     MediaPreviewGrid(
         modifier = Modifier
             .fillMaxWidth()
@@ -36,19 +42,29 @@ fun StatusAttachmentsPreview(attachments: List<MediaAttachmentItemModel>) {
         attachments.take(4).fastForEach { mediaAttachment ->
             when (mediaAttachment) {
                 is ImageAttachmentItemModel -> {
-                    AsyncBlurImage(
-                        url = mediaAttachment.url,
-                        blurHash = mediaAttachment.blurHash,
-                        contentDescription = mediaAttachment.description,
-                        contentScale = ContentScale.Crop,
+                    ImageAttachment(
+                        mediaAttachment,
                         modifier = Modifier.ifNotNull(mediaAttachment.aspect) {
                             if (attachments.size == 1) {
                                 aspectRatio(it)
                             } else {
                                 Modifier
                             }
-                        }
-                    )
+                        })
+                }
+
+                is VideoAttachmentItemModel -> {
+                    VideoAttachment(
+                        attachments,
+                        exoPlayer,
+                        mediaAttachment,
+                        modifier = Modifier.ifNotNull(mediaAttachment.previewAspect) {
+                            if (attachments.size == 1) {
+                                aspectRatio(it)
+                            } else {
+                                Modifier
+                            }
+                        })
                 }
 
                 else -> {}
@@ -58,3 +74,41 @@ fun StatusAttachmentsPreview(attachments: List<MediaAttachmentItemModel>) {
 
     }
 }
+
+@Composable
+private fun ImageAttachment(
+    mediaAttachment: ImageAttachmentItemModel,
+    modifier: Modifier = Modifier
+) {
+    AsyncBlurImage(
+        url = mediaAttachment.url,
+        blurHash = mediaAttachment.blurHash,
+        contentDescription = mediaAttachment.description,
+        contentScale = ContentScale.Crop,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun VideoAttachment(
+    attachments: List<MediaAttachmentItemModel>,
+    exoPlayer: ExoPlayer?,
+    mediaAttachment: VideoAttachmentItemModel,
+    modifier: Modifier = Modifier
+) {
+    if ((attachments.firstOrNull() as? VideoAttachmentItemModel)?.currentlyPlaying == true && exoPlayer != null) {
+        VideoPlayer(
+            exoPlayer,
+            modifier = modifier
+        )
+    } else {
+        AsyncBlurImage(
+            url = mediaAttachment.url,
+            blurHash = mediaAttachment.blurHash,
+            contentDescription = mediaAttachment.description,
+            contentScale = ContentScale.Crop,
+            modifier = modifier
+        )
+    }
+}
+

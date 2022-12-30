@@ -90,7 +90,7 @@ fun StatusResponse.toDomain(): Status? {
                 is GifvAttachmentResponse -> null
                 is ImageAttachmentResponse -> it.toDomain()
                 UnknownAttachmentResponse -> null
-                is VideoAttachmentResponse -> null
+                is VideoAttachmentResponse -> it.toDomain()
                 is AudioAttachmentResponse -> null
             }
         } ?: listOf()

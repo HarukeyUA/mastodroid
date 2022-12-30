@@ -18,8 +18,6 @@ data class VideoAttachmentResponse(
     val previewUrl: String?,
     @SerialName("remote_url")
     val remoteUrl: String?,
-    @SerialName("type")
-    val type: String?,
     @SerialName("url")
     val url: String?
 ): MediaAttachmentResponse() {

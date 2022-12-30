@@ -1,19 +1,25 @@
 package com.rainy.mastodroid.features.home.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.media3.exoplayer.ExoPlayer
+import com.rainy.mastodroid.R
 import com.rainy.mastodroid.extensions.ifNotNull
 import com.rainy.mastodroid.features.home.model.ImageAttachmentItemModel
 import com.rainy.mastodroid.features.home.model.MediaAttachmentItemModel
@@ -102,13 +108,22 @@ fun VideoAttachment(
             modifier = modifier
         )
     } else {
-        AsyncBlurImage(
-            url = mediaAttachment.url,
-            blurHash = mediaAttachment.blurHash,
-            contentDescription = mediaAttachment.description,
-            contentScale = ContentScale.Crop,
-            modifier = modifier
-        )
+        Box(modifier = modifier) {
+            AsyncBlurImage(
+                url = mediaAttachment.url,
+                blurHash = mediaAttachment.blurHash,
+                contentDescription = mediaAttachment.description,
+                contentScale = ContentScale.Crop,
+                modifier = modifier.fillMaxSize()
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.play_circle),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+
     }
 }
 

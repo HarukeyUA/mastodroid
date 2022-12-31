@@ -1,6 +1,7 @@
 package com.rainy.mastodroid.features.home.model
 
 import androidx.compose.runtime.Stable
+import com.rainy.mastodroid.core.domain.model.mediaAttachment.GifvAttachment
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.ImageAttachment
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.VideoAttachment
 import com.rainy.mastodroid.core.domain.model.status.Status
@@ -31,6 +32,7 @@ fun Status.toStatusListItemModel(): StatusListItemModel {
             when (it) {
                 is ImageAttachment -> it.toItemModel()
                 is VideoAttachment -> it.toItemModel()
+                is GifvAttachment -> it.toItemModel()
             }
         }
     )

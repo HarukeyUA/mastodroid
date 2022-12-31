@@ -1,6 +1,5 @@
 package com.rainy.mastodroid.core.data.model.response.mediaAttachment
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -19,8 +18,6 @@ data class GifvAttachmentResponse(
     val previewUrl: String?,
     @SerialName("remote_url")
     val remoteUrl: String?,
-    @SerialName("type")
-    val type: String?,
     @SerialName("url")
     val url: String?
 ): MediaAttachmentResponse() {

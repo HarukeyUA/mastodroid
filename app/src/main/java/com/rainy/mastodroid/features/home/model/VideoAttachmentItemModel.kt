@@ -1,5 +1,6 @@
 package com.rainy.mastodroid.features.home.model
 
+import com.rainy.mastodroid.core.domain.model.mediaAttachment.GifvAttachment
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.VideoAttachment
 
 data class VideoAttachmentItemModel(
@@ -10,6 +11,7 @@ data class VideoAttachmentItemModel(
     val description: String,
     val blurHash: String,
     val previewAspect: Float?,
+    val isGifv: Boolean,
     val currentlyPlaying: Boolean = false
 ): MediaAttachmentItemModel()
 
@@ -21,6 +23,20 @@ fun VideoAttachment.toItemModel(): VideoAttachmentItemModel {
         remoteUrl = remoteUrl,
         description = description,
         blurHash = blurHash,
+        isGifv = false,
+        previewAspect = previewAspect
+    )
+}
+
+fun GifvAttachment.toItemModel(): VideoAttachmentItemModel {
+    return VideoAttachmentItemModel(
+        id = id,
+        url = url,
+        previewUrl = previewUrl,
+        remoteUrl = remoteUrl,
+        description = description,
+        blurHash = blurHash,
+        isGifv = true,
         previewAspect = previewAspect
     )
 }

@@ -87,7 +87,7 @@ fun StatusResponse.toDomain(): Status? {
         pinned = pinned ?: false,
         mediaAttachments = mediaAttachments?.mapNotNull {
             when (it) {
-                is GifvAttachmentResponse -> null
+                is GifvAttachmentResponse -> it.toDomain()
                 is ImageAttachmentResponse -> it.toDomain()
                 UnknownAttachmentResponse -> null
                 is VideoAttachmentResponse -> it.toDomain()

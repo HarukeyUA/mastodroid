@@ -20,6 +20,8 @@ import kotlinx.datetime.Instant
 
 data class Status(
     val id: String,
+    val reblogId: String?,
+    val reblogAccount: User?,
     val uri: String,
     val createdAt: Instant?,
     val account: User,
@@ -37,7 +39,6 @@ data class Status(
     val url: String?,
     val inReplyToId: String?,
     val inReplyToAccountId: String?,
-    val reblog: Status?,
     val previewCard: PreviewCard?,
     val language: String?,
     val text: String?,
@@ -51,48 +52,51 @@ data class Status(
 )
 
 fun StatusResponse.toDomain(): Status? {
-    if (id.isNullOrEmpty() || account == null) {
-        loge("Illegal timeline status response data: id: $id account: $account")
-        return null
-    }
+    with(reblog ?: this) {
+        if (id.isNullOrEmpty() || account == null) {
+            loge("Illegal timeline status response data: id: $id account: $account")
+            return null
+        }
 
-    return Status(
-        id = id,
-        uri = uri ?: "",
-        createdAt = createdAt,
-        account = account.toDomain(),
-        content = content ?: "",
-        visibility = visibility ?: Visibility.PUBLIC,
-        sensitive = sensitive ?: false,
-        spoilerText = spoilerText ?: "",
-        application = application?.toDomain(),
-        mentions = mentions?.mapNotNull(StatusMentionResponse::toDomain) ?: listOf(),
-        tags = tags?.map(StatusTagResponse::toDomain) ?: listOf(),
-        customEmojis = emojis?.mapNotNull(CustomEmojiResponse::toDomain) ?: listOf(),
-        reblogsCount = reblogsCount ?: 0,
-        favouritesCount = favouritesCount ?: 0,
-        repliesCount = repliesCount ?: 0,
-        url = url,
-        inReplyToId = inReplyToId,
-        inReplyToAccountId = inReplyToAccountId,
-        reblog = reblog?.toDomain(),
-        previewCard = previewCard?.toDomain(),
-        language = language,
-        text = text,
-        editedAt = editedAt,
-        favourited = favourited ?: false,
-        reblogged = reblogged ?: false,
-        muted = muted ?: false,
-        bookmarked = bookmarked ?: false,
-        pinned = pinned ?: false,
-        mediaAttachments = mediaAttachments?.mapNotNull {
-            when (it) {
-                is GifvAttachmentResponse -> it.toDomain()
-                is ImageAttachmentResponse -> it.toDomain()
-                UnknownAttachmentResponse -> null
-                is VideoAttachmentResponse -> it.toDomain()
-                is AudioAttachmentResponse -> null
-            }
-        } ?: listOf()
-    )
+        return Status(
+            id = id,
+            reblogId = this@toDomain.id,
+            reblogAccount = this@toDomain.account?.toDomain(),
+            uri = uri ?: "",
+            createdAt = createdAt,
+            account = account.toDomain(),
+            content = content ?: "",
+            visibility = visibility ?: Visibility.PUBLIC,
+            sensitive = sensitive ?: false,
+            spoilerText = spoilerText ?: "",
+            application = application?.toDomain(),
+            mentions = mentions?.mapNotNull(StatusMentionResponse::toDomain) ?: listOf(),
+            tags = tags?.map(StatusTagResponse::toDomain) ?: listOf(),
+            customEmojis = emojis?.mapNotNull(CustomEmojiResponse::toDomain) ?: listOf(),
+            reblogsCount = reblogsCount ?: 0,
+            favouritesCount = favouritesCount ?: 0,
+            repliesCount = repliesCount ?: 0,
+            url = url,
+            inReplyToId = inReplyToId,
+            inReplyToAccountId = inReplyToAccountId,
+            previewCard = previewCard?.toDomain(),
+            language = language,
+            text = text,
+            editedAt = editedAt,
+            favourited = favourited ?: false,
+            reblogged = reblogged ?: false,
+            muted = muted ?: false,
+            bookmarked = bookmarked ?: false,
+            pinned = pinned ?: false,
+            mediaAttachments = mediaAttachments?.mapNotNull {
+                when (it) {
+                    is GifvAttachmentResponse -> it.toDomain()
+                    is ImageAttachmentResponse -> it.toDomain()
+                    UnknownAttachmentResponse -> null
+                    is VideoAttachmentResponse -> it.toDomain()
+                    is AudioAttachmentResponse -> null
+                }
+            } ?: listOf()
+        )
+    }
 }

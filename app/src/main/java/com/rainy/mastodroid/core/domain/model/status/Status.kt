@@ -19,9 +19,9 @@ import com.rainy.mastodroid.util.loge
 import kotlinx.datetime.Instant
 
 data class Status(
-    val id: String,
+    val originalId: String,
     val reblogId: String?,
-    val reblogAccount: User?,
+    val reblogAuthorAccount: User?,
     val uri: String,
     val createdAt: Instant?,
     val account: User,
@@ -53,15 +53,15 @@ data class Status(
 
 fun StatusResponse.toDomain(): Status? {
     with(reblog ?: this) {
-        if (id.isNullOrEmpty() || account == null) {
+        if (id.isNullOrEmpty() || account == null || this@toDomain.id == null) {
             loge("Illegal timeline status response data: id: $id account: $account")
             return null
         }
 
         return Status(
-            id = id,
-            reblogId = this@toDomain.id,
-            reblogAccount = this@toDomain.account?.toDomain(),
+            originalId = this@toDomain.id,
+            reblogId = this@toDomain.reblog?.id,
+            reblogAuthorAccount = this@toDomain.account?.toDomain(),
             uri = uri ?: "",
             createdAt = createdAt,
             account = account.toDomain(),

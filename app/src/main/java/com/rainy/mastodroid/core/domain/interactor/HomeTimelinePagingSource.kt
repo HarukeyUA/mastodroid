@@ -24,7 +24,7 @@ class HomeTimelinePagingSource(
             )
             LoadResult.Page(
                 statuses,
-                nextKey = statuses.last().id,
+                nextKey = statuses.last().originalId,
                 prevKey = null
             )
         } catch (e: Throwable) {

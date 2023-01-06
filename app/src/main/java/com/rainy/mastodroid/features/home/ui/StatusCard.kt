@@ -66,15 +66,23 @@ fun StatusCard(
                     .weight(1f)
                     .padding(start = 4.dp)
             ) {
+                Text(
+                    text = fullAccountName,
+                    style = MaterialTheme.typography.titleSmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
                 Row {
                     Text(
-                        text = fullAccountName,
-                        style = MaterialTheme.typography.titleSmall,
+                        text = stringResource(id = R.string.username_handle, accountUserName),
+                        style = MaterialTheme.typography.labelMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
                             .alignByBaseline()
+                            .weight(1f, fill = false)
                     )
+
                     updatedTime?.also {
                         Text(
                             "\u2022",
@@ -96,19 +104,11 @@ fun StatusCard(
                             contentDescription = stringResource(id = R.string.edited),
                             modifier = Modifier
                                 .size(14.dp)
-                                .padding(start = 4.dp)
+                                .padding(start = 2.dp)
                                 .align(Alignment.CenterVertically)
                         )
                     }
-
                 }
-
-                Text(
-                    text = stringResource(id = R.string.username_handle, accountUserName),
-                    style = MaterialTheme.typography.labelMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
             }
             IconButton(onClick = { /*TODO*/ }) {
                 Icon(

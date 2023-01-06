@@ -31,20 +31,25 @@ class HomeViewModel(
         .combine(currentlyPlayingItem) { timeline, currentlyPlaying ->
             timeline.map { status ->
                 if (status.id == currentlyPlaying?.statusId) {
-                    status.copy(
-                        attachments = status.attachments.map { attachment ->
-                            if (attachment is VideoAttachmentItemModel && attachment.id == currentlyPlaying.mediaId) {
-                                attachment.copy(currentlyPlaying = true)
-                            } else {
-                                attachment
-                            }
-                        }
-                    )
+                    setCurrentlyPlayingAttachment(status, currentlyPlaying.mediaId)
                 } else {
                     status
                 }
             }
         }
+
+    private fun setCurrentlyPlayingAttachment(
+        status: StatusListItemModel,
+        attachmentId: String,
+    ) = status.copy(
+        attachments = status.attachments.map { attachment ->
+            if (attachment is VideoAttachmentItemModel && attachment.id == attachmentId) {
+                attachment.copy(currentlyPlaying = true)
+            } else {
+                attachment
+            }
+        }
+    )
 
     fun setFocussedVideoAttachment(status: StatusListItemModel?) {
         logi("Focused timeline item: ${status?.id}")

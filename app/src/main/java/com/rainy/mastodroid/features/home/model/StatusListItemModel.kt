@@ -21,7 +21,7 @@ data class StatusListItemModel(
 
 fun Status.toStatusListItemModel(): StatusListItemModel {
     return StatusListItemModel(
-        id = id,
+        id = originalId,
         authorDisplayName = account.displayName,
         authorAccountHandle = account.accountUri,
         authorAvatarUrl = account.avatarUrl,

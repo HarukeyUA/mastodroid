@@ -1,5 +1,6 @@
 package com.rainy.mastodroid.ui.styledText
 
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import org.jsoup.Jsoup
@@ -12,20 +13,26 @@ enum class MastodonContentTag {
     HASHTAG, MENTION, URL
 }
 
-fun String.annotateMastodonContent(): AnnotatedString {
+private val emojiRegex = "(?<=:)(.*?)(?=:)".toRegex() // Everything between ':' and ':' non inclusive
+
+fun String.annotateMastodonContent(emojiShortCodes: List<String> = listOf()): AnnotatedString {
     return buildAnnotatedString {
-        traverseContent(this@annotateMastodonContent, this)
+        traverseContent(this@annotateMastodonContent, this, emojiShortCodes)
     }
 }
 
-private fun traverseContent(string: String, to: AnnotatedString.Builder) {
+private fun traverseContent(
+    string: String,
+    to: AnnotatedString.Builder,
+    emojiShortCodes: List<String>
+) {
     val htmlDocument = Jsoup.parse(string)
     val invisible = htmlDocument.getElementsByClass("invisible")
     invisible.remove()
     htmlDocument.traverse(object : NodeVisitor {
         override fun head(node: Node, depth: Int) {
             if (node is TextNode) {
-                to.append(node.text())
+                annotateInlineEmojis(node.text(), emojiShortCodes, to)
             } else if (node is Element) {
                 when (node.nodeName()) {
                     "a" -> {
@@ -69,4 +76,26 @@ private fun traverseContent(string: String, to: AnnotatedString.Builder) {
             }
         }
     })
+}
+
+private fun annotateInlineEmojis(
+    text: String,
+    shortcodes: List<String>,
+    to: AnnotatedString.Builder
+) {
+    val emojiPositions = emojiRegex.findAll(text)
+        .filter { shortcodes.contains(it.value) }
+    text.forEachIndexed { index: Int, c: Char ->
+        val emojiPosition =
+            emojiPositions.find { it.range.any { rangeElement -> rangeElement in index - 1..index + 1 } } // Account for custom emoji ':' parenthesis
+        if (emojiPosition?.range?.first == index) {
+            emojiPosition.also {
+                to.appendInlineContent(emojiPosition.value)
+            }
+        }
+
+        if (emojiPosition == null) {
+            to.append(c)
+        }
+    }
 }

@@ -95,7 +95,7 @@ fun Timeline(
 fun StatusListItem(item: StatusListItemModel, exoPlayer: ExoPlayer? = null, onUrlClicked: (url: String) -> Unit) {
     val contentText by remember {
         derivedStateOf {
-            item.content.annotateMastodonContent()
+            item.content.annotateMastodonContent(item.emojis.map { it.shortcode })
         }
     }
     StatusCard(fullAccountName = item.authorDisplayName,
@@ -105,7 +105,7 @@ fun StatusListItem(item: StatusListItemModel, exoPlayer: ExoPlayer? = null, onUr
         isEdited = item.edited,
         content = {
             Column {
-                StatusTextContent(text = contentText) { url ->
+                StatusTextContent(text = contentText, item.emojis) { url ->
                     onUrlClicked(url)
                 }
                 StatusAttachmentsPreview(item.attachments, exoPlayer)

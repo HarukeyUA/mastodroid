@@ -103,6 +103,7 @@ fun StatusListItem(item: StatusListItemModel, exoPlayer: ExoPlayer? = null, onUr
         accountAvatarUrl = item.authorAvatarUrl,
         updatedTime = item.lastUpdate,
         isEdited = item.edited,
+        usernameEmojis = item.authorDisplayNameEmojis,
         content = {
             Column {
                 StatusTextContent(text = contentText, item.emojis) { url ->

@@ -21,6 +21,12 @@ fun String.annotateMastodonContent(emojiShortCodes: List<String> = listOf()): An
     }
 }
 
+fun String.annotateMastodonEmojis(emojiShortCodes: List<String> = listOf()): AnnotatedString {
+    return buildAnnotatedString {
+        annotateInlineEmojis(this@annotateMastodonEmojis, emojiShortCodes, this)
+    }
+}
+
 private fun traverseContent(
     string: String,
     to: AnnotatedString.Builder,

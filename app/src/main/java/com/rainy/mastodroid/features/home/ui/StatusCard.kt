@@ -30,6 +30,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.rainy.mastodroid.R
+import com.rainy.mastodroid.features.home.model.CustomEmojiItemModel
+import com.rainy.mastodroid.ui.styledText.annotateMastodonEmojis
+import com.rainy.mastodroid.ui.styledText.textInlineCustomEmojis
 import com.rainy.mastodroid.ui.theme.MastodroidTheme
 import com.rainy.mastodroid.util.ColorSchemePreview
 import kotlinx.coroutines.delay
@@ -48,6 +51,7 @@ fun StatusCard(
     updatedTime: Instant?,
     isEdited: Boolean,
     modifier: Modifier = Modifier,
+    usernameEmojis: List<CustomEmojiItemModel>,
     content: @Composable () -> Unit = {},
 ) {
     ElevatedCard(shape = RectangleShape, modifier = modifier.fillMaxWidth()) {
@@ -67,10 +71,11 @@ fun StatusCard(
                     .padding(start = 4.dp)
             ) {
                 Text(
-                    text = fullAccountName,
+                    text = fullAccountName.annotateMastodonEmojis(emojiShortCodes = usernameEmojis.map { it.shortcode }),
                     style = MaterialTheme.typography.titleSmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    inlineContent = textInlineCustomEmojis(usernameEmojis)
                 )
                 Row {
                     Text(
@@ -182,7 +187,8 @@ private fun StatusCardPreview() {
             accountAvatarUrl = "",
             updatedTime = Instant.parse("2021-12-17T23:11:43.130Z"),
             isEdited = true,
-            content = {}
+            content = {},
+            usernameEmojis = listOf()
         )
     }
 }

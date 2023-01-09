@@ -16,6 +16,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -83,41 +84,49 @@ fun StatusCard(
                         inlineContent = textInlineCustomEmojis(usernameEmojis)
                     )
                     Row {
-                        Text(
-                            text = stringResource(id = R.string.username_handle, accountUserName),
-                            style = MaterialTheme.typography.labelMedium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .alignByBaseline()
-                                .weight(1f, fill = false)
-                        )
-
-                        updatedTime?.also {
+                        CompositionLocalProvider(
+                            LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant
+                        ) {
                             Text(
-                                "\u2022",
-                                style = MaterialTheme.typography.labelSmall,
+                                text = stringResource(
+                                    id = R.string.username_handle,
+                                    accountUserName
+                                ),
+                                style = MaterialTheme.typography.labelMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier
-                                    .padding(start = 2.dp)
                                     .alignByBaseline()
+                                    .weight(1f, fill = false)
                             )
-                            StatusCardTimeCounter(
-                                it,
-                                modifier = Modifier
-                                    .padding(start = 2.dp)
-                                    .alignByBaseline()
-                            )
+
+                            updatedTime?.also {
+                                Text(
+                                    "\u2022",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    modifier = Modifier
+                                        .padding(start = 2.dp)
+                                        .alignByBaseline()
+                                )
+                                StatusCardTimeCounter(
+                                    it,
+                                    modifier = Modifier
+                                        .padding(start = 2.dp)
+                                        .alignByBaseline()
+                                )
+                            }
+                            if (isEdited) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Edit,
+                                    contentDescription = stringResource(id = R.string.edited),
+                                    modifier = Modifier
+                                        .size(14.dp)
+                                        .padding(start = 2.dp)
+                                        .align(Alignment.CenterVertically)
+                                )
+                            }
                         }
-                        if (isEdited) {
-                            Icon(
-                                imageVector = Icons.Outlined.Edit,
-                                contentDescription = stringResource(id = R.string.edited),
-                                modifier = Modifier
-                                    .size(14.dp)
-                                    .padding(start = 2.dp)
-                                    .align(Alignment.CenterVertically)
-                            )
-                        }
+
                     }
                 }
                 IconButton(onClick = { /*TODO*/ }) {

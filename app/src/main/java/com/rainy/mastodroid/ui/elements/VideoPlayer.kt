@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 
 @SuppressLint("UnsafeOptInUsageError")
@@ -18,6 +19,7 @@ fun VideoPlayer(
             PlayerView(context).apply {
                 player = exoPlayer
                 setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
+                resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
                 useController = false
             }
         },

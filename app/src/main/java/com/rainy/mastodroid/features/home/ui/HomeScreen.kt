@@ -2,7 +2,6 @@ package com.rainy.mastodroid.features.home.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -16,9 +15,6 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,7 +23,6 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import com.rainy.mastodroid.features.home.model.StatusListItemModel
-import com.rainy.mastodroid.ui.styledText.annotateMastodonContent
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -89,30 +84,4 @@ fun Timeline(
             }
         }
     }
-}
-
-@Composable
-fun StatusListItem(item: StatusListItemModel, exoPlayer: ExoPlayer? = null, onUrlClicked: (url: String) -> Unit) {
-    val contentText by remember {
-        derivedStateOf {
-            item.content.annotateMastodonContent(item.emojis.map { it.shortcode })
-        }
-    }
-    StatusCard(fullAccountName = item.authorDisplayName,
-        accountUserName = item.authorAccountHandle,
-        accountAvatarUrl = item.authorAvatarUrl,
-        updatedTime = item.lastUpdate,
-        isEdited = item.edited,
-        usernameEmojis = item.authorDisplayNameEmojis,
-        content = {
-            Column {
-                StatusTextContent(text = contentText, item.emojis) { url ->
-                    onUrlClicked(url)
-                }
-                StatusAttachmentsPreview(item.attachments, exoPlayer)
-            }
-
-        }
-
-    )
 }

@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.media3.exoplayer.ExoPlayer
 import com.rainy.mastodroid.R
-import com.rainy.mastodroid.extensions.ifNotNull
+import com.rainy.mastodroid.extensions.ifTrue
 import com.rainy.mastodroid.features.home.model.ImageAttachmentItemModel
 import com.rainy.mastodroid.features.home.model.MediaAttachmentItemModel
 import com.rainy.mastodroid.features.home.model.VideoAttachmentItemModel
@@ -28,16 +28,18 @@ import com.rainy.mastodroid.ui.elements.AsyncBlurImage
 import com.rainy.mastodroid.ui.elements.MediaPreviewGrid
 import com.rainy.mastodroid.ui.elements.VideoPlayer
 
+private const val MAX_ATTACHMENTS_HEIGHT = 800
+
 @Composable
 fun StatusAttachmentsPreview(
     attachments: List<MediaAttachmentItemModel>,
+    modifier: Modifier = Modifier,
     exoPlayer: ExoPlayer? = null
 ) {
     MediaPreviewGrid(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp)
-            .padding(bottom = 8.dp)
+            .heightIn(max = MAX_ATTACHMENTS_HEIGHT.dp)
             .clip(MaterialTheme.shapes.large)
             .background(
                 color = MaterialTheme.colorScheme.surfaceColorAtElevation(
@@ -50,13 +52,10 @@ fun StatusAttachmentsPreview(
                 is ImageAttachmentItemModel -> {
                     ImageAttachment(
                         mediaAttachment,
-                        modifier = Modifier.ifNotNull(mediaAttachment.aspect) {
-                            if (attachments.size == 1) {
-                                aspectRatio(it)
-                            } else {
-                                Modifier
-                            }
-                        })
+                        modifier = Modifier.ifTrue(attachments.size == 1) {
+                            aspectRatio(mediaAttachment.aspect ?: 1f)
+                        }
+                    )
                 }
 
                 is VideoAttachmentItemModel -> {
@@ -64,13 +63,10 @@ fun StatusAttachmentsPreview(
                         attachments,
                         exoPlayer,
                         mediaAttachment,
-                        modifier = Modifier.ifNotNull(mediaAttachment.previewAspect) {
-                            if (attachments.size == 1) {
-                                aspectRatio(it)
-                            } else {
-                                Modifier
-                            }
-                        })
+                        modifier = Modifier.ifTrue(attachments.size == 1) {
+                            aspectRatio(mediaAttachment.previewAspect ?: 1f)
+                        }
+                    )
                 }
 
                 else -> {}

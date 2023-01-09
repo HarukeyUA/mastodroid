@@ -1,5 +1,6 @@
 package com.rainy.mastodroid.features.home.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,77 +56,81 @@ fun StatusCard(
     content: @Composable () -> Unit = {},
 ) {
     ElevatedCard(shape = RectangleShape, modifier = modifier.fillMaxWidth()) {
-        Row(modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)) {
-            AsyncImage(
-                model = accountAvatarUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(MaterialTheme.shapes.large)
-            )
-            Column(
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .weight(1f)
-                    .padding(start = 4.dp)
-            ) {
-                Text(
-                    text = fullAccountName.annotateMastodonEmojis(emojiShortCodes = usernameEmojis.map { it.shortcode }),
-                    style = MaterialTheme.typography.titleSmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    inlineContent = textInlineCustomEmojis(usernameEmojis)
+        Column(
+            modifier = Modifier.padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Row {
+                AsyncImage(
+                    model = accountAvatarUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(MaterialTheme.shapes.large)
                 )
-                Row {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .weight(1f)
+                        .padding(start = 4.dp)
+                ) {
                     Text(
-                        text = stringResource(id = R.string.username_handle, accountUserName),
-                        style = MaterialTheme.typography.labelMedium,
+                        text = fullAccountName.annotateMastodonEmojis(emojiShortCodes = usernameEmojis.map { it.shortcode }),
+                        style = MaterialTheme.typography.titleSmall,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .alignByBaseline()
-                            .weight(1f, fill = false)
+                        inlineContent = textInlineCustomEmojis(usernameEmojis)
                     )
-
-                    updatedTime?.also {
+                    Row {
                         Text(
-                            "\u2022",
-                            style = MaterialTheme.typography.labelSmall,
+                            text = stringResource(id = R.string.username_handle, accountUserName),
+                            style = MaterialTheme.typography.labelMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                             modifier = Modifier
-                                .padding(start = 2.dp)
                                 .alignByBaseline()
+                                .weight(1f, fill = false)
                         )
-                        StatusCardTimeCounter(
-                            it,
-                            modifier = Modifier
-                                .padding(start = 2.dp)
-                                .alignByBaseline()
-                        )
-                    }
-                    if (isEdited) {
-                        Icon(
-                            imageVector = Icons.Outlined.Edit,
-                            contentDescription = stringResource(id = R.string.edited),
-                            modifier = Modifier
-                                .size(14.dp)
-                                .padding(start = 2.dp)
-                                .align(Alignment.CenterVertically)
-                        )
+
+                        updatedTime?.also {
+                            Text(
+                                "\u2022",
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier
+                                    .padding(start = 2.dp)
+                                    .alignByBaseline()
+                            )
+                            StatusCardTimeCounter(
+                                it,
+                                modifier = Modifier
+                                    .padding(start = 2.dp)
+                                    .alignByBaseline()
+                            )
+                        }
+                        if (isEdited) {
+                            Icon(
+                                imageVector = Icons.Outlined.Edit,
+                                contentDescription = stringResource(id = R.string.edited),
+                                modifier = Modifier
+                                    .size(14.dp)
+                                    .padding(start = 2.dp)
+                                    .align(Alignment.CenterVertically)
+                            )
+                        }
                     }
                 }
-            }
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    imageVector = Icons.Outlined.MoreVert,
-                    contentDescription = null,
-                    tint = LocalContentColor.current.copy(alpha = 0.5f)
-                )
-            }
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = Icons.Outlined.MoreVert,
+                        contentDescription = null,
+                        tint = LocalContentColor.current.copy(alpha = 0.5f)
+                    )
+                }
 
+            }
+            content()
         }
-
-        content()
     }
 }
 

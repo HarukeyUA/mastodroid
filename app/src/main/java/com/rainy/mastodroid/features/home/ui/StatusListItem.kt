@@ -39,6 +39,11 @@ fun StatusListItem(
         updatedTime = item.lastUpdate,
         isEdited = item.edited,
         usernameEmojis = item.authorDisplayNameEmojis,
+        favorites = item.favorites,
+        reblogs = item.reblogs,
+        replies = item.replies,
+        isFavorite = item.isFavorite,
+        isRebloged = item.isRebloged,
         content = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -96,7 +101,12 @@ private fun StatusListItemAttachmentsWithTextPreview() {
                         height = 300,
                         aspect = 1f
                     )
-                )
+                ),
+                favorites = 34,
+                reblogs = 342,
+                replies = 16,
+                isFavorite = false,
+                isRebloged = false
             )
         ) {}
     }
@@ -140,7 +150,12 @@ private fun StatusListItemAttachmentsPreview() {
                         height = 300,
                         aspect = 1f
                     )
-                )
+                ),
+                favorites = 34,
+                reblogs = 342,
+                replies = 16,
+                isFavorite = false,
+                isRebloged = false
             )
         ) {}
     }
@@ -161,7 +176,12 @@ private fun StatusListItemTextPreview() {
                 lastUpdate = Instant.parse("2022-12-17T23:11:43.130Z"),
                 edited = true,
                 emojis = listOf(),
-                attachments = listOf()
+                attachments = listOf(),
+                favorites = 34,
+                reblogs = 342,
+                replies = 16,
+                isFavorite = false,
+                isRebloged = false
             )
         ) {}
     }

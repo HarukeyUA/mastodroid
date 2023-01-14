@@ -19,7 +19,12 @@ data class StatusListItemModel(
     val lastUpdate: Instant?,
     val edited: Boolean,
     val emojis: List<CustomEmojiItemModel>,
-    val attachments: List<MediaAttachmentItemModel>
+    val attachments: List<MediaAttachmentItemModel>,
+    val favorites: Int,
+    val reblogs: Int,
+    val replies: Int,
+    val isFavorite: Boolean,
+    val isRebloged: Boolean
 )
 
 fun Status.toStatusListItemModel(): StatusListItemModel {
@@ -39,6 +44,11 @@ fun Status.toStatusListItemModel(): StatusListItemModel {
                 is VideoAttachment -> it.toItemModel()
                 is GifvAttachment -> it.toItemModel()
             }
-        }
+        },
+        favorites = favouritesCount,
+        reblogs = reblogsCount,
+        replies = repliesCount,
+        isFavorite = favourited,
+        isRebloged = reblogged
     )
 }

@@ -24,4 +24,6 @@
     <string name="days">%d d</string>
     <string name="years">%d y</string>
     <string name="edited">edited</string>
+    <string name="count_thousands">%sk</string>
+    <string name="count_millions">%sm</string>
 </resources>

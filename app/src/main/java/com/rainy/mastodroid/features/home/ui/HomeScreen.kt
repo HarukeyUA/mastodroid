@@ -33,7 +33,9 @@ fun HomeScreen(
     lazyListState: LazyListState = rememberLazyListState(),
     exoPlayer: ExoPlayer? = null,
     onRefreshInvoked: () -> Unit,
-    onUrlClicked: (url: String) -> Unit
+    onUrlClicked: (url: String) -> Unit,
+    onFavoriteClicked: (id: String, action: Boolean) -> Unit,
+    onReblogClicked: (id: String, action: Boolean) -> Unit
 ) {
     val pullRefreshState = rememberPullRefreshState(
         isRefreshing, onRefresh = onRefreshInvoked
@@ -42,11 +44,18 @@ fun HomeScreen(
     Box(
         modifier = modifier.pullRefresh(pullRefreshState)
     ) {
-        Timeline(statusesPagingList, lazyListState, exoPlayer, onUrlClicked)
+        Timeline(
+            statusesPagingList = statusesPagingList,
+            lazyListState = lazyListState,
+            exoPlayer = exoPlayer,
+            onUrlClicked = onUrlClicked,
+            onFavoriteClicked = onFavoriteClicked,
+            onReblogClicked = onReblogClicked
+        )
         PullRefreshIndicator(
-            isRefreshing,
-            pullRefreshState,
-            Modifier.align(Alignment.TopCenter),
+            refreshing = isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter),
             backgroundColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
         )
@@ -59,7 +68,9 @@ fun Timeline(
     statusesPagingList: LazyPagingItems<StatusListItemModel>,
     lazyListState: LazyListState = rememberLazyListState(),
     exoPlayer: ExoPlayer? = null,
-    onUrlClicked: (url: String) -> Unit
+    onUrlClicked: (url: String) -> Unit,
+    onFavoriteClicked: (id: String, action: Boolean) -> Unit,
+    onReblogClicked: (id: String, action: Boolean) -> Unit
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -70,7 +81,7 @@ fun Timeline(
             status.id
         }) { item ->
             item?.also {
-                StatusListItem(item, exoPlayer, onUrlClicked)
+                StatusListItem(item, exoPlayer, onUrlClicked, onFavoriteClicked, onReblogClicked )
             }
         }
 

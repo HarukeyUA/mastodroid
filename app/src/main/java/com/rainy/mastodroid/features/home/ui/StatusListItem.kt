@@ -21,7 +21,9 @@ import kotlinx.datetime.Instant
 fun StatusListItem(
     item: StatusListItemModel,
     exoPlayer: ExoPlayer? = null,
-    onUrlClicked: (url: String) -> Unit
+    onUrlClicked: (url: String) -> Unit,
+    onFavoriteClicked: (id: String, action: Boolean) -> Unit,
+    onReblogClicked: (id: String, action: Boolean) -> Unit
 ) {
     val view = LocalView.current
     val contentText by remember {
@@ -44,6 +46,12 @@ fun StatusListItem(
         replies = item.replies,
         isFavorite = item.isFavorite,
         isRebloged = item.isRebloged,
+        onFavoriteClicked = { action: Boolean ->
+            onFavoriteClicked(item.actionId, action)
+        },
+        onReblogClicked = { action ->
+            onReblogClicked(item.actionId, action)
+        },
         content = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -70,6 +78,7 @@ private fun StatusListItemAttachmentsWithTextPreview() {
         StatusListItem(
             item = StatusListItemModel(
                 id = "101",
+                actionId = "",
                 authorDisplayName = "Talis, clemens exemplars saepe imperium de peritus, rusticus vortex.",
                 authorDisplayNameEmojis = listOf(),
                 authorAccountHandle = "Orgia, exsul, et liberi.",
@@ -107,8 +116,11 @@ private fun StatusListItemAttachmentsWithTextPreview() {
                 replies = 16,
                 isFavorite = false,
                 isRebloged = false
-            )
-        ) {}
+            ),
+            onFavoriteClicked = { _, _ -> },
+            onUrlClicked = {},
+            onReblogClicked = { _, _ -> }
+        )
     }
 }
 
@@ -119,6 +131,7 @@ private fun StatusListItemAttachmentsPreview() {
         StatusListItem(
             item = StatusListItemModel(
                 id = "101",
+                actionId = "",
                 authorDisplayName = "Talis, clemens exemplars saepe imperium de peritus, rusticus vortex.",
                 authorDisplayNameEmojis = listOf(),
                 authorAccountHandle = "Orgia, exsul, et liberi.",
@@ -156,8 +169,11 @@ private fun StatusListItemAttachmentsPreview() {
                 replies = 16,
                 isFavorite = false,
                 isRebloged = false
-            )
-        ) {}
+            ),
+            onFavoriteClicked = { _, _ -> },
+            onUrlClicked = {},
+            onReblogClicked = { _, _ -> }
+        )
     }
 }
 
@@ -168,6 +184,7 @@ private fun StatusListItemTextPreview() {
         StatusListItem(
             item = StatusListItemModel(
                 id = "101",
+                actionId = "",
                 authorDisplayName = "Talis, clemens exemplars saepe imperium de peritus, rusticus vortex.",
                 authorDisplayNameEmojis = listOf(),
                 authorAccountHandle = "Orgia, exsul, et liberi.",
@@ -182,7 +199,10 @@ private fun StatusListItemTextPreview() {
                 replies = 16,
                 isFavorite = false,
                 isRebloged = false
-            )
-        ) {}
+            ),
+            onFavoriteClicked = { _, _ -> },
+            onUrlClicked = {},
+            onReblogClicked = { _, _ -> }
+        )
     }
 }

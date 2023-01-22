@@ -54,13 +54,15 @@ fun StatusCard(
     accountAvatarUrl: String,
     updatedTime: Instant?,
     isEdited: Boolean,
-    modifier: Modifier = Modifier,
     usernameEmojis: List<CustomEmojiItemModel>,
     reblogs: Int,
     favorites: Int,
     replies: Int,
     isFavorite: Boolean,
     isRebloged: Boolean,
+    onFavoriteClicked: (Boolean) -> Unit,
+    onReblogClicked: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit = {},
 ) {
     ElevatedCard(shape = RectangleShape, modifier = modifier.fillMaxWidth()) {
@@ -152,10 +154,10 @@ fun StatusCard(
             StatusQuickActions(
                 favorites = favorites,
                 isFavorite = isFavorite,
-                onFavoriteClicked = { /*TODO*/ },
+                onFavoriteClicked = onFavoriteClicked,
                 reblogs = reblogs,
                 isRebloged = isRebloged,
-                onReblogClicked = { /*TODO*/ },
+                onReblogClicked = onReblogClicked,
                 replies = replies,
                 onReplyClicked = { /*TODO*/ },
                 modifier = Modifier.fillMaxWidth()
@@ -228,7 +230,9 @@ private fun StatusCardPreview() {
             favorites = 9383,
             replies = 2,
             isRebloged = false,
-            isFavorite = false
+            isFavorite = false,
+            onFavoriteClicked = {},
+            onReblogClicked = {}
         )
     }
 }

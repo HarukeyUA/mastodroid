@@ -1,6 +1,6 @@
 package com.rainy.mastodroid.util
 
-import java.util.concurrent.CancellationException
+import kotlinx.coroutines.CancellationException
 
 sealed class BaseResult<out T : Any> {
 

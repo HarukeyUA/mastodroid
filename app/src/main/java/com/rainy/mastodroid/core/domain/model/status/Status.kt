@@ -49,7 +49,9 @@ data class Status(
     val bookmarked: Boolean,
     val pinned: Boolean,
     val mediaAttachments: List<MediaAttachment>
-)
+) {
+    val actionId get() = reblogId ?: originalId
+}
 
 fun StatusResponse.toDomain(): Status? {
     with(reblog ?: this) {

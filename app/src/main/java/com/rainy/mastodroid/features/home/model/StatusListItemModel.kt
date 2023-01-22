@@ -11,6 +11,7 @@ import kotlinx.datetime.Instant
 @Stable
 data class StatusListItemModel(
     val id: String,
+    val actionId: String,
     val authorDisplayName: String,
     val authorDisplayNameEmojis: List<CustomEmojiItemModel>,
     val authorAccountHandle: String,
@@ -30,6 +31,7 @@ data class StatusListItemModel(
 fun Status.toStatusListItemModel(): StatusListItemModel {
     return StatusListItemModel(
         id = originalId,
+        actionId = actionId,
         authorDisplayName = account.displayName,
         authorAccountHandle = account.accountUri,
         authorAvatarUrl = account.avatarUrl,

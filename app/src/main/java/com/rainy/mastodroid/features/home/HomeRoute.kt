@@ -1,5 +1,6 @@
 package com.rainy.mastodroid.features.home
 
+import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -21,6 +22,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.rainy.mastodroid.core.navigation.NavRoute
+import com.rainy.mastodroid.extensions.observeWithLifecycle
 import com.rainy.mastodroid.features.home.model.CurrentlyPlayingMedia
 import com.rainy.mastodroid.features.home.model.StatusListItemModel
 import com.rainy.mastodroid.features.home.model.VideoAttachmentItemModel
@@ -42,6 +44,11 @@ object HomeRoute : NavRoute<HomeViewModel> {
         val lazyListState = rememberLazyListState()
         val exoPlayer = rememberExoPlayerInstance()
         val currentlyPlaying by viewModel.currentlyPlayingItem.collectAsState()
+        val context = LocalContext.current
+
+        viewModel.errorEventFlow.observeWithLifecycle {
+            Toast.makeText(context, it.resolveText(context), Toast.LENGTH_SHORT).show()
+        }
 
         LaunchedEffect(Unit) {
             snapshotFlow {
@@ -57,7 +64,7 @@ object HomeRoute : NavRoute<HomeViewModel> {
         PlayFocusedVideo(currentlyPlaying, exoPlayer)
         ExoPlayerLifecycleEvents(exoPlayer, currentlyPlaying)
 
-        val context = LocalContext.current
+
         HomeScreen(
             statusesPagingList = statusItems,
             isRefreshing = statusItems.loadState.refresh == LoadState.Loading,
@@ -70,7 +77,9 @@ object HomeRoute : NavRoute<HomeViewModel> {
                 val builder: CustomTabsIntent.Builder = CustomTabsIntent.Builder()
                 val customTabsIntent: CustomTabsIntent = builder.build()
                 customTabsIntent.launchUrl(context, url.toUri())
-            }
+            },
+            onFavoriteClicked = viewModel::setFavorite,
+            onReblogClicked = viewModel::setReblog
         )
     }
 

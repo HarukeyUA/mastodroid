@@ -35,7 +35,8 @@ fun HomeScreen(
     onRefreshInvoked: () -> Unit,
     onUrlClicked: (url: String) -> Unit,
     onFavoriteClicked: (id: String, action: Boolean) -> Unit,
-    onReblogClicked: (id: String, action: Boolean) -> Unit
+    onReblogClicked: (id: String, action: Boolean) -> Unit,
+    onSensitiveExpandClicked: (id: String) -> Unit
 ) {
     val pullRefreshState = rememberPullRefreshState(
         isRefreshing, onRefresh = onRefreshInvoked
@@ -50,7 +51,8 @@ fun HomeScreen(
             exoPlayer = exoPlayer,
             onUrlClicked = onUrlClicked,
             onFavoriteClicked = onFavoriteClicked,
-            onReblogClicked = onReblogClicked
+            onReblogClicked = onReblogClicked,
+            onSensitiveExpandClicked = onSensitiveExpandClicked
         )
         PullRefreshIndicator(
             refreshing = isRefreshing,
@@ -70,7 +72,8 @@ fun Timeline(
     exoPlayer: ExoPlayer? = null,
     onUrlClicked: (url: String) -> Unit,
     onFavoriteClicked: (id: String, action: Boolean) -> Unit,
-    onReblogClicked: (id: String, action: Boolean) -> Unit
+    onReblogClicked: (id: String, action: Boolean) -> Unit,
+    onSensitiveExpandClicked: (id: String) -> Unit
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -81,7 +84,14 @@ fun Timeline(
             status.id
         }) { item ->
             item?.also {
-                StatusListItem(item, exoPlayer, onUrlClicked, onFavoriteClicked, onReblogClicked )
+                StatusListItem(
+                    item = item,
+                    exoPlayer = exoPlayer,
+                    onUrlClicked = onUrlClicked,
+                    onFavoriteClicked = onFavoriteClicked,
+                    onReblogClicked = onReblogClicked,
+                    onSensitiveExpandClicked = onSensitiveExpandClicked
+                )
             }
         }
 

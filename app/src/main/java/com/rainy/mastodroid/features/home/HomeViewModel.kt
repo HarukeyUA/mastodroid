@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -37,15 +38,23 @@ class HomeViewModel(
     val errorEventFlow = errorEventChannel.receiveAsFlow()
 
     val currentlyPlayingItem = MutableStateFlow<CurrentlyPlayingMedia?>(null)
+    private val expandedItems = MutableStateFlow<Set<String>>(setOf())
 
     val homeStatusesFlow = homeTimelineInteractor.getTimeLinePaging(viewModelScope)
         .map { statusPagingData ->
             statusPagingData.map(Status::toStatusListItemModel)
-        }
-        .combine(currentlyPlayingItem) { timeline, currentlyPlaying ->
+        }.combine(currentlyPlayingItem) { timeline, currentlyPlaying ->
             timeline.map { status ->
                 if (status.id == currentlyPlaying?.statusId) {
                     setCurrentlyPlayingAttachment(status, currentlyPlaying.mediaId)
+                } else {
+                    status
+                }
+            }
+        }.combine(expandedItems) { timeline, expandedItems ->
+            timeline.map { status ->
+                if (expandedItems.contains(status.id)) {
+                    status.copy(isSensitiveExpanded = true)
                 } else {
                     status
                 }
@@ -92,6 +101,14 @@ class HomeViewModel(
     fun setReblog(id: String, action: Boolean) {
         viewModelScope.launch(exceptionHandler) {
             homeTimelineInteractor.setReblogStatus(id, action)
+        }
+    }
+
+    fun expandSensitiveStatus(id: String) {
+        expandedItems.update {
+            it.toMutableSet().apply {
+                add(id)
+            }
         }
     }
 

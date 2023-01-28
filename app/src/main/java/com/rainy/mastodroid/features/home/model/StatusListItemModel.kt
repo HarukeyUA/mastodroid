@@ -25,8 +25,14 @@ data class StatusListItemModel(
     val reblogs: Int,
     val replies: Int,
     val isFavorite: Boolean,
-    val isRebloged: Boolean
-)
+    val isRebloged: Boolean,
+    val isSensitive: Boolean,
+    val spoilerText: String,
+    val isSensitiveExpanded: Boolean
+) {
+    val isSubjectForAutoPlay =
+        attachments.size == 1 && attachments.firstOrNull() is VideoAttachmentItemModel && (!isSensitive || isSensitiveExpanded)
+}
 
 fun Status.toStatusListItemModel(): StatusListItemModel {
     return StatusListItemModel(
@@ -51,6 +57,9 @@ fun Status.toStatusListItemModel(): StatusListItemModel {
         reblogs = reblogsCount,
         replies = repliesCount,
         isFavorite = favourited,
-        isRebloged = reblogged
+        isRebloged = reblogged,
+        isSensitive = sensitive || spoilerText.isNotEmpty(),
+        spoilerText = spoilerText,
+        isSensitiveExpanded = false
     )
 }

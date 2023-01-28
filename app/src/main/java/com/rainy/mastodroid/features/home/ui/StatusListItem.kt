@@ -23,7 +23,8 @@ fun StatusListItem(
     exoPlayer: ExoPlayer? = null,
     onUrlClicked: (url: String) -> Unit,
     onFavoriteClicked: (id: String, action: Boolean) -> Unit,
-    onReblogClicked: (id: String, action: Boolean) -> Unit
+    onReblogClicked: (id: String, action: Boolean) -> Unit,
+    onSensitiveExpandClicked: (id: String) -> Unit
 ) {
     val view = LocalView.current
     val contentText by remember {
@@ -53,22 +54,40 @@ fun StatusListItem(
             onReblogClicked(item.actionId, action)
         },
         content = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                if (contentText.isNotEmpty()) {
-                    StatusTextContent(text = contentText, customEmoji = item.emojis) { url ->
-                        onUrlClicked(url)
-                    }
+            if (item.isSensitive) {
+                SpoilerStatusContent(
+                    text = item.spoilerText,
+                    isExpanded = item.isSensitiveExpanded,
+                    onExpandClicked = { onSensitiveExpandClicked(item.id) }) {
+                    StatusContent(contentText, item, onUrlClicked, exoPlayer)
                 }
-                if (item.attachments.isNotEmpty()) {
-                    StatusAttachmentsPreview(attachments = item.attachments, exoPlayer = exoPlayer)
-                }
+            } else {
+                StatusContent(contentText, item, onUrlClicked, exoPlayer)
             }
-
         }
 
     )
+}
+
+@Composable
+fun StatusContent(
+    contentText: AnnotatedString,
+    item: StatusListItemModel,
+    onUrlClicked: (url: String) -> Unit,
+    exoPlayer: ExoPlayer?
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        if (contentText.isNotEmpty()) {
+            StatusTextContent(text = contentText, customEmoji = item.emojis) { url ->
+                onUrlClicked(url)
+            }
+        }
+        if (item.attachments.isNotEmpty()) {
+            StatusAttachmentsPreview(attachments = item.attachments, exoPlayer = exoPlayer)
+        }
+    }
 }
 
 @Composable
@@ -115,11 +134,15 @@ private fun StatusListItemAttachmentsWithTextPreview() {
                 reblogs = 342,
                 replies = 16,
                 isFavorite = false,
-                isRebloged = false
+                isRebloged = false,
+                isSensitive = false,
+                spoilerText = "",
+                isSensitiveExpanded = false
             ),
             onFavoriteClicked = { _, _ -> },
             onUrlClicked = {},
-            onReblogClicked = { _, _ -> }
+            onReblogClicked = { _, _ -> },
+            onSensitiveExpandClicked = {}
         )
     }
 }
@@ -168,11 +191,15 @@ private fun StatusListItemAttachmentsPreview() {
                 reblogs = 342,
                 replies = 16,
                 isFavorite = false,
-                isRebloged = false
+                isRebloged = false,
+                isSensitive = false,
+                spoilerText = "",
+                isSensitiveExpanded = false
             ),
             onFavoriteClicked = { _, _ -> },
             onUrlClicked = {},
-            onReblogClicked = { _, _ -> }
+            onReblogClicked = { _, _ -> },
+            onSensitiveExpandClicked = {}
         )
     }
 }
@@ -198,11 +225,15 @@ private fun StatusListItemTextPreview() {
                 reblogs = 342,
                 replies = 16,
                 isFavorite = false,
-                isRebloged = false
+                isRebloged = false,
+                isSensitive = false,
+                spoilerText = "",
+                isSensitiveExpanded = false
             ),
             onFavoriteClicked = { _, _ -> },
             onUrlClicked = {},
-            onReblogClicked = { _, _ -> }
+            onReblogClicked = { _, _ -> },
+            onSensitiveExpandClicked = {}
         )
     }
 }

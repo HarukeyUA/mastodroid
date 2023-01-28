@@ -79,7 +79,8 @@ object HomeRoute : NavRoute<HomeViewModel> {
                 customTabsIntent.launchUrl(context, url.toUri())
             },
             onFavoriteClicked = viewModel::setFavorite,
-            onReblogClicked = viewModel::setReblog
+            onReblogClicked = viewModel::setReblog,
+            onSensitiveExpandClicked = viewModel::expandSensitiveStatus
         )
     }
 
@@ -153,7 +154,7 @@ object HomeRoute : NavRoute<HomeViewModel> {
                 val itemsFromCenter =
                     layoutInfo.visibleItemsInfo.sortedBy { abs((it.offset + it.size / 2) - midPoint) }
                 itemsFromCenter.map { items[it.index] }
-                    .firstOrNull { it.attachments.size == 1 && it.attachments.firstOrNull() is VideoAttachmentItemModel }
+                    .firstOrNull { it.isSubjectForAutoPlay }
             }
         }
     }

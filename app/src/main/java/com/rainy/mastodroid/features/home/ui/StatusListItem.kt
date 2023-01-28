@@ -47,6 +47,8 @@ fun StatusListItem(
         replies = item.replies,
         isFavorite = item.isFavorite,
         isRebloged = item.isRebloged,
+        rebblogedByAccountUserName = item.rebblogedByDisplayName,
+        rebblogedByUsernameEmojis = item.rebblogedByDisplayNameEmojis,
         onFavoriteClicked = { action: Boolean ->
             onFavoriteClicked(item.actionId, action)
         },
@@ -137,7 +139,9 @@ private fun StatusListItemAttachmentsWithTextPreview() {
                 isRebloged = false,
                 isSensitive = false,
                 spoilerText = "",
-                isSensitiveExpanded = false
+                isSensitiveExpanded = false,
+                rebblogedByDisplayNameEmojis = listOf(),
+                rebblogedByDisplayName = null
             ),
             onFavoriteClicked = { _, _ -> },
             onUrlClicked = {},
@@ -194,7 +198,9 @@ private fun StatusListItemAttachmentsPreview() {
                 isRebloged = false,
                 isSensitive = false,
                 spoilerText = "",
-                isSensitiveExpanded = false
+                isSensitiveExpanded = false,
+                rebblogedByDisplayNameEmojis = listOf(),
+                rebblogedByDisplayName = null
             ),
             onFavoriteClicked = { _, _ -> },
             onUrlClicked = {},
@@ -228,7 +234,9 @@ private fun StatusListItemTextPreview() {
                 isRebloged = false,
                 isSensitive = false,
                 spoilerText = "",
-                isSensitiveExpanded = false
+                isSensitiveExpanded = false,
+                rebblogedByDisplayNameEmojis = listOf(),
+                rebblogedByDisplayName = null
             ),
             onFavoriteClicked = { _, _ -> },
             onUrlClicked = {},

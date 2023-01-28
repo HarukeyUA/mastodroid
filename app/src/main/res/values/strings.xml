@@ -28,4 +28,5 @@
     <string name="count_millions">%sm</string>
     <string name="sensitive_content_warning">Sensitive Content</string>
     <string name="tap_to_reveal">Tap to reveal</string>
+    <string name="reblogged_by">%s reblogged</string>
 </resources>

@@ -14,6 +14,8 @@ data class StatusListItemModel(
     val actionId: String,
     val authorDisplayName: String,
     val authorDisplayNameEmojis: List<CustomEmojiItemModel>,
+    val rebblogedByDisplayName: String?,
+    val rebblogedByDisplayNameEmojis: List<CustomEmojiItemModel>,
     val authorAccountHandle: String,
     val authorAvatarUrl: String,
     val content: String,
@@ -60,6 +62,9 @@ fun Status.toStatusListItemModel(): StatusListItemModel {
         isRebloged = reblogged,
         isSensitive = sensitive || spoilerText.isNotEmpty(),
         spoilerText = spoilerText,
-        isSensitiveExpanded = false
+        isSensitiveExpanded = false,
+        rebblogedByDisplayName = reblogAuthorAccount?.displayName,
+        rebblogedByDisplayNameEmojis = reblogAuthorAccount?.customEmojis?.map(CustomEmoji::toItemModel)
+            ?: listOf()
     )
 }

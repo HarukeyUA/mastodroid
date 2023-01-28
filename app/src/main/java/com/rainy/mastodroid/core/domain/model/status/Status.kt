@@ -63,7 +63,7 @@ fun StatusResponse.toDomain(): Status? {
         return Status(
             originalId = this@toDomain.id,
             reblogId = this@toDomain.reblog?.id,
-            reblogAuthorAccount = this@toDomain.account?.toDomain(),
+            reblogAuthorAccount = if (this@toDomain.reblog != null) this@toDomain.account?.toDomain() else null,
             uri = uri ?: "",
             createdAt = createdAt,
             account = account.toDomain(),

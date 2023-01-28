@@ -13,6 +13,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -60,6 +62,8 @@ fun StatusCard(
     replies: Int,
     isFavorite: Boolean,
     isRebloged: Boolean,
+    rebblogedByAccountUserName: String?,
+    rebblogedByUsernameEmojis: List<CustomEmojiItemModel>,
     onFavoriteClicked: (Boolean) -> Unit,
     onReblogClicked: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -70,6 +74,31 @@ fun StatusCard(
             modifier = Modifier.padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
+            if (rebblogedByAccountUserName != null) {
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    CompositionLocalProvider(
+                        LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant,
+                        LocalTextStyle provides MaterialTheme.typography.bodyMedium
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_repeat),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(18.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                        Text(
+                            text = stringResource(
+                                id = R.string.reblogged_by,
+                                rebblogedByAccountUserName
+                            ).annotateMastodonEmojis(emojiShortCodes = rebblogedByUsernameEmojis.map { it.shortcode }),
+                            inlineContent = textInlineCustomEmojis(usernameEmojis),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
             Row {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -232,7 +261,9 @@ private fun StatusCardPreview() {
             isRebloged = false,
             isFavorite = false,
             onFavoriteClicked = {},
-            onReblogClicked = {}
+            onReblogClicked = {},
+            rebblogedByAccountUserName = "Test",
+            rebblogedByUsernameEmojis = listOf()
         )
     }
 }

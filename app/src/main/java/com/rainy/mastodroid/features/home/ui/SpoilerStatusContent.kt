@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.rainy.mastodroid.R
 import com.rainy.mastodroid.ui.theme.MastodroidTheme
@@ -46,7 +47,9 @@ fun SpoilerStatusContent(
             ) {
                 Text(
                     text = text.ifEmpty { stringResource(R.string.sensitive_content_warning) },
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.headlineSmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = stringResource(R.string.tap_to_reveal),

@@ -1,5 +1,6 @@
 package com.rainy.mastodroid.core.domain.model.mediaAttachment
 
+import com.rainy.mastodroid.core.data.model.entity.status.MediaAttachmentEntity
 import com.rainy.mastodroid.core.data.model.response.mediaAttachment.ImageAttachmentResponse
 import com.rainy.mastodroid.util.loge
 
@@ -31,5 +32,19 @@ fun ImageAttachmentResponse.toDomain(): ImageAttachment? {
         width = meta?.original?.width,
         height = meta?.original?.height,
         aspect = meta?.original?.aspect
+    )
+}
+
+fun MediaAttachmentEntity.ImageAttachmentEntity.toDomain(): ImageAttachment {
+    return ImageAttachment(
+        id = id,
+        url = url,
+        previewUrl = previewUrl,
+        remoteUrl = remoteUrl,
+        description = description,
+        blurHash = blurHash,
+        width = width,
+        height = height,
+        aspect = aspect
     )
 }

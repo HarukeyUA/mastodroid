@@ -1,9 +1,10 @@
 package com.rainy.mastodroid.core.domain.model.status
 
+import com.rainy.mastodroid.core.data.model.entity.status.UrlPreviewCardEntity
 import com.rainy.mastodroid.core.data.model.response.status.PreviewCardResponse
 import com.rainy.mastodroid.core.data.model.response.status.PreviewType
 
-data class PreviewCard(
+data class UrlPreviewCard(
     val url: String,
     val title: String,
     val description: String,
@@ -20,8 +21,8 @@ data class PreviewCard(
     val blurhash: String
 )
 
-fun PreviewCardResponse.toDomain(): PreviewCard {
-    return PreviewCard(
+fun PreviewCardResponse.toDomain(): UrlPreviewCard {
+    return UrlPreviewCard(
         url = url ?: "",
         title = title ?: "",
         description = description ?: "",
@@ -36,5 +37,24 @@ fun PreviewCardResponse.toDomain(): PreviewCard {
         thumbnail = thumbnail ?: "",
         embedUrl = embedUrl ?: "",
         blurhash = blurhash ?: ""
+    )
+}
+
+fun UrlPreviewCardEntity.toDomain(): UrlPreviewCard {
+    return UrlPreviewCard(
+        url = url,
+        title = title,
+        description = description,
+        type = type,
+        authorName = authorName,
+        authorUrl = authorUrl,
+        providerName = providerName,
+        providerUrl = providerUrl,
+        html = html,
+        width = width,
+        height = height,
+        thumbnail = thumbnail,
+        embedUrl = embedUrl,
+        blurhash = blurhash
     )
 }

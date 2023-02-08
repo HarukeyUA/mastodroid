@@ -11,6 +11,7 @@ import com.rainy.mastodroid.features.home.model.StatusListItemModel
 import com.rainy.mastodroid.features.home.model.VideoAttachmentItemModel
 import com.rainy.mastodroid.features.home.model.toStatusListItemModel
 import com.rainy.mastodroid.util.ErrorModel
+import com.rainy.mastodroid.util.ImmutableWrap
 import com.rainy.mastodroid.util.NetworkExceptionIdentifier
 import com.rainy.mastodroid.util.logi
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -65,19 +66,20 @@ class HomeViewModel(
         status: StatusListItemModel,
         attachmentId: String,
     ) = status.copy(
-        attachments = status.attachments.map { attachment ->
+        attachments = ImmutableWrap(status.attachments.content.map { attachment ->
             if (attachment is VideoAttachmentItemModel && attachment.id == attachmentId) {
                 attachment.copy(currentlyPlaying = true)
             } else {
                 attachment
             }
         }
+        )
     )
 
     fun setFocussedVideoAttachment(status: StatusListItemModel?) {
         logi("Focused timeline item: ${status?.id}")
-        if (status != null && status.attachments.size == 1) {
-            currentlyPlayingItem.value = status.attachments.firstOrNull()?.let { media ->
+        if (status != null && status.attachments.content.size == 1) {
+            currentlyPlayingItem.value = status.attachments.content.firstOrNull()?.let { media ->
                 if (media is VideoAttachmentItemModel) {
                     logi("Playing: ${media.url}")
                     CurrentlyPlayingMedia(status.id, media.id, media.url)
@@ -92,15 +94,15 @@ class HomeViewModel(
         }
     }
 
-    fun setFavorite(id: String, action: Boolean) {
+    fun setFavorite(id: String, actionId: String, action: Boolean) {
         viewModelScope.launch(exceptionHandler) {
-            homeTimelineInteractor.setFavoriteStatus(id, action)
+            homeTimelineInteractor.setFavoriteStatus(id, actionId, action)
         }
     }
 
-    fun setReblog(id: String, action: Boolean) {
+    fun setReblog(id: String, actionId: String, action: Boolean) {
         viewModelScope.launch(exceptionHandler) {
-            homeTimelineInteractor.setReblogStatus(id, action)
+            homeTimelineInteractor.setReblogStatus(id, actionId, action)
         }
     }
 

@@ -1,5 +1,6 @@
 package com.rainy.mastodroid.core.domain.model.mediaAttachment
 
+import com.rainy.mastodroid.core.data.model.entity.status.MediaAttachmentEntity
 import com.rainy.mastodroid.core.data.model.response.mediaAttachment.GifvAttachmentResponse
 import com.rainy.mastodroid.util.loge
 
@@ -27,5 +28,17 @@ fun GifvAttachmentResponse.toDomain(): GifvAttachment? {
         description = description ?: "",
         blurHash = blurhash ?: "",
         previewAspect = meta?.small?.aspect
+    )
+}
+
+fun MediaAttachmentEntity.GifvAttachmentEntity.toDomain(): GifvAttachment {
+    return GifvAttachment(
+        id = id,
+        url = url,
+        previewUrl = previewUrl,
+        remoteUrl = remoteUrl,
+        description = description,
+        blurHash = blurHash,
+        previewAspect = previewAspect
     )
 }

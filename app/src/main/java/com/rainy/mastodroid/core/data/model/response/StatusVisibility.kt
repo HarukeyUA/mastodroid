@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class Visibility {
+enum class StatusVisibility {
     @SerialName("public")
     PUBLIC,
     @SerialName("unlisted")

@@ -1,7 +1,12 @@
 package com.rainy.mastodroid.core.domain.model.status
 
+import com.rainy.mastodroid.core.data.model.entity.status.MediaAttachmentEntity
+import com.rainy.mastodroid.core.data.model.entity.status.StatusCustomEmojiEntity
+import com.rainy.mastodroid.core.data.model.entity.status.StatusEntity
+import com.rainy.mastodroid.core.data.model.entity.status.StatusMentionEntity
+import com.rainy.mastodroid.core.data.model.entity.status.StatusTagEntity
 import com.rainy.mastodroid.core.data.model.response.CustomEmojiResponse
-import com.rainy.mastodroid.core.data.model.response.Visibility
+import com.rainy.mastodroid.core.data.model.response.StatusVisibility
 import com.rainy.mastodroid.core.data.model.response.mediaAttachment.AudioAttachmentResponse
 import com.rainy.mastodroid.core.data.model.response.mediaAttachment.GifvAttachmentResponse
 import com.rainy.mastodroid.core.data.model.response.mediaAttachment.ImageAttachmentResponse
@@ -20,13 +25,13 @@ import kotlinx.datetime.Instant
 
 data class Status(
     val originalId: String,
-    val reblogId: String?,
+    val rebloggedStatusId: String?,
     val reblogAuthorAccount: User?,
     val uri: String,
     val createdAt: Instant?,
     val account: User,
     val content: String,
-    val visibility: Visibility,
+    val visibility: StatusVisibility,
     val sensitive: Boolean,
     val spoilerText: String,
     val application: StatusApplication?,
@@ -39,7 +44,7 @@ data class Status(
     val url: String?,
     val inReplyToId: String?,
     val inReplyToAccountId: String?,
-    val previewCard: PreviewCard?,
+    val urlPreviewCard: UrlPreviewCard?,
     val language: String?,
     val text: String?,
     val editedAt: Instant?,
@@ -50,7 +55,7 @@ data class Status(
     val pinned: Boolean,
     val mediaAttachments: List<MediaAttachment>
 ) {
-    val actionId get() = reblogId ?: originalId
+    val actionId get() = rebloggedStatusId ?: originalId
 }
 
 fun StatusResponse.toDomain(): Status? {
@@ -62,13 +67,13 @@ fun StatusResponse.toDomain(): Status? {
 
         return Status(
             originalId = this@toDomain.id,
-            reblogId = this@toDomain.reblog?.id,
+            rebloggedStatusId = this@toDomain.reblog?.id,
             reblogAuthorAccount = if (this@toDomain.reblog != null) this@toDomain.account?.toDomain() else null,
             uri = uri ?: "",
             createdAt = createdAt,
             account = account.toDomain(),
             content = content ?: "",
-            visibility = visibility ?: Visibility.PUBLIC,
+            visibility = visibility ?: StatusVisibility.PUBLIC,
             sensitive = sensitive ?: false,
             spoilerText = spoilerText ?: "",
             application = application?.toDomain(),
@@ -81,7 +86,7 @@ fun StatusResponse.toDomain(): Status? {
             url = url,
             inReplyToId = inReplyToId,
             inReplyToAccountId = inReplyToAccountId,
-            previewCard = previewCard?.toDomain(),
+            urlPreviewCard = previewCard?.toDomain(),
             language = language,
             text = text,
             editedAt = editedAt,
@@ -101,4 +106,45 @@ fun StatusResponse.toDomain(): Status? {
             } ?: listOf()
         )
     }
+}
+
+fun StatusEntity.toDomain(): Status {
+    return Status(
+        originalId = originalId,
+        rebloggedStatusId = rebloggedStatusId,
+        reblogAuthorAccount = reblogAuthorAccount?.toDomain(),
+        uri = uri,
+        createdAt = createdAt,
+        account = account.toDomain(),
+        content = content,
+        visibility = visibility,
+        sensitive = sensitive,
+        spoilerText = spoilerText,
+        application = application?.toDomain(),
+        mentions = mentions.map(StatusMentionEntity::toDomain),
+        tags = tags.map(StatusTagEntity::toDomain),
+        customEmojis = customEmojis.map(StatusCustomEmojiEntity::toDomain),
+        reblogsCount = reblogsCount,
+        favouritesCount = favouritesCount,
+        repliesCount = repliesCount,
+        url = url,
+        inReplyToId = inReplyToId,
+        inReplyToAccountId = inReplyToAccountId,
+        urlPreviewCard = urlPreviewCard?.toDomain(),
+        language = language,
+        text = text,
+        editedAt = editedAt,
+        favourited = favourited,
+        reblogged = reblogged,
+        muted = muted,
+        bookmarked = bookmarked,
+        mediaAttachments = mediaAttachments.map {
+            when (it) {
+                is MediaAttachmentEntity.GifvAttachmentEntity -> it.toDomain()
+                is MediaAttachmentEntity.ImageAttachmentEntity -> it.toDomain()
+                is MediaAttachmentEntity.VideoAttachmentEntity -> it.toDomain()
+            }
+        },
+        pinned = pinned
+    )
 }

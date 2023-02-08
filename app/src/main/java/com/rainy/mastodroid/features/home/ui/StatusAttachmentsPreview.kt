@@ -27,14 +27,15 @@ import com.rainy.mastodroid.features.home.model.VideoAttachmentItemModel
 import com.rainy.mastodroid.ui.elements.AsyncBlurImage
 import com.rainy.mastodroid.ui.elements.MediaPreviewGrid
 import com.rainy.mastodroid.ui.elements.VideoPlayer
+import com.rainy.mastodroid.util.ImmutableWrap
 
 private const val MAX_ATTACHMENTS_HEIGHT = 800
 
 @Composable
 fun StatusAttachmentsPreview(
-    attachments: List<MediaAttachmentItemModel>,
+    attachments: ImmutableWrap<List<MediaAttachmentItemModel>>,
     modifier: Modifier = Modifier,
-    exoPlayer: ExoPlayer? = null
+    exoPlayer: ImmutableWrap<ExoPlayer>? = null
 ) {
     MediaPreviewGrid(
         modifier = modifier
@@ -47,12 +48,12 @@ fun StatusAttachmentsPreview(
                 )
             )
     ) {
-        attachments.take(4).fastForEach { mediaAttachment ->
+        attachments.content.take(4).fastForEach { mediaAttachment ->
             when (mediaAttachment) {
                 is ImageAttachmentItemModel -> {
                     ImageAttachment(
                         mediaAttachment,
-                        modifier = Modifier.ifTrue(attachments.size == 1) {
+                        modifier = Modifier.ifTrue(attachments.content.size == 1) {
                             aspectRatio(mediaAttachment.aspect ?: 1f)
                         }
                     )
@@ -63,7 +64,7 @@ fun StatusAttachmentsPreview(
                         attachments,
                         exoPlayer,
                         mediaAttachment,
-                        modifier = Modifier.ifTrue(attachments.size == 1) {
+                        modifier = Modifier.ifTrue(attachments.content.size == 1) {
                             aspectRatio(mediaAttachment.previewAspect ?: 1f)
                         }
                     )
@@ -93,14 +94,14 @@ private fun ImageAttachment(
 
 @Composable
 fun VideoAttachment(
-    attachments: List<MediaAttachmentItemModel>,
-    exoPlayer: ExoPlayer?,
+    attachments: ImmutableWrap<List<MediaAttachmentItemModel>>,
+    exoPlayer: ImmutableWrap<ExoPlayer>?,
     mediaAttachment: VideoAttachmentItemModel,
     modifier: Modifier = Modifier
 ) {
-    if ((attachments.firstOrNull() as? VideoAttachmentItemModel)?.currentlyPlaying == true && exoPlayer != null) {
+    if ((attachments.content.firstOrNull() as? VideoAttachmentItemModel)?.currentlyPlaying == true && exoPlayer != null) {
         VideoPlayer(
-            exoPlayer,
+            exoPlayer.content,
             modifier = modifier
         )
     } else {

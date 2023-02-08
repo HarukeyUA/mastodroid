@@ -16,14 +16,16 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.takeOrElse
+import androidx.compose.ui.util.fastForEach
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.rainy.mastodroid.R
 import com.rainy.mastodroid.features.home.model.CustomEmojiItemModel
+import com.rainy.mastodroid.util.ImmutableWrap
 
 @Composable
-fun textInlineCustomEmojis(emojis: List<CustomEmojiItemModel>): Map<String, InlineTextContent> {
+fun textInlineCustomEmojis(emojis: ImmutableWrap<List<CustomEmojiItemModel>>): Map<String, InlineTextContent> {
     val context = LocalContext.current
     val surfaceColor =
         MaterialTheme.colorScheme.surfaceColorAtElevation(LocalAbsoluteTonalElevation.current + 4.dp)
@@ -33,7 +35,7 @@ fun textInlineCustomEmojis(emojis: List<CustomEmojiItemModel>): Map<String, Inli
         }
     }
     return buildMap {
-        emojis.forEach { emoji ->
+        emojis.content.fastForEach { emoji ->
             put(
                 emoji.shortcode, InlineTextContent(
                     placeholder = Placeholder(

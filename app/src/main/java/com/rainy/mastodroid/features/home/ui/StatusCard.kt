@@ -33,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastMap
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.rainy.mastodroid.R
@@ -41,6 +42,7 @@ import com.rainy.mastodroid.ui.styledText.annotateMastodonEmojis
 import com.rainy.mastodroid.ui.styledText.textInlineCustomEmojis
 import com.rainy.mastodroid.ui.theme.MastodroidTheme
 import com.rainy.mastodroid.util.ColorSchemePreview
+import com.rainy.mastodroid.util.ImmutableWrap
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.Clock
@@ -54,16 +56,16 @@ fun StatusCard(
     fullAccountName: String,
     accountUserName: String,
     accountAvatarUrl: String,
-    updatedTime: Instant?,
+    updatedTime: ImmutableWrap<Instant>?,
     isEdited: Boolean,
-    usernameEmojis: List<CustomEmojiItemModel>,
+    usernameEmojis: ImmutableWrap<List<CustomEmojiItemModel>>,
     reblogs: Int,
     favorites: Int,
     replies: Int,
     isFavorite: Boolean,
     isRebloged: Boolean,
     rebblogedByAccountUserName: String?,
-    rebblogedByUsernameEmojis: List<CustomEmojiItemModel>,
+    rebblogedByUsernameEmojis: ImmutableWrap<List<CustomEmojiItemModel>>,
     onFavoriteClicked: (Boolean) -> Unit,
     onReblogClicked: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -91,8 +93,8 @@ fun StatusCard(
                             text = stringResource(
                                 id = R.string.reblogged_by,
                                 rebblogedByAccountUserName
-                            ).annotateMastodonEmojis(emojiShortCodes = rebblogedByUsernameEmojis.map { it.shortcode }),
-                            inlineContent = textInlineCustomEmojis(usernameEmojis),
+                            ).annotateMastodonEmojis(emojiShortCodes = rebblogedByUsernameEmojis.content.fastMap { it.shortcode }),
+                            inlineContent = textInlineCustomEmojis(rebblogedByUsernameEmojis),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -118,7 +120,7 @@ fun StatusCard(
                         .padding(start = 4.dp)
                 ) {
                     Text(
-                        text = fullAccountName.annotateMastodonEmojis(emojiShortCodes = usernameEmojis.map { it.shortcode }),
+                        text = fullAccountName.annotateMastodonEmojis(emojiShortCodes = usernameEmojis.content.fastMap { it.shortcode }),
                         style = MaterialTheme.typography.titleSmall,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -196,13 +198,13 @@ fun StatusCard(
 }
 
 @Composable
-fun StatusCardTimeCounter(lastUpdated: Instant, modifier: Modifier = Modifier) {
+fun StatusCardTimeCounter(lastUpdated: ImmutableWrap<Instant>, modifier: Modifier = Modifier) {
     var timeSinceUpdate by remember {
-        mutableStateOf(lastUpdated.minus(Clock.System.now()).absoluteValue)
+        mutableStateOf(lastUpdated.content.minus(Clock.System.now()).absoluteValue)
     }
     LaunchedEffect(lastUpdated) {
         while (isActive) {
-            timeSinceUpdate = lastUpdated.minus(Clock.System.now()).absoluteValue
+            timeSinceUpdate = lastUpdated.content.minus(Clock.System.now()).absoluteValue
             delay(
                 if (timeSinceUpdate.inWholeMinutes > 0) {
                     TimeUnit.MINUTES.toMillis(1)
@@ -251,10 +253,10 @@ private fun StatusCardPreview() {
             fullAccountName = "Historias mori!",
             accountUserName = "Ecce, emeritis gabalium!",
             accountAvatarUrl = "",
-            updatedTime = Instant.parse("2021-12-17T23:11:43.130Z"),
+            updatedTime = ImmutableWrap(Instant.parse("2021-12-17T23:11:43.130Z")),
             isEdited = true,
             content = {},
-            usernameEmojis = listOf(),
+            usernameEmojis = ImmutableWrap(listOf()),
             reblogs = 302,
             favorites = 9383,
             replies = 2,
@@ -263,7 +265,7 @@ private fun StatusCardPreview() {
             onFavoriteClicked = {},
             onReblogClicked = {},
             rebblogedByAccountUserName = "Test",
-            rebblogedByUsernameEmojis = listOf()
+            rebblogedByUsernameEmojis = ImmutableWrap(listOf())
         )
     }
 }

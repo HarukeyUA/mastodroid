@@ -1,7 +1,7 @@
 package com.rainy.mastodroid.core.data.model.response.status
 
 import com.rainy.mastodroid.core.data.model.response.CustomEmojiResponse
-import com.rainy.mastodroid.core.data.model.response.Visibility
+import com.rainy.mastodroid.core.data.model.response.StatusVisibility
 import com.rainy.mastodroid.core.data.model.response.mediaAttachment.MediaAttachmentResponse
 import com.rainy.mastodroid.core.data.model.response.user.AccountResponse
 import kotlinx.datetime.Instant
@@ -21,7 +21,7 @@ data class StatusResponse(
     @SerialName("content")
     val content: String?,
     @SerialName("visibility")
-    val visibility: Visibility?,
+    val visibility: StatusVisibility?,
     @SerialName("sensitive")
     val sensitive: Boolean?,
     @SerialName("spoiler_text")

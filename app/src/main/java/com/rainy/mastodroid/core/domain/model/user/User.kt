@@ -1,6 +1,9 @@
 package com.rainy.mastodroid.core.domain.model.user
 
 import com.rainy.mastodroid.core.data.model.entity.LocalUserEntity
+import com.rainy.mastodroid.core.data.model.entity.status.StatusAccountEntity
+import com.rainy.mastodroid.core.data.model.entity.status.StatusAccountUserFieldEntity
+import com.rainy.mastodroid.core.data.model.entity.status.StatusCustomEmojiEntity
 import com.rainy.mastodroid.core.data.model.response.CustomEmojiResponse
 import com.rainy.mastodroid.core.data.model.response.user.AccountResponse
 import kotlinx.datetime.Instant
@@ -75,6 +78,34 @@ fun LocalUserEntity.toDomain(): User {
         headerUrl = headerUrl,
         headerStaticUrl = headerStaticUrl,
         id = remoteId,
+        locked = locked,
+        note = note,
+        source = null,
+        statusesCount = statusesCount,
+        url = url,
+        username = username,
+        group = group,
+        discoverable = discoverable,
+        suspended = suspended,
+        limited = limited
+    )
+}
+
+fun StatusAccountEntity.toDomain(): User {
+    return User(
+        accountUri = accountUri,
+        avatarUrl = avatarUrl,
+        avatarStaticUrl = avatarStaticUrl,
+        bot = bot,
+        createdAt = createdAt,
+        displayName = displayName,
+        customEmojis = customEmojis.map(StatusCustomEmojiEntity::toDomain),
+        fields = fields.map(StatusAccountUserFieldEntity::toDomain),
+        followersCount = followersCount,
+        followingCount = followingCount,
+        headerUrl = headerUrl,
+        headerStaticUrl = headerStaticUrl,
+        id = id,
         locked = locked,
         note = note,
         source = null,

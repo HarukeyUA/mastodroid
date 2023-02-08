@@ -5,7 +5,7 @@ import com.rainy.mastodroid.core.domain.data.local.LocalUserLocalDataSource
 import com.rainy.mastodroid.core.domain.model.user.LocalUserAuthInfo
 import com.rainy.mastodroid.core.domain.model.user.User
 import com.rainy.mastodroid.core.domain.model.user.toDomain
-import com.rainy.mastodroid.database.converters.LocalUserDao
+import com.rainy.mastodroid.database.LocalUserDao
 
 class LocalUserLocalDataSourceImpl(
     private val localUserDao: LocalUserDao

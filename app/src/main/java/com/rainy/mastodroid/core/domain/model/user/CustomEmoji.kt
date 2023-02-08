@@ -1,5 +1,6 @@
 package com.rainy.mastodroid.core.domain.model.user
 
+import com.rainy.mastodroid.core.data.model.entity.status.StatusCustomEmojiEntity
 import com.rainy.mastodroid.core.data.model.response.CustomEmojiResponse
 import com.rainy.mastodroid.util.loge
 
@@ -23,5 +24,15 @@ fun CustomEmojiResponse.toDomain(): CustomEmoji? {
         url = url ?: "",
         visibleInPicker = visibleInPicker ?: false,
         category = category ?: ""
+    )
+}
+
+fun StatusCustomEmojiEntity.toDomain(): CustomEmoji {
+    return CustomEmoji(
+        shortcode = shortcode,
+        staticUrl = staticUrl,
+        url = url,
+        visibleInPicker = visibleInPicker,
+        category = category
     )
 }

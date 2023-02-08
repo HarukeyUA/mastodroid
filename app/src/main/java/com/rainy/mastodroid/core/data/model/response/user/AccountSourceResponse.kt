@@ -1,6 +1,6 @@
 package com.rainy.mastodroid.core.data.model.response.user
 
-import com.rainy.mastodroid.core.data.model.response.Visibility
+import com.rainy.mastodroid.core.data.model.response.StatusVisibility
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -15,7 +15,7 @@ data class AccountSourceResponse(
     @SerialName("note")
     val note: String?,
     @SerialName("privacy")
-    val privacy: Visibility?,
+    val privacy: StatusVisibility?,
     @SerialName("sensitive")
     val sensitive: Boolean?
 )

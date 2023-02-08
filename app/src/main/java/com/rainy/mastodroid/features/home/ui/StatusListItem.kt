@@ -9,21 +9,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastMap
 import androidx.media3.exoplayer.ExoPlayer
 import com.rainy.mastodroid.features.home.model.ImageAttachmentItemModel
 import com.rainy.mastodroid.features.home.model.StatusListItemModel
 import com.rainy.mastodroid.ui.styledText.annotateMastodonContent
 import com.rainy.mastodroid.ui.theme.MastodroidTheme
 import com.rainy.mastodroid.util.ColorSchemePreview
+import com.rainy.mastodroid.util.ImmutableWrap
 import kotlinx.datetime.Instant
 
 @Composable
 fun StatusListItem(
     item: StatusListItemModel,
-    exoPlayer: ExoPlayer? = null,
+    exoPlayer: ImmutableWrap<ExoPlayer>? = null,
     onUrlClicked: (url: String) -> Unit,
-    onFavoriteClicked: (id: String, action: Boolean) -> Unit,
-    onReblogClicked: (id: String, action: Boolean) -> Unit,
+    onFavoriteClicked: (id: String, actionId: String, action: Boolean) -> Unit,
+    onReblogClicked: (id: String, actionId: String, action: Boolean) -> Unit,
     onSensitiveExpandClicked: (id: String) -> Unit
 ) {
     val view = LocalView.current
@@ -32,7 +34,7 @@ fun StatusListItem(
             if (view.isInEditMode) {
                 AnnotatedString(item.content)
             } else {
-                item.content.annotateMastodonContent(item.emojis.map { it.shortcode })
+                item.content.annotateMastodonContent(item.emojis.content.fastMap { it.shortcode })
             }
         }
     }
@@ -50,10 +52,10 @@ fun StatusListItem(
         rebblogedByAccountUserName = item.rebblogedByDisplayName,
         rebblogedByUsernameEmojis = item.rebblogedByDisplayNameEmojis,
         onFavoriteClicked = { action: Boolean ->
-            onFavoriteClicked(item.actionId, action)
+            onFavoriteClicked(item.id, item.actionId, action)
         },
         onReblogClicked = { action ->
-            onReblogClicked(item.actionId, action)
+            onReblogClicked(item.id, item.actionId, action)
         },
         content = {
             if (item.isSensitive) {
@@ -76,7 +78,7 @@ fun StatusContent(
     contentText: AnnotatedString,
     item: StatusListItemModel,
     onUrlClicked: (url: String) -> Unit,
-    exoPlayer: ExoPlayer?
+    exoPlayer: ImmutableWrap<ExoPlayer>?
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -86,8 +88,11 @@ fun StatusContent(
                 onUrlClicked(url)
             }
         }
-        if (item.attachments.isNotEmpty()) {
-            StatusAttachmentsPreview(attachments = item.attachments, exoPlayer = exoPlayer)
+        if (item.attachments.content.isNotEmpty()) {
+            StatusAttachmentsPreview(
+                attachments = item.attachments,
+                exoPlayer = exoPlayer
+            )
         }
     }
 }
@@ -101,35 +106,37 @@ private fun StatusListItemAttachmentsWithTextPreview() {
                 id = "101",
                 actionId = "",
                 authorDisplayName = "Talis, clemens exemplars saepe imperium de peritus, rusticus vortex.",
-                authorDisplayNameEmojis = listOf(),
+                authorDisplayNameEmojis = ImmutableWrap(listOf()),
                 authorAccountHandle = "Orgia, exsul, et liberi.",
                 authorAvatarUrl = "",
                 content = "Hercle, burgus mirabilis!, victrix!",
-                lastUpdate = Instant.parse("2022-12-17T23:11:43.130Z"),
+                lastUpdate = ImmutableWrap(Instant.parse("2022-12-17T23:11:43.130Z")),
                 edited = true,
-                emojis = listOf(),
-                attachments = listOf(
-                    ImageAttachmentItemModel(
-                        id = "",
-                        url = "",
-                        previewUrl = "",
-                        remoteUrl = "",
-                        description = "",
-                        blurHash = "",
-                        width = 300,
-                        height = 300,
-                        aspect = 1f
-                    ),
-                    ImageAttachmentItemModel(
-                        id = "",
-                        url = "",
-                        previewUrl = "",
-                        remoteUrl = "",
-                        description = "",
-                        blurHash = "",
-                        width = 300,
-                        height = 300,
-                        aspect = 1f
+                emojis = ImmutableWrap(listOf()),
+                attachments = ImmutableWrap(
+                    listOf(
+                        ImageAttachmentItemModel(
+                            id = "",
+                            url = "",
+                            previewUrl = "",
+                            remoteUrl = "",
+                            description = "",
+                            blurHash = "",
+                            width = 300,
+                            height = 300,
+                            aspect = 1f
+                        ),
+                        ImageAttachmentItemModel(
+                            id = "",
+                            url = "",
+                            previewUrl = "",
+                            remoteUrl = "",
+                            description = "",
+                            blurHash = "",
+                            width = 300,
+                            height = 300,
+                            aspect = 1f
+                        )
                     )
                 ),
                 favorites = 34,
@@ -140,12 +147,12 @@ private fun StatusListItemAttachmentsWithTextPreview() {
                 isSensitive = false,
                 spoilerText = "",
                 isSensitiveExpanded = false,
-                rebblogedByDisplayNameEmojis = listOf(),
+                rebblogedByDisplayNameEmojis = ImmutableWrap(listOf()),
                 rebblogedByDisplayName = null
             ),
-            onFavoriteClicked = { _, _ -> },
+            onFavoriteClicked = { _, _, _ -> },
             onUrlClicked = {},
-            onReblogClicked = { _, _ -> },
+            onReblogClicked = { _, _, _ -> },
             onSensitiveExpandClicked = {}
         )
     }
@@ -160,35 +167,37 @@ private fun StatusListItemAttachmentsPreview() {
                 id = "101",
                 actionId = "",
                 authorDisplayName = "Talis, clemens exemplars saepe imperium de peritus, rusticus vortex.",
-                authorDisplayNameEmojis = listOf(),
+                authorDisplayNameEmojis = ImmutableWrap(listOf()),
                 authorAccountHandle = "Orgia, exsul, et liberi.",
                 authorAvatarUrl = "",
                 content = "",
-                lastUpdate = Instant.parse("2022-12-17T23:11:43.130Z"),
+                lastUpdate = ImmutableWrap(Instant.parse("2022-12-17T23:11:43.130Z")),
                 edited = true,
-                emojis = listOf(),
-                attachments = listOf(
-                    ImageAttachmentItemModel(
-                        id = "",
-                        url = "",
-                        previewUrl = "",
-                        remoteUrl = "",
-                        description = "",
-                        blurHash = "",
-                        width = 300,
-                        height = 300,
-                        aspect = 1f
-                    ),
-                    ImageAttachmentItemModel(
-                        id = "",
-                        url = "",
-                        previewUrl = "",
-                        remoteUrl = "",
-                        description = "",
-                        blurHash = "",
-                        width = 300,
-                        height = 300,
-                        aspect = 1f
+                emojis = ImmutableWrap(listOf()),
+                attachments = ImmutableWrap(
+                    listOf(
+                        ImageAttachmentItemModel(
+                            id = "",
+                            url = "",
+                            previewUrl = "",
+                            remoteUrl = "",
+                            description = "",
+                            blurHash = "",
+                            width = 300,
+                            height = 300,
+                            aspect = 1f
+                        ),
+                        ImageAttachmentItemModel(
+                            id = "",
+                            url = "",
+                            previewUrl = "",
+                            remoteUrl = "",
+                            description = "",
+                            blurHash = "",
+                            width = 300,
+                            height = 300,
+                            aspect = 1f
+                        )
                     )
                 ),
                 favorites = 34,
@@ -199,12 +208,12 @@ private fun StatusListItemAttachmentsPreview() {
                 isSensitive = false,
                 spoilerText = "",
                 isSensitiveExpanded = false,
-                rebblogedByDisplayNameEmojis = listOf(),
+                rebblogedByDisplayNameEmojis = ImmutableWrap(listOf()),
                 rebblogedByDisplayName = null
             ),
-            onFavoriteClicked = { _, _ -> },
+            onFavoriteClicked = { _, _, _ -> },
             onUrlClicked = {},
-            onReblogClicked = { _, _ -> },
+            onReblogClicked = { _, _, _ -> },
             onSensitiveExpandClicked = {}
         )
     }
@@ -219,14 +228,14 @@ private fun StatusListItemTextPreview() {
                 id = "101",
                 actionId = "",
                 authorDisplayName = "Talis, clemens exemplars saepe imperium de peritus, rusticus vortex.",
-                authorDisplayNameEmojis = listOf(),
+                authorDisplayNameEmojis = ImmutableWrap(listOf()),
                 authorAccountHandle = "Orgia, exsul, et liberi.",
                 authorAvatarUrl = "",
                 content = "Hercle, burgus mirabilis!, victrix!",
-                lastUpdate = Instant.parse("2022-12-17T23:11:43.130Z"),
+                lastUpdate = ImmutableWrap(Instant.parse("2022-12-17T23:11:43.130Z")),
                 edited = true,
-                emojis = listOf(),
-                attachments = listOf(),
+                emojis = ImmutableWrap(listOf()),
+                attachments = ImmutableWrap(listOf()),
                 favorites = 34,
                 reblogs = 342,
                 replies = 16,
@@ -235,12 +244,12 @@ private fun StatusListItemTextPreview() {
                 isSensitive = false,
                 spoilerText = "",
                 isSensitiveExpanded = false,
-                rebblogedByDisplayNameEmojis = listOf(),
+                rebblogedByDisplayNameEmojis = ImmutableWrap(listOf()),
                 rebblogedByDisplayName = null
             ),
-            onFavoriteClicked = { _, _ -> },
+            onFavoriteClicked = { _, _, _ -> },
             onUrlClicked = {},
-            onReblogClicked = { _, _ -> },
+            onReblogClicked = { _, _, _ -> },
             onSensitiveExpandClicked = {}
         )
     }

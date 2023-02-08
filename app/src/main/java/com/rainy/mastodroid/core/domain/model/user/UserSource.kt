@@ -1,6 +1,6 @@
 package com.rainy.mastodroid.core.domain.model.user
 
-import com.rainy.mastodroid.core.data.model.response.Visibility
+import com.rainy.mastodroid.core.data.model.response.StatusVisibility
 import com.rainy.mastodroid.core.data.model.response.user.AccountFieldResponse
 import com.rainy.mastodroid.core.data.model.response.user.AccountSourceResponse
 
@@ -9,7 +9,7 @@ data class UserSource(
     val followRequestsCount: Int,
     val language: String,
     val note: String,
-    val privacy: Visibility,
+    val privacy: StatusVisibility,
     val sensitive: Boolean
 )
 
@@ -19,7 +19,7 @@ fun AccountSourceResponse.toDomain(): UserSource {
         followRequestsCount = followRequestsCount ?: 0,
         language = language ?: "",
         note = note ?: "",
-        privacy = privacy ?: Visibility.PUBLIC,
+        privacy = privacy ?: StatusVisibility.PUBLIC,
         sensitive = sensitive ?: true
     )
 }

@@ -11,11 +11,12 @@ import com.rainy.mastodroid.features.home.model.CustomEmojiItemModel
 import com.rainy.mastodroid.ui.elements.ClickableText
 import com.rainy.mastodroid.ui.styledText.MastodonContentTag
 import com.rainy.mastodroid.ui.styledText.textInlineCustomEmojis
+import com.rainy.mastodroid.util.ImmutableWrap
 
 @Composable
 fun StatusTextContent(
     text: AnnotatedString,
-    customEmoji: List<CustomEmojiItemModel>,
+    customEmoji: ImmutableWrap<List<CustomEmojiItemModel>>,
     modifier: Modifier = Modifier,
     onUrlClicked: (url: String) -> Unit,
 ) {

@@ -13,6 +13,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.util.fastFirstOrNull
+import androidx.compose.ui.util.fastMap
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -27,6 +29,7 @@ import com.rainy.mastodroid.features.home.model.CurrentlyPlayingMedia
 import com.rainy.mastodroid.features.home.model.StatusListItemModel
 import com.rainy.mastodroid.features.home.model.VideoAttachmentItemModel
 import com.rainy.mastodroid.features.home.ui.HomeScreen
+import com.rainy.mastodroid.util.ImmutableWrap
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.koin.androidx.compose.koinViewModel
 import kotlin.math.abs
@@ -69,7 +72,7 @@ object HomeRoute : NavRoute<HomeViewModel> {
             statusesPagingList = statusItems,
             isRefreshing = statusItems.loadState.refresh == LoadState.Loading,
             lazyListState = lazyListState,
-            exoPlayer = exoPlayer,
+            exoPlayer = ImmutableWrap(exoPlayer),
             onRefreshInvoked = {
                 statusItems.refresh()
             },
@@ -143,9 +146,12 @@ object HomeRoute : NavRoute<HomeViewModel> {
         layoutInfo: LazyListLayoutInfo,
         items: List<StatusListItemModel>
     ): StatusListItemModel? {
-        val visibleItems = layoutInfo.visibleItemsInfo.map { items[it.index] }
+        if (items.isEmpty())
+            return null
+
+        val visibleItems = layoutInfo.visibleItemsInfo.mapNotNull { info -> items.fastFirstOrNull { it.id == info.key } }
         val itemsWithVideo =
-            visibleItems.filter { it.attachments.size == 1 && it.attachments.firstOrNull() is VideoAttachmentItemModel }
+            visibleItems.filter { it.attachments.content.size == 1 && it.attachments.content.firstOrNull() is VideoAttachmentItemModel }
         return when (itemsWithVideo.size) {
             0 -> null
             1 -> itemsWithVideo.first()
@@ -153,8 +159,8 @@ object HomeRoute : NavRoute<HomeViewModel> {
                 val midPoint = (layoutInfo.viewportStartOffset + layoutInfo.viewportEndOffset) / 2
                 val itemsFromCenter =
                     layoutInfo.visibleItemsInfo.sortedBy { abs((it.offset + it.size / 2) - midPoint) }
-                itemsFromCenter.map { items[it.index] }
-                    .firstOrNull { it.isSubjectForAutoPlay }
+                itemsFromCenter.fastMap { items[it.index] }
+                    .fastFirstOrNull { it.isSubjectForAutoPlay }
             }
         }
     }

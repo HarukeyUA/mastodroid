@@ -1,15 +1,21 @@
 package com.rainy.mastodroid.core.domain.interactor
 
-import androidx.paging.PagingSource
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadType
 import androidx.paging.PagingState
+import androidx.paging.RemoteMediator
+import com.rainy.mastodroid.core.data.model.entity.status.StatusEntity
+import com.rainy.mastodroid.core.domain.data.remote.TimelineLocalDataSource
 import com.rainy.mastodroid.core.domain.data.remote.TimelineRemoteDataSource
-import com.rainy.mastodroid.core.domain.model.status.Status
+import retrofit2.HttpException
+import java.io.IOException
 
-// TODO: Migrate to db paging mediator
+@OptIn(ExperimentalPagingApi::class)
 class HomeTimelinePagingSource(
-    private val timelineRemoteDataSource: TimelineRemoteDataSource
-) : PagingSource<String, Status>() {
-    override val jumpingSupported: Boolean
+    private val timelineRemoteDataSource: TimelineRemoteDataSource,
+    private val timelineLocalDataSource: TimelineLocalDataSource
+) : RemoteMediator<Int, StatusEntity>() {
+    /*override val jumpingSupported: Boolean
         get() = super.jumpingSupported
 
     override fun getRefreshKey(state: PagingState<String, Status>): String? {
@@ -31,6 +37,36 @@ class HomeTimelinePagingSource(
             LoadResult.Error(
                 e
             )
+        }
+    }*/
+    override suspend fun load(
+        loadType: LoadType,
+        state: PagingState<Int, StatusEntity>
+    ): MediatorResult {
+        try {
+            val loadKey = when (loadType) {
+                LoadType.REFRESH -> null
+                LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
+                LoadType.APPEND -> state.lastItemOrNull()?.originalId
+                    ?: return MediatorResult.Success(endOfPaginationReached = true)
+            }
+
+            val statuses = timelineRemoteDataSource.getHomeStatuses(
+                olderThanId = loadKey,
+                limit = state.config.pageSize
+            )
+
+            if (loadType == LoadType.REFRESH) {
+                timelineLocalDataSource.replaceStatuses(statuses)
+            } else {
+                timelineLocalDataSource.insertStatuses(statuses)
+            }
+
+            return MediatorResult.Success(endOfPaginationReached = statuses.isEmpty())
+        } catch (e: IOException) {
+            return MediatorResult.Error(e)
+        } catch (e: HttpException) {
+            return MediatorResult.Error(e)
         }
     }
 

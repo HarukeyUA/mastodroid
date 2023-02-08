@@ -6,6 +6,7 @@ import com.rainy.mastodroid.core.domain.model.mediaAttachment.ImageAttachment
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.VideoAttachment
 import com.rainy.mastodroid.core.domain.model.status.Status
 import com.rainy.mastodroid.core.domain.model.user.CustomEmoji
+import com.rainy.mastodroid.util.ImmutableWrap
 import kotlinx.datetime.Instant
 
 @Stable
@@ -13,16 +14,16 @@ data class StatusListItemModel(
     val id: String,
     val actionId: String,
     val authorDisplayName: String,
-    val authorDisplayNameEmojis: List<CustomEmojiItemModel>,
+    val authorDisplayNameEmojis: ImmutableWrap<List<CustomEmojiItemModel>>,
     val rebblogedByDisplayName: String?,
-    val rebblogedByDisplayNameEmojis: List<CustomEmojiItemModel>,
+    val rebblogedByDisplayNameEmojis: ImmutableWrap<List<CustomEmojiItemModel>>,
     val authorAccountHandle: String,
     val authorAvatarUrl: String,
     val content: String,
-    val lastUpdate: Instant?,
+    val lastUpdate: ImmutableWrap<Instant>?,
     val edited: Boolean,
-    val emojis: List<CustomEmojiItemModel>,
-    val attachments: List<MediaAttachmentItemModel>,
+    val emojis: ImmutableWrap<List<CustomEmojiItemModel>>,
+    val attachments: ImmutableWrap<List<MediaAttachmentItemModel>>,
     val favorites: Int,
     val reblogs: Int,
     val replies: Int,
@@ -33,7 +34,7 @@ data class StatusListItemModel(
     val isSensitiveExpanded: Boolean
 ) {
     val isSubjectForAutoPlay =
-        attachments.size == 1 && attachments.firstOrNull() is VideoAttachmentItemModel && (!isSensitive || isSensitiveExpanded)
+        attachments.content.size == 1 && attachments.content.firstOrNull() is VideoAttachmentItemModel && (!isSensitive || isSensitiveExpanded)
 }
 
 fun Status.toStatusListItemModel(): StatusListItemModel {
@@ -43,18 +44,18 @@ fun Status.toStatusListItemModel(): StatusListItemModel {
         authorDisplayName = account.displayName,
         authorAccountHandle = account.accountUri,
         authorAvatarUrl = account.avatarUrl,
-        authorDisplayNameEmojis = account.customEmojis.map(CustomEmoji::toItemModel),
+        authorDisplayNameEmojis = ImmutableWrap(account.customEmojis.map(CustomEmoji::toItemModel)),
         content = content,
-        lastUpdate = editedAt ?: createdAt,
+        lastUpdate = editedAt?.let(::ImmutableWrap) ?: createdAt?.let(::ImmutableWrap),
         edited = editedAt != null,
-        emojis = customEmojis.map(CustomEmoji::toItemModel),
-        attachments = mediaAttachments.map {
+        emojis = ImmutableWrap(customEmojis.map(CustomEmoji::toItemModel)),
+        attachments = ImmutableWrap(mediaAttachments.map {
             when (it) {
                 is ImageAttachment -> it.toItemModel()
                 is VideoAttachment -> it.toItemModel()
                 is GifvAttachment -> it.toItemModel()
             }
-        },
+        }),
         favorites = favouritesCount,
         reblogs = reblogsCount,
         replies = repliesCount,
@@ -64,7 +65,9 @@ fun Status.toStatusListItemModel(): StatusListItemModel {
         spoilerText = spoilerText,
         isSensitiveExpanded = false,
         rebblogedByDisplayName = reblogAuthorAccount?.displayName,
-        rebblogedByDisplayNameEmojis = reblogAuthorAccount?.customEmojis?.map(CustomEmoji::toItemModel)
-            ?: listOf()
+        rebblogedByDisplayNameEmojis = ImmutableWrap(
+            reblogAuthorAccount?.customEmojis?.map(CustomEmoji::toItemModel)
+                ?: listOf()
+        )
     )
 }

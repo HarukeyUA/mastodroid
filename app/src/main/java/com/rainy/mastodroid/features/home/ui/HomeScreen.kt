@@ -23,6 +23,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import com.rainy.mastodroid.features.home.model.StatusListItemModel
+import com.rainy.mastodroid.util.ImmutableWrap
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -31,11 +32,11 @@ fun HomeScreen(
     isRefreshing: Boolean,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
-    exoPlayer: ExoPlayer? = null,
+    exoPlayer: ImmutableWrap<ExoPlayer>? = null,
     onRefreshInvoked: () -> Unit,
     onUrlClicked: (url: String) -> Unit,
-    onFavoriteClicked: (id: String, action: Boolean) -> Unit,
-    onReblogClicked: (id: String, action: Boolean) -> Unit,
+    onFavoriteClicked: (id: String, actionId: String, action: Boolean) -> Unit,
+    onReblogClicked: (id: String, actionId: String, action: Boolean) -> Unit,
     onSensitiveExpandClicked: (id: String) -> Unit
 ) {
     val pullRefreshState = rememberPullRefreshState(
@@ -69,10 +70,10 @@ fun HomeScreen(
 fun Timeline(
     statusesPagingList: LazyPagingItems<StatusListItemModel>,
     lazyListState: LazyListState = rememberLazyListState(),
-    exoPlayer: ExoPlayer? = null,
+    exoPlayer: ImmutableWrap<ExoPlayer>? = null,
     onUrlClicked: (url: String) -> Unit,
-    onFavoriteClicked: (id: String, action: Boolean) -> Unit,
-    onReblogClicked: (id: String, action: Boolean) -> Unit,
+    onFavoriteClicked: (id: String, actionId: String, action: Boolean) -> Unit,
+    onReblogClicked: (id: String, actionId: String, action: Boolean) -> Unit,
     onSensitiveExpandClicked: (id: String) -> Unit
 ) {
     LazyColumn(

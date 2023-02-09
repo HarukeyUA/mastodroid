@@ -30,4 +30,9 @@ class TimelineLocalDataSourceImpl(
     override suspend fun getStatusById(id: String): Status? {
         return timelineDao.getTimelineStatusById(id)?.toDomain()
     }
+
+    override suspend fun getLastStatus(): Status? {
+        return timelineDao.getLastStatus()?.toDomain()
+    }
+
 }

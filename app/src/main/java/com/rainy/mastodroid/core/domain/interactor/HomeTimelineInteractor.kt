@@ -38,7 +38,7 @@ class HomeTimelineInteractorImpl(
             initialLoadSize = HOME_TIMELINE_LOAD_SIZE,
             enablePlaceholders = true, // Workaround for https://issuetracker.google.com/issues/235319241
         ),
-        remoteMediator = HomeTimelinePagingSource(
+        remoteMediator = HomeTimelineMediator(
             timelineRemoteDataSource,
             timelineLocalDataSource
         )
@@ -117,6 +117,6 @@ class HomeTimelineInteractorImpl(
     }
 
     companion object {
-        private const val HOME_TIMELINE_LOAD_SIZE = 20
+        private const val HOME_TIMELINE_LOAD_SIZE = 40
     }
 }

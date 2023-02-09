@@ -1,8 +1,8 @@
 package com.rainy.mastodroid.core.data.model.entity.status
 
-import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.rainy.mastodroid.core.data.model.response.StatusVisibility
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.GifvAttachment
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.ImageAttachment
@@ -13,15 +13,10 @@ import com.rainy.mastodroid.core.domain.model.status.StatusTag
 import com.rainy.mastodroid.core.domain.model.user.CustomEmoji
 import kotlinx.datetime.Instant
 
-private const val ORIGINAL_ID_KEY = "originalId"
-
-@Entity(
-    primaryKeys = [
-        ORIGINAL_ID_KEY,
-    ]
-)
+@Entity
 data class StatusEntity(
-    @ColumnInfo(name = ORIGINAL_ID_KEY)
+    @PrimaryKey(autoGenerate = true)
+    val localId: Long = 0,
     val originalId: String,
     val rebloggedStatusId: String?,
     val reblogAuthorAccount: StatusAccountEntity?,

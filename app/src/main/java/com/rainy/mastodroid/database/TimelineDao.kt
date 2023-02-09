@@ -17,7 +17,7 @@ interface TimelineDao {
     @Query("DELETE FROM StatusEntity")
     suspend fun removeAll()
 
-    @Query("SELECT * FROM StatusEntity ORDER BY LENGTH(originalId) DESC, originalId DESC")
+    @Query("SELECT * FROM StatusEntity ORDER BY localId ASC")
     fun getTimelinePaging(): PagingSource<Int, StatusEntity>
 
     @Update
@@ -25,6 +25,9 @@ interface TimelineDao {
 
     @Query("SELECT * FROM StatusEntity WHERE originalId = :id")
     suspend fun getTimelineStatusById(id: String): StatusEntity?
+
+    @Query("SELECT * FROM StatusEntity ORDER BY LENGTH(originalId) ASC, originalId ASC LIMIT 1")
+    suspend fun getLastStatus(): StatusEntity?
 
     @Transaction
     suspend fun replaceStatuses(statuses: List<StatusEntity>) {

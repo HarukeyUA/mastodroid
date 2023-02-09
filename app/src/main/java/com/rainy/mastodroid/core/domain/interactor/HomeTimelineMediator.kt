@@ -7,38 +7,16 @@ import androidx.paging.RemoteMediator
 import com.rainy.mastodroid.core.data.model.entity.status.StatusEntity
 import com.rainy.mastodroid.core.domain.data.remote.TimelineLocalDataSource
 import com.rainy.mastodroid.core.domain.data.remote.TimelineRemoteDataSource
+import com.rainy.mastodroid.core.domain.model.status.Status
 import retrofit2.HttpException
 import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
-class HomeTimelinePagingSource(
+class HomeTimelineMediator(
     private val timelineRemoteDataSource: TimelineRemoteDataSource,
     private val timelineLocalDataSource: TimelineLocalDataSource
 ) : RemoteMediator<Int, StatusEntity>() {
-    /*override val jumpingSupported: Boolean
-        get() = super.jumpingSupported
 
-    override fun getRefreshKey(state: PagingState<String, Status>): String? {
-        return null
-    }
-
-    override suspend fun load(params: LoadParams<String>): LoadResult<String, Status> {
-        return try {
-            val statuses = timelineRemoteDataSource.getHomeStatuses(
-                olderThanId = params.key,
-                limit = params.loadSize
-            )
-            LoadResult.Page(
-                statuses,
-                nextKey = statuses.last().originalId,
-                prevKey = null
-            )
-        } catch (e: Throwable) {
-            LoadResult.Error(
-                e
-            )
-        }
-    }*/
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, StatusEntity>
@@ -47,7 +25,7 @@ class HomeTimelinePagingSource(
             val loadKey = when (loadType) {
                 LoadType.REFRESH -> null
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
-                LoadType.APPEND -> state.lastItemOrNull()?.originalId
+                LoadType.APPEND -> timelineLocalDataSource.getLastStatus()?.originalId
                     ?: return MediatorResult.Success(endOfPaginationReached = true)
             }
 
@@ -57,9 +35,9 @@ class HomeTimelinePagingSource(
             )
 
             if (loadType == LoadType.REFRESH) {
-                timelineLocalDataSource.replaceStatuses(statuses)
+                timelineLocalDataSource.replaceStatuses(reorderStatuses(statuses))
             } else {
-                timelineLocalDataSource.insertStatuses(statuses)
+                timelineLocalDataSource.insertStatuses(reorderStatuses(statuses))
             }
 
             return MediatorResult.Success(endOfPaginationReached = statuses.isEmpty())
@@ -70,5 +48,36 @@ class HomeTimelinePagingSource(
         }
     }
 
+    private fun reorderStatuses(statuses: List<Status>): List<Status> {
+        val repliesIndexes = mutableMapOf<String, StatusNode>()
+        statuses.forEach { repliesIndexes[it.originalId] = StatusNode(content = it) }
+        repliesIndexes.forEach { (_, statusNode) ->
+            val parent = repliesIndexes[statusNode.content.inReplyToId]
+            parent?.also {
+                statusNode.parent = parent
+                parent.children.add(statusNode)
+            }
+        }
 
+        return extractContent(repliesIndexes.values.filter { it.parent == null })
+    }
+
+    private fun extractContent(statusNode: List<StatusNode>): List<Status> {
+        return statusNode.flatMap {
+            if (it.children.isEmpty()) {
+                listOf(it.content)
+            } else {
+                buildList {
+                    add(it.content)
+                    addAll(extractContent(it.children))
+                }
+            }
+        }
+    }
+
+    private data class StatusNode(
+        var parent: StatusNode? = null,
+        val children: MutableList<StatusNode> = mutableListOf(),
+        val content: Status
+    )
 }

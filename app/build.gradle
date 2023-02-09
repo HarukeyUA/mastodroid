@@ -40,7 +40,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.0'
+        kotlinCompilerExtensionVersion '1.4.2'
     }
     packagingOptions {
         resources {
@@ -102,9 +102,9 @@ dependencies {
 
     implementation 'org.jsoup:jsoup:1.15.3'
 
-    def paging_version = "3.2.0-alpha03"
+    def paging_version = "3.2.0-alpha04"
     implementation "androidx.paging:paging-runtime:$paging_version"
-    implementation "androidx.paging:paging-compose:1.0.0-alpha17"
+    implementation "androidx.paging:paging-compose:1.0.0-alpha18"
 
     def media3_version = "1.0.0-beta03"
     implementation "androidx.media3:media3-exoplayer:$media3_version"
@@ -112,7 +112,7 @@ dependencies {
 
     implementation "androidx.browser:browser:1.4.0"
 
-    implementation platform('dev.chrisbanes.compose:compose-bom:2023.02.00-alpha02')
+    implementation platform('dev.chrisbanes.compose:compose-bom:2023.02.00-beta01')
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'
     implementation 'androidx.compose.ui:ui-tooling-preview'
@@ -125,7 +125,7 @@ dependencies {
     def accompanist_version = '0.28.0'
     implementation "com.google.accompanist:accompanist-webview:$accompanist_version"
 
-    androidTestImplementation platform('dev.chrisbanes.compose:compose-bom:2023.02.00-alpha02')
+    androidTestImplementation platform('dev.chrisbanes.compose:compose-bom:2023.02.00-beta01')
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'

@@ -13,4 +13,6 @@ interface TimelineLocalDataSource {
     suspend fun updateStatus(status: Status)
 
     suspend fun getStatusById(id: String): Status?
+
+    suspend fun getLastStatus(): Status?
 }

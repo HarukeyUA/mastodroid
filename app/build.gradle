@@ -121,7 +121,7 @@ dependencies {
     implementation "androidx.media3:media3-exoplayer:$media3_version"
     implementation "androidx.media3:media3-ui:$media3_version"
 
-    def browser_version = "1.4.0"
+    def browser_version = "1.5.0"
     implementation "androidx.browser:browser:$browser_version"
 
     def compose_bom_version = "2023.02.00-beta01"

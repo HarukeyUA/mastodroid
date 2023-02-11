@@ -13,6 +13,7 @@ import kotlinx.datetime.Instant
 data class StatusListItemModel(
     val id: String,
     val actionId: String,
+    val inReplyToId: String?,
     val authorDisplayName: String,
     val authorDisplayNameEmojis: ImmutableWrap<List<CustomEmojiItemModel>>,
     val rebblogedByDisplayName: String?,
@@ -41,6 +42,7 @@ fun Status.toStatusListItemModel(): StatusListItemModel {
     return StatusListItemModel(
         id = originalId,
         actionId = actionId,
+        inReplyToId = inReplyToId,
         authorDisplayName = account.displayName,
         authorAccountHandle = account.accountUri,
         authorAvatarUrl = account.avatarUrl,

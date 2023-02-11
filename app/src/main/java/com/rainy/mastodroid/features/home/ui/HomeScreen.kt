@@ -30,14 +30,14 @@ import com.rainy.mastodroid.util.ImmutableWrap
 fun HomeScreen(
     statusesPagingList: LazyPagingItems<StatusListItemModel>,
     isRefreshing: Boolean,
-    modifier: Modifier = Modifier,
-    lazyListState: LazyListState = rememberLazyListState(),
-    exoPlayer: ImmutableWrap<ExoPlayer>? = null,
     onRefreshInvoked: () -> Unit,
     onUrlClicked: (url: String) -> Unit,
     onFavoriteClicked: (id: String, actionId: String, action: Boolean) -> Unit,
     onReblogClicked: (id: String, actionId: String, action: Boolean) -> Unit,
-    onSensitiveExpandClicked: (id: String) -> Unit
+    onSensitiveExpandClicked: (id: String) -> Unit,
+    modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState(),
+    exoPlayer: ImmutableWrap<ExoPlayer>? = null,
 ) {
     val pullRefreshState = rememberPullRefreshState(
         isRefreshing, onRefresh = onRefreshInvoked
@@ -69,17 +69,18 @@ fun HomeScreen(
 @Composable
 fun Timeline(
     statusesPagingList: LazyPagingItems<StatusListItemModel>,
-    lazyListState: LazyListState = rememberLazyListState(),
-    exoPlayer: ImmutableWrap<ExoPlayer>? = null,
     onUrlClicked: (url: String) -> Unit,
     onFavoriteClicked: (id: String, actionId: String, action: Boolean) -> Unit,
     onReblogClicked: (id: String, actionId: String, action: Boolean) -> Unit,
-    onSensitiveExpandClicked: (id: String) -> Unit
+    onSensitiveExpandClicked: (id: String) -> Unit,
+    modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState(),
+    exoPlayer: ImmutableWrap<ExoPlayer>? = null,
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         state = lazyListState,
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         items(statusesPagingList, key = { status ->
             status.id

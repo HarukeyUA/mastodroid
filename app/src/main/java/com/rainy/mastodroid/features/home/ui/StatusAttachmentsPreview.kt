@@ -111,7 +111,7 @@ fun VideoAttachment(
                 blurHash = mediaAttachment.blurHash,
                 contentDescription = mediaAttachment.description,
                 contentScale = ContentScale.Crop,
-                modifier = modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             )
             Icon(
                 painter = painterResource(id = R.drawable.play_circle),

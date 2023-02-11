@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
@@ -22,11 +23,11 @@ import kotlinx.datetime.Instant
 @Composable
 fun StatusListItem(
     item: StatusListItemModel,
-    exoPlayer: ImmutableWrap<ExoPlayer>? = null,
     onUrlClicked: (url: String) -> Unit,
     onFavoriteClicked: (id: String, actionId: String, action: Boolean) -> Unit,
     onReblogClicked: (id: String, actionId: String, action: Boolean) -> Unit,
-    onSensitiveExpandClicked: (id: String) -> Unit
+    onSensitiveExpandClicked: (id: String) -> Unit,
+    exoPlayer: ImmutableWrap<ExoPlayer>? = null,
 ) {
     val view = LocalView.current
     val contentText by remember {
@@ -62,9 +63,11 @@ fun StatusListItem(
                 SpoilerStatusContent(
                     text = item.spoilerText,
                     isExpanded = item.isSensitiveExpanded,
-                    onExpandClicked = { onSensitiveExpandClicked(item.id) }) {
-                    StatusContent(contentText, item, onUrlClicked, exoPlayer)
-                }
+                    onExpandClicked = { onSensitiveExpandClicked(item.id) },
+                    content = {
+                        StatusContent(contentText, item, onUrlClicked, exoPlayer)
+                    }
+                )
             } else {
                 StatusContent(contentText, item, onUrlClicked, exoPlayer)
             }
@@ -78,10 +81,12 @@ fun StatusContent(
     contentText: AnnotatedString,
     item: StatusListItemModel,
     onUrlClicked: (url: String) -> Unit,
-    exoPlayer: ImmutableWrap<ExoPlayer>?
+    exoPlayer: ImmutableWrap<ExoPlayer>?,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = modifier
     ) {
         if (contentText.isNotEmpty()) {
             StatusTextContent(text = contentText, customEmoji = item.emojis) { url ->
@@ -148,7 +153,8 @@ private fun StatusListItemAttachmentsWithTextPreview() {
                 spoilerText = "",
                 isSensitiveExpanded = false,
                 rebblogedByDisplayNameEmojis = ImmutableWrap(listOf()),
-                rebblogedByDisplayName = null
+                rebblogedByDisplayName = null,
+                inReplyToId = null
             ),
             onFavoriteClicked = { _, _, _ -> },
             onUrlClicked = {},
@@ -209,7 +215,8 @@ private fun StatusListItemAttachmentsPreview() {
                 spoilerText = "",
                 isSensitiveExpanded = false,
                 rebblogedByDisplayNameEmojis = ImmutableWrap(listOf()),
-                rebblogedByDisplayName = null
+                rebblogedByDisplayName = null,
+                inReplyToId = null
             ),
             onFavoriteClicked = { _, _, _ -> },
             onUrlClicked = {},
@@ -245,7 +252,8 @@ private fun StatusListItemTextPreview() {
                 spoilerText = "",
                 isSensitiveExpanded = false,
                 rebblogedByDisplayNameEmojis = ImmutableWrap(listOf()),
-                rebblogedByDisplayName = null
+                rebblogedByDisplayName = null,
+                inReplyToId = null
             ),
             onFavoriteClicked = { _, _, _ -> },
             onUrlClicked = {},

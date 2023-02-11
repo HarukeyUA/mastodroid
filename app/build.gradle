@@ -56,8 +56,11 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    def compose_lint_version = "1.0.0"
+    lintChecks "com.slack.lint.compose:compose-lint-checks:$compose_lint_version"
+
+    def core_version = "1.9.0"
+    implementation "androidx.core:core-ktx:$core_version"
 
     def coroutine_version = "1.6.4"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version"
@@ -68,16 +71,22 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
 
     def retrofit_version = "2.9.0"
+    def log_interceptor_version = "4.10.0"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.10.0'
+    implementation "com.squareup.okhttp3:logging-interceptor:$log_interceptor_version"
 
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
-    implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0"
+    def serialization_version = "1.4.1"
+    def retrofit_converter_version = "0.8.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
+    implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:$retrofit_converter_version"
 
-    implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.2'
+    def datetime_version = "0.4.0"
+    def desugar_version = "2.0.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-datetime:$datetime_version"
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar_version"
 
     def nav_version = "2.5.3"
     implementation "androidx.navigation:navigation-compose:$nav_version"
@@ -100,19 +109,23 @@ dependencies {
     implementation "io.coil-kt:coil-video:$coil_version"
     implementation "io.coil-kt:coil-gif:$coil_version"
 
-    implementation 'org.jsoup:jsoup:1.15.3'
+    def jsoup_version = "1.15.3"
+    implementation "org.jsoup:jsoup:$jsoup_version"
 
     def paging_version = "3.2.0-alpha04"
+    def paging_compose_version = "1.0.0-alpha18"
     implementation "androidx.paging:paging-runtime:$paging_version"
-    implementation "androidx.paging:paging-compose:1.0.0-alpha18"
+    implementation "androidx.paging:paging-compose:$paging_compose_version"
 
     def media3_version = "1.0.0-beta03"
     implementation "androidx.media3:media3-exoplayer:$media3_version"
     implementation "androidx.media3:media3-ui:$media3_version"
 
-    implementation "androidx.browser:browser:1.4.0"
+    def browser_version = "1.4.0"
+    implementation "androidx.browser:browser:$browser_version"
 
-    implementation platform('dev.chrisbanes.compose:compose-bom:2023.02.00-beta01')
+    def compose_bom_version = "2023.02.00-beta01"
+    implementation platform("dev.chrisbanes.compose:compose-bom:$compose_bom_version")
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'
     implementation 'androidx.compose.ui:ui-tooling-preview'
@@ -120,12 +133,13 @@ dependencies {
     implementation "androidx.compose.material:material"
     implementation "androidx.compose.ui:ui-util"
 
-    implementation 'androidx.activity:activity-compose:1.6.1'
+    def activity_compose_version = "1.6.1"
+    implementation "androidx.activity:activity-compose:$activity_compose_version"
 
     def accompanist_version = '0.28.0'
     implementation "com.google.accompanist:accompanist-webview:$accompanist_version"
 
-    androidTestImplementation platform('dev.chrisbanes.compose:compose-bom:2023.02.00-beta01')
+    androidTestImplementation platform("dev.chrisbanes.compose:compose-bom:$compose_bom_version")
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'

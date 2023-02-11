@@ -25,9 +25,9 @@ import com.rainy.mastodroid.util.ColorSchemePreview
 fun SpoilerStatusContent(
     text: String,
     isExpanded: Boolean,
-    modifier: Modifier = Modifier,
     onExpandClicked: () -> Unit,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Crossfade(
         targetState = isExpanded,
@@ -41,7 +41,7 @@ fun SpoilerStatusContent(
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.large)
                     .clickable(onClick = onExpandClicked)
@@ -72,8 +72,9 @@ private fun SpoilerStatusContentPreview() {
             SpoilerStatusContent(
                 text = "Text spoiler warning",
                 isExpanded = false,
-                onExpandClicked = {}
-            ) {}
+                onExpandClicked = {},
+                content = {}
+            )
         }
     }
 }

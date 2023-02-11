@@ -63,7 +63,8 @@ fun WebAuthScreen(
 @Composable
 fun AuthWebView(
     webViewState: WebViewState,
-    webClient: OauthWebClient
+    webClient: OauthWebClient,
+    modifier: Modifier = Modifier
 ) {
     WebView(
         webViewState,
@@ -76,7 +77,7 @@ fun AuthWebView(
             }
         },
         client = webClient,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
     )
 }

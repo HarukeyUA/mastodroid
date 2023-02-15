@@ -56,7 +56,7 @@ android {
 
 dependencies {
 
-    def compose_lint_version = "1.0.0"
+    def compose_lint_version = "1.0.1"
     lintChecks "com.slack.lint.compose:compose-lint-checks:$compose_lint_version"
 
     def core_version = "1.9.0"

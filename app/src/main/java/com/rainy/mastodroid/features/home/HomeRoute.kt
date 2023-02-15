@@ -159,7 +159,8 @@ object HomeRoute : NavRoute<HomeViewModel> {
                 val midPoint = (layoutInfo.viewportStartOffset + layoutInfo.viewportEndOffset) / 2
                 val itemsFromCenter =
                     layoutInfo.visibleItemsInfo.sortedBy { abs((it.offset + it.size / 2) - midPoint) }
-                itemsFromCenter.fastMap { items[it.index] }
+                itemsFromCenter.fastMap { info -> items.fastFirstOrNull { it.id == info.key } }
+                    .filterNotNull()
                     .fastFirstOrNull { it.isSubjectForAutoPlay }
             }
         }

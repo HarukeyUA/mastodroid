@@ -6,7 +6,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.rainy.mastodroid.core.data.model.entity.status.StatusEntity
 import com.rainy.mastodroid.core.domain.data.remote.StatusRemoteDataSource
 import com.rainy.mastodroid.core.domain.data.remote.TimelineLocalDataSource
 import com.rainy.mastodroid.core.domain.data.remote.TimelineRemoteDataSource
@@ -47,37 +46,13 @@ class HomeTimelineInteractorImpl(
     }.flow
 
     override fun getTimeLinePaging(scope: CoroutineScope) =
-        rawPagingSource.map { it.map(StatusEntity::toDomain) }.cachedIn(scope)
-
-    private fun calculateLocalStatCount(
-        localFavoriteAction: Boolean?,
-        stat: Int,
-    ) = when (localFavoriteAction) {
-        true -> {
-            stat + 1
-        }
-
-        false -> {
-            stat - 1
-        }
-
-        else -> {
-            stat
-        }
-    }
+        rawPagingSource.map { it.map { it.statusEntity.toDomain() } }.cachedIn(scope)
 
     override suspend fun setFavoriteStatus(id: String, actionId: String, action: Boolean) {
-        val localStatus = timelineLocalDataSource.getStatusById(id)
-        localStatus?.also {
-            timelineLocalDataSource.updateStatus(
-                localStatus.copy(
-                    favouritesCount = calculateLocalStatCount(
-                        action,
-                        localStatus.favouritesCount
-                    ),
-                    favourited = action
-                )
-            )
+        if (action) {
+            timelineLocalDataSource.setFavourite(id)
+        } else {
+            timelineLocalDataSource.unFavourite(id)
         }
         wrapResult {
             if (action) {
@@ -87,22 +62,19 @@ class HomeTimelineInteractorImpl(
             }
             return@wrapResult
         }.onErrorValue {
-            localStatus?.also { timelineLocalDataSource.updateStatus(it) }
+            if (!action) {
+                timelineLocalDataSource.setFavourite(id)
+            } else {
+                timelineLocalDataSource.unFavourite(id)
+            }
         }.dispatchOrThrow()
     }
 
     override suspend fun setReblogStatus(id: String, actionId: String, action: Boolean) {
-        val localStatus = timelineLocalDataSource.getStatusById(id)
-        localStatus?.also {
-            timelineLocalDataSource.updateStatus(
-                localStatus.copy(
-                    reblogsCount = calculateLocalStatCount(
-                        action,
-                        localStatus.favouritesCount
-                    ),
-                    reblogged = action
-                )
-            )
+        if (action) {
+            timelineLocalDataSource.setRebloged(id)
+        } else {
+            timelineLocalDataSource.unReblog(id)
         }
         wrapResult {
             if (action) {
@@ -112,7 +84,11 @@ class HomeTimelineInteractorImpl(
             }
             return@wrapResult
         }.onErrorValue {
-            localStatus?.also { timelineLocalDataSource.updateStatus(it) }
+            if (!action) {
+                timelineLocalDataSource.setRebloged(id)
+            } else {
+                timelineLocalDataSource.unReblog(id)
+            }
         }.dispatchOrThrow()
     }
 

@@ -1,7 +1,9 @@
 package com.rainy.mastodroid.core.data.model.entity.status
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.rainy.mastodroid.core.data.model.response.StatusVisibility
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.GifvAttachment
@@ -13,10 +15,21 @@ import com.rainy.mastodroid.core.domain.model.status.StatusTag
 import com.rainy.mastodroid.core.domain.model.user.CustomEmoji
 import kotlinx.datetime.Instant
 
-@Entity
+const val STATUS_ENTITY_ORIGINAL_ID = "originalId"
+
+@Entity(
+    foreignKeys = [
+        ForeignKey(
+            entity = TimelineElementEntity::class,
+            parentColumns = [TIMELINE_ELEMENT_STATUS_ID],
+            childColumns = [STATUS_ENTITY_ORIGINAL_ID],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
 data class StatusEntity(
-    @PrimaryKey(autoGenerate = true)
-    val localId: Long = 0,
+    @PrimaryKey
+    @ColumnInfo(name = STATUS_ENTITY_ORIGINAL_ID)
     val originalId: String,
     val rebloggedStatusId: String?,
     val reblogAuthorAccount: StatusAccountEntity?,

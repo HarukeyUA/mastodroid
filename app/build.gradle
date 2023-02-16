@@ -117,7 +117,7 @@ dependencies {
     implementation "androidx.paging:paging-runtime:$paging_version"
     implementation "androidx.paging:paging-compose:$paging_compose_version"
 
-    def media3_version = "1.0.0-beta03"
+    def media3_version = "1.0.0-rc01"
     implementation "androidx.media3:media3-exoplayer:$media3_version"
     implementation "androidx.media3:media3-ui:$media3_version"
 

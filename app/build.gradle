@@ -109,7 +109,7 @@ dependencies {
     implementation "io.coil-kt:coil-video:$coil_version"
     implementation "io.coil-kt:coil-gif:$coil_version"
 
-    def jsoup_version = "1.15.3"
+    def jsoup_version = "1.15.4"
     implementation "org.jsoup:jsoup:$jsoup_version"
 
     def paging_version = "3.2.0-alpha04"

@@ -27,6 +27,8 @@ fun StatusListItem(
     onFavoriteClicked: (id: String, actionId: String, action: Boolean) -> Unit,
     onReblogClicked: (id: String, actionId: String, action: Boolean) -> Unit,
     onSensitiveExpandClicked: (id: String) -> Unit,
+    isReply: Boolean,
+    isRepliedTo: Boolean,
     exoPlayer: ImmutableWrap<ExoPlayer>? = null,
 ) {
     val view = LocalView.current
@@ -52,6 +54,8 @@ fun StatusListItem(
         isRebloged = item.isRebloged,
         rebblogedByAccountUserName = item.rebblogedByDisplayName,
         rebblogedByUsernameEmojis = item.rebblogedByDisplayNameEmojis,
+        isRepliedTo = isRepliedTo,
+        isReply = isReply,
         onFavoriteClicked = { action: Boolean ->
             onFavoriteClicked(item.id, item.actionId, action)
         },
@@ -156,6 +160,8 @@ private fun StatusListItemAttachmentsWithTextPreview() {
                 rebblogedByDisplayName = null,
                 inReplyToId = null
             ),
+            isRepliedTo = false,
+            isReply = false,
             onFavoriteClicked = { _, _, _ -> },
             onUrlClicked = {},
             onReblogClicked = { _, _, _ -> },
@@ -218,6 +224,8 @@ private fun StatusListItemAttachmentsPreview() {
                 rebblogedByDisplayName = null,
                 inReplyToId = null
             ),
+            isRepliedTo = false,
+            isReply = false,
             onFavoriteClicked = { _, _, _ -> },
             onUrlClicked = {},
             onReblogClicked = { _, _, _ -> },
@@ -255,6 +263,8 @@ private fun StatusListItemTextPreview() {
                 rebblogedByDisplayName = null,
                 inReplyToId = null
             ),
+            isRepliedTo = false,
+            isReply = false,
             onFavoriteClicked = { _, _, _ -> },
             onUrlClicked = {},
             onReblogClicked = { _, _, _ -> },

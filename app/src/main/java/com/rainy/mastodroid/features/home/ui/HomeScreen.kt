@@ -1,9 +1,10 @@
 package com.rainy.mastodroid.features.home.ui
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -21,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.items
+import androidx.paging.compose.itemsIndexed
 import com.rainy.mastodroid.features.home.model.StatusListItemModel
 import com.rainy.mastodroid.util.ImmutableWrap
 
@@ -78,17 +79,27 @@ fun Timeline(
     exoPlayer: ImmutableWrap<ExoPlayer>? = null,
 ) {
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
         state = lazyListState,
         modifier = modifier.fillMaxSize()
     ) {
-        items(statusesPagingList, key = { status ->
+        itemsIndexed(statusesPagingList, key = { _, status ->
             status.id
-        }) { item ->
+        }) { index, item ->
             item?.also {
+                val isReply = statusesPagingList.peekOrNull(index - 1)?.let {
+                    it.id == item.inReplyToId
+                } ?: false
+                val isRepliedTo = statusesPagingList.peekOrNull(index + 1)?.let {
+                    it.inReplyToId == item.id
+                } ?: false
+                if (!isReply && index != 0) {
+                    Spacer(modifier = Modifier.size(8.dp))
+                }
                 StatusListItem(
                     item = item,
                     exoPlayer = exoPlayer,
+                    isReply = isReply,
+                    isRepliedTo = isRepliedTo,
                     onUrlClicked = onUrlClicked,
                     onFavoriteClicked = onFavoriteClicked,
                     onReblogClicked = onReblogClicked,
@@ -106,5 +117,13 @@ fun Timeline(
                 )
             }
         }
+    }
+}
+
+fun <T : Any> LazyPagingItems<T>.peekOrNull(index: Int): T? {
+    return try {
+        peek(index)
+    } catch (oob: IndexOutOfBoundsException) {
+        null
     }
 }

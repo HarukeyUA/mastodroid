@@ -1,5 +1,6 @@
 package com.rainy.mastodroid.features.home.ui
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,7 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults.cardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -29,11 +30,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastMap
 import coil.compose.AsyncImage
@@ -50,8 +55,20 @@ import kotlinx.coroutines.isActive
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import java.util.concurrent.TimeUnit
+import kotlin.math.max
 
 const val YEAR_IN_DAYS = 365
+
+private const val REBLOG_LABEL_ID = "reblog"
+private const val STATUS_INFO_ID = "statusInfo"
+private const val CONTENT_AND_ACTIONS_ID = "contentAndActions"
+private const val TOP_REPLY_LINE_ID = "topLine"
+private const val BOTTOM_REPLY_LINE_ID = "bottomLine"
+private const val AVATAR_ID = "avatar"
+
+private const val AVATAR_DIMENSIONS_DP = 48
+private const val STATUS_CONTENT_PADDING_DP = 8
+private const val STATUS_SPACING_DP = 4
 
 @Composable
 fun StatusCard(
@@ -68,53 +85,182 @@ fun StatusCard(
     isRebloged: Boolean,
     rebblogedByAccountUserName: String?,
     rebblogedByUsernameEmojis: ImmutableWrap<List<CustomEmojiItemModel>>,
+    isReply: Boolean,
+    isRepliedTo: Boolean,
     onFavoriteClicked: (Boolean) -> Unit,
     onReblogClicked: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit = {},
 ) {
     Card(
-        shape = MaterialTheme.shapes.medium, colors = cardColors(
+        shape = MaterialTheme.shapes.medium, colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
         ), modifier = modifier.fillMaxWidth()
     ) {
-        Column(
-            modifier = Modifier.padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
+        Layout(content = {
+            val lineColor = MaterialTheme.colorScheme.secondaryContainer
             if (rebblogedByAccountUserName != null) {
                 ReblogLabel(
                     rebblogedByAccountUserName = rebblogedByAccountUserName,
-                    rebblogedByUsernameEmojis = rebblogedByUsernameEmojis
+                    rebblogedByUsernameEmojis = rebblogedByUsernameEmojis,
+                    modifier = Modifier
+                        .layoutId(REBLOG_LABEL_ID)
+                        .padding(start = 4.dp, bottom = 4.dp)
                 )
             }
             StatusHeadInfo(
-                accountAvatarUrl = accountAvatarUrl,
                 fullAccountName = fullAccountName,
                 usernameEmojis = usernameEmojis,
                 accountUserName = accountUserName,
                 updatedTime = updatedTime,
-                isEdited = isEdited
+                isEdited = isEdited,
+                modifier = Modifier.layoutId(STATUS_INFO_ID)
             )
-            content()
-            StatusQuickActions(
-                favorites = favorites,
-                isFavorite = isFavorite,
-                onFavoriteClicked = onFavoriteClicked,
-                reblogs = reblogs,
-                isRebloged = isRebloged,
-                onReblogClicked = onReblogClicked,
-                replies = replies,
-                onReplyClicked = { /*TODO*/ },
-                modifier = Modifier.fillMaxWidth()
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current).data(accountAvatarUrl)
+                    .crossfade(true).build(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(AVATAR_DIMENSIONS_DP.dp)
+                    .clip(MaterialTheme.shapes.large)
+                    .layoutId(AVATAR_ID)
             )
-        }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier
+                    .layoutId(CONTENT_AND_ACTIONS_ID)
+                    .padding(top = 4.dp)
+            ) {
+                content()
+                StatusQuickActions(
+                    favorites = favorites,
+                    isFavorite = isFavorite,
+                    onFavoriteClicked = onFavoriteClicked,
+                    reblogs = reblogs,
+                    isRebloged = isRebloged,
+                    onReblogClicked = onReblogClicked,
+                    replies = replies,
+                    onReplyClicked = { /*TODO*/ },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Canvas(modifier = Modifier.layoutId(TOP_REPLY_LINE_ID), onDraw = {
+                drawLine(
+                    lineColor,
+                    start = Offset((size.width / 2), 0.dp.toPx()),
+                    end = Offset((size.width / 2), size.height),
+                    strokeWidth = 2.dp.toPx()
+                )
+            })
+            Canvas(modifier = Modifier.layoutId(BOTTOM_REPLY_LINE_ID), onDraw = {
+                drawLine(
+                    lineColor,
+                    start = Offset((size.width / 2), 0.dp.toPx()),
+                    end = Offset((size.width / 2), size.height),
+                    strokeWidth = 2.dp.toPx()
+                )
+            })
+        }, measurePolicy = { measurables, constraints ->
+            val combinedAxisContentPadding = (STATUS_CONTENT_PADDING_DP * 2).dp.roundToPx()
+            val avatar = measurables.first { it.layoutId == AVATAR_ID }.measure(
+                Constraints.fixed(
+                    AVATAR_DIMENSIONS_DP.dp.roundToPx(), AVATAR_DIMENSIONS_DP.dp.roundToPx()
+                )
+            )
+            val reblogLabel = measurables.firstOrNull { it.layoutId == REBLOG_LABEL_ID }?.measure(
+                if (isReply) {
+                    constraints.copy(
+                        maxWidth = constraints.maxWidth - avatar.width - combinedAxisContentPadding
+                    )
+                } else {
+                    constraints
+                }
+            )
+            val statusInfo = measurables.first { it.layoutId == STATUS_INFO_ID }.measure(
+                constraints.copy(maxWidth = constraints.maxWidth - (avatar.width) - combinedAxisContentPadding)
+            )
+
+            val contentAction = measurables.first { it.layoutId == CONTENT_AND_ACTIONS_ID }.measure(
+                if (isRepliedTo) {
+                    constraints.copy(maxWidth = constraints.maxWidth - (avatar.width) - combinedAxisContentPadding - STATUS_SPACING_DP.dp.roundToPx())
+                } else {
+                    constraints.copy(maxWidth = constraints.maxWidth - combinedAxisContentPadding)
+                }
+            )
+
+            val height = contentAction.height + statusInfo.height + (reblogLabel?.height
+                ?: 0) + combinedAxisContentPadding
+
+            layout(constraints.maxWidth, height) {
+                val reblogLabelX = if (!isReply) {
+                    STATUS_CONTENT_PADDING_DP.dp.roundToPx()
+                } else {
+                    avatar.width + STATUS_CONTENT_PADDING_DP.dp.roundToPx()
+                }
+                val reblogLabelY = STATUS_CONTENT_PADDING_DP.dp.roundToPx()
+
+                val avatarYVariant = if (reblogLabel != null) {
+                    reblogLabel.height + reblogLabelY
+                } else {
+                    STATUS_CONTENT_PADDING_DP.dp.roundToPx()
+                }
+
+                val statusInfoYVariant = if (reblogLabel != null) {
+                    reblogLabel.height + reblogLabelY
+                } else {
+                    STATUS_CONTENT_PADDING_DP.dp.roundToPx()
+                }
+
+                val statusInfoX = avatar.width + STATUS_CONTENT_PADDING_DP.dp.roundToPx()
+                val statusInfoY = if (avatar.height >= statusInfo.height) {
+                    ((statusInfo.height - avatar.height) / 2) + avatarYVariant
+                } else {
+                    statusInfoYVariant
+                }
+
+                val avatarX = STATUS_CONTENT_PADDING_DP.dp.roundToPx()
+                val avatarY = if (avatar.height >= statusInfo.height) {
+                    avatarYVariant
+                } else {
+                    ((statusInfo.height - avatar.height) / 2) + statusInfoY
+                }
+
+                val contentX =
+                    if (isRepliedTo) statusInfoX + STATUS_SPACING_DP.dp.roundToPx() else STATUS_CONTENT_PADDING_DP.dp.roundToPx()
+                val contentY = max(avatarY + avatar.height, statusInfoY + statusInfo.height)
+
+                reblogLabel?.placeRelative(x = reblogLabelX, y = reblogLabelY)
+                statusInfo.placeRelative(x = statusInfoX, y = statusInfoY)
+                avatar.placeRelative(x = avatarX, y = avatarY)
+                contentAction.placeRelative(x = contentX, y = contentY)
+
+                if (isReply) {
+                    val topLine = measurables.first { it.layoutId == TOP_REPLY_LINE_ID }.measure(
+                        Constraints.fixed(
+                            width = avatar.width, height = avatarY
+                        )
+                    )
+                    topLine.placeRelative(avatarX, 0)
+                }
+
+                if (isRepliedTo) {
+                    val bottomLine =
+                        measurables.first { it.layoutId == BOTTOM_REPLY_LINE_ID }.measure(
+                            Constraints.fixed(
+                                width = avatar.width, height = height - (avatarY + avatar.height)
+                            )
+                        )
+                    bottomLine.placeRelative(avatarX, avatarY + avatar.height)
+                }
+            }
+        })
     }
 }
 
 @Composable
 fun StatusHeadInfo(
-    accountAvatarUrl: String,
     fullAccountName: String,
     usernameEmojis: ImmutableWrap<List<CustomEmojiItemModel>>,
     accountUserName: String,
@@ -123,17 +269,6 @@ fun StatusHeadInfo(
     modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(accountAvatarUrl)
-                .crossfade(true)
-                .build(),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(MaterialTheme.shapes.large)
-        )
         Column(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
@@ -304,7 +439,9 @@ private fun StatusCardPreview() {
                 onFavoriteClicked = {},
                 onReblogClicked = {},
                 rebblogedByAccountUserName = "Test",
-                rebblogedByUsernameEmojis = ImmutableWrap(listOf())
+                rebblogedByUsernameEmojis = ImmutableWrap(listOf()),
+                isReply = true,
+                isRepliedTo = true
             )
         }
 

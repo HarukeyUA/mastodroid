@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
@@ -150,16 +151,18 @@ fun StatusCard(
                 drawLine(
                     lineColor,
                     start = Offset((size.width / 2), 0.dp.toPx()),
-                    end = Offset((size.width / 2), size.height),
-                    strokeWidth = 2.dp.toPx()
+                    end = Offset((size.width / 2), size.height - 4.dp.toPx()),
+                    cap = StrokeCap.Round,
+                    strokeWidth = 3.dp.toPx()
                 )
             })
             Canvas(modifier = Modifier.layoutId(BOTTOM_REPLY_LINE_ID), onDraw = {
                 drawLine(
                     lineColor,
-                    start = Offset((size.width / 2), 0.dp.toPx()),
+                    start = Offset((size.width / 2), 4.dp.toPx()),
                     end = Offset((size.width / 2), size.height),
-                    strokeWidth = 2.dp.toPx()
+                    cap = StrokeCap.Round,
+                    strokeWidth = 3.dp.toPx()
                 )
             })
         }, measurePolicy = { measurables, constraints ->

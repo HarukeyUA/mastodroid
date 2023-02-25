@@ -30,6 +30,7 @@ import com.rainy.mastodroid.features.home.model.StatusListItemModel
 import com.rainy.mastodroid.features.home.model.VideoAttachmentItemModel
 import com.rainy.mastodroid.features.home.ui.HomeScreen
 import com.rainy.mastodroid.util.ImmutableWrap
+import com.rainy.mastodroid.util.logi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.koin.androidx.compose.koinViewModel
 import kotlin.math.abs
@@ -65,7 +66,7 @@ object HomeRoute : NavRoute<HomeViewModel> {
         }
 
         PlayFocusedVideo(currentlyPlaying, exoPlayer)
-        ExoPlayerLifecycleEvents(exoPlayer, currentlyPlaying)
+        ExoPlayerLifecycleEvents(exoPlayer)
 
 
         HomeScreen(
@@ -111,6 +112,7 @@ object HomeRoute : NavRoute<HomeViewModel> {
                     prepare()
                     playWhenReady = true
                 } else {
+                    logi("Stop player - timeline")
                     stop()
                 }
             }
@@ -119,16 +121,22 @@ object HomeRoute : NavRoute<HomeViewModel> {
 
     @Composable
     private fun ExoPlayerLifecycleEvents(
-        exoPlayer: ExoPlayer,
-        currentlyPlaying: CurrentlyPlayingMedia?
+        exoPlayer: ExoPlayer
     ) {
         val lifecycle = LocalLifecycleOwner.current
         DisposableEffect(exoPlayer) {
             val lifecycleObserver = LifecycleEventObserver { _, event ->
-                if (currentlyPlaying == null) return@LifecycleEventObserver
                 when (event) {
-                    Lifecycle.Event.ON_START -> exoPlayer.play()
-                    Lifecycle.Event.ON_STOP -> exoPlayer.pause()
+                    Lifecycle.Event.ON_START -> {
+                        logi("Start player - lifecycle")
+                        exoPlayer.play()
+                    }
+
+                    Lifecycle.Event.ON_STOP -> {
+                        logi("Stop player - lifecycle")
+                        exoPlayer.pause()
+                    }
+
                     else -> {}
                 }
             }
@@ -136,6 +144,7 @@ object HomeRoute : NavRoute<HomeViewModel> {
             lifecycle.lifecycle.addObserver(lifecycleObserver)
 
             onDispose {
+                logi("Release player - lifecycle")
                 lifecycle.lifecycle.removeObserver(lifecycleObserver)
                 exoPlayer.release()
             }
@@ -149,7 +158,8 @@ object HomeRoute : NavRoute<HomeViewModel> {
         if (items.isEmpty())
             return null
 
-        val visibleItems = layoutInfo.visibleItemsInfo.mapNotNull { info -> items.fastFirstOrNull { it.id == info.key } }
+        val visibleItems =
+            layoutInfo.visibleItemsInfo.mapNotNull { info -> items.fastFirstOrNull { it.id == info.key } }
         val itemsWithVideo =
             visibleItems.filter { it.attachments.content.size == 1 && it.attachments.content.firstOrNull() is VideoAttachmentItemModel }
         return when (itemsWithVideo.size) {

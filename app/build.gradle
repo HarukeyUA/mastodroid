@@ -125,7 +125,7 @@ dependencies {
     def browser_version = "1.5.0"
     implementation "androidx.browser:browser:$browser_version"
 
-    def compose_bom_version = "2023.02.00-beta02"
+    def compose_bom_version = "2023.02.00-rc02"
     implementation platform("dev.chrisbanes.compose:compose-bom:$compose_bom_version")
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'

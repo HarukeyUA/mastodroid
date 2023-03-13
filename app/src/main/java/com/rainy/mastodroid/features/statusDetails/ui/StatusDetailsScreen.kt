@@ -171,7 +171,7 @@ private fun FocusedStatusListItem(
         accountAvatarUrl = focusedStatus.authorAvatarUrl,
         fullAccountName = focusedStatus.authorDisplayName,
         accountUserName = focusedStatus.authorAccountHandle,
-        usernameEmojis = focusedStatus.emojis,
+        usernameEmojis = focusedStatus.authorDisplayNameEmojis,
         favorites = focusedStatus.favorites,
         isFavorite = focusedStatus.isFavorite,
         reblogs = focusedStatus.reblogs,

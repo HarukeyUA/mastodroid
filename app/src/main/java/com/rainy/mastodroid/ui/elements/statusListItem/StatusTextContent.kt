@@ -1,4 +1,4 @@
-package com.rainy.mastodroid.features.home.ui
+package com.rainy.mastodroid.ui.elements.statusListItem
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -7,7 +7,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
-import com.rainy.mastodroid.features.home.model.CustomEmojiItemModel
+import com.rainy.mastodroid.ui.elements.statusListItem.model.CustomEmojiItemModel
 import com.rainy.mastodroid.ui.elements.ClickableText
 import com.rainy.mastodroid.ui.styledText.MastodonContentTag
 import com.rainy.mastodroid.ui.styledText.textInlineCustomEmojis
@@ -18,7 +18,8 @@ fun StatusTextContent(
     text: AnnotatedString,
     customEmoji: ImmutableWrap<List<CustomEmojiItemModel>>,
     modifier: Modifier = Modifier,
-    onUrlClicked: (url: String) -> Unit,
+    onTextClicked: () -> Unit = {},
+    onUrlClicked: (url: String) -> Unit
 ) {
     ClickableText(
         text = styleTextByAnnotations(text),
@@ -28,7 +29,7 @@ fun StatusTextContent(
             text.getStringAnnotations(offset, offset).firstOrNull()
                 ?.also { annotation ->
                     onUrlClicked(annotation.item)
-                }
+                } ?: run(onTextClicked)
         },
         inlineContent = textInlineCustomEmojis(emojis = customEmoji)
     )

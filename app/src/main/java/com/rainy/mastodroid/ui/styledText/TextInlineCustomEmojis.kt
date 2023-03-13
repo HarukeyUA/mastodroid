@@ -21,7 +21,7 @@ import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.rainy.mastodroid.R
-import com.rainy.mastodroid.features.home.model.CustomEmojiItemModel
+import com.rainy.mastodroid.ui.elements.statusListItem.model.CustomEmojiItemModel
 import com.rainy.mastodroid.util.ImmutableWrap
 
 @Composable

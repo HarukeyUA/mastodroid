@@ -1,4 +1,4 @@
-package com.rainy.mastodroid.features.home.ui
+package com.rainy.mastodroid.ui.elements.statusListItem
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +23,7 @@ import com.rainy.mastodroid.R
 import com.rainy.mastodroid.ui.elements.ResizableIconButton
 import com.rainy.mastodroid.ui.elements.ResizableIconToggleButton
 import com.rainy.mastodroid.ui.theme.MastodroidTheme
-import com.rainy.mastodroid.util.ColorSchemePreview
+import com.rainy.mastodroid.util.ColorSchemePreviews
 import java.text.DecimalFormat
 
 @Composable
@@ -150,7 +150,7 @@ private fun abbreviateCount(favorites: Int) = when {
     else -> favorites.toString()
 }
 
-@ColorSchemePreview
+@ColorSchemePreviews
 @Composable
 private fun StatusQuickActionsPreview() {
     MastodroidTheme {
@@ -169,7 +169,7 @@ private fun StatusQuickActionsPreview() {
     }
 }
 
-@ColorSchemePreview
+@ColorSchemePreviews
 @Composable
 private fun StatusQuickActionsPreviewActive() {
     MastodroidTheme {

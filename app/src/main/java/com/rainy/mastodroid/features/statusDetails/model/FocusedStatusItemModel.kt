@@ -1,4 +1,4 @@
-package com.rainy.mastodroid.features.home.model
+package com.rainy.mastodroid.features.statusDetails.model
 
 import androidx.compose.runtime.Stable
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.GifvAttachment
@@ -6,11 +6,15 @@ import com.rainy.mastodroid.core.domain.model.mediaAttachment.ImageAttachment
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.VideoAttachment
 import com.rainy.mastodroid.core.domain.model.status.Status
 import com.rainy.mastodroid.core.domain.model.user.CustomEmoji
+import com.rainy.mastodroid.ui.elements.statusListItem.model.CustomEmojiItemModel
+import com.rainy.mastodroid.ui.elements.statusListItem.model.MediaAttachmentItemModel
+import com.rainy.mastodroid.ui.elements.statusListItem.model.VideoAttachmentItemModel
+import com.rainy.mastodroid.ui.elements.statusListItem.model.toItemModel
 import com.rainy.mastodroid.util.ImmutableWrap
 import kotlinx.datetime.Instant
 
 @Stable
-data class StatusListItemModel(
+data class FocusedStatusItemModel(
     val id: String,
     val actionId: String,
     val inReplyToId: String?,
@@ -21,7 +25,6 @@ data class StatusListItemModel(
     val authorAccountHandle: String,
     val authorAvatarUrl: String,
     val content: String,
-    val lastUpdate: ImmutableWrap<Instant>?,
     val edited: Boolean,
     val emojis: ImmutableWrap<List<CustomEmojiItemModel>>,
     val attachments: ImmutableWrap<List<MediaAttachmentItemModel>>,
@@ -32,14 +35,17 @@ data class StatusListItemModel(
     val isRebloged: Boolean,
     val isSensitive: Boolean,
     val spoilerText: String,
-    val isSensitiveExpanded: Boolean
+    val isSensitiveExpanded: Boolean,
+    val createdAt: ImmutableWrap<Instant>?,
+    val updatedAt: ImmutableWrap<Instant>?,
+    val applicationName: String?,
 ) {
     val isSubjectForAutoPlay =
         attachments.content.size == 1 && attachments.content.firstOrNull() is VideoAttachmentItemModel && (!isSensitive || isSensitiveExpanded)
 }
 
-fun Status.toStatusListItemModel(): StatusListItemModel {
-    return StatusListItemModel(
+fun Status.toFocusedStatusItemModel(): FocusedStatusItemModel {
+    return FocusedStatusItemModel(
         id = originalId,
         actionId = actionId,
         inReplyToId = inReplyToId,
@@ -48,7 +54,7 @@ fun Status.toStatusListItemModel(): StatusListItemModel {
         authorAvatarUrl = account.avatarUrl,
         authorDisplayNameEmojis = ImmutableWrap(account.customEmojis.map(CustomEmoji::toItemModel)),
         content = content,
-        lastUpdate = editedAt?.let(::ImmutableWrap) ?: createdAt?.let(::ImmutableWrap),
+        updatedAt = editedAt?.let(::ImmutableWrap),
         edited = editedAt != null,
         emojis = ImmutableWrap(customEmojis.map(CustomEmoji::toItemModel)),
         attachments = ImmutableWrap(mediaAttachments.map {
@@ -70,6 +76,9 @@ fun Status.toStatusListItemModel(): StatusListItemModel {
         rebblogedByDisplayNameEmojis = ImmutableWrap(
             reblogAuthorAccount?.customEmojis?.map(CustomEmoji::toItemModel)
                 ?: listOf()
-        )
+        ),
+        createdAt = createdAt?.let(::ImmutableWrap),
+        applicationName = application?.name
     )
 }
+

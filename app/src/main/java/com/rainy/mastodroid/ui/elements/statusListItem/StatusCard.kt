@@ -1,4 +1,4 @@
-package com.rainy.mastodroid.features.home.ui
+package com.rainy.mastodroid.ui.elements.statusListItem
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +12,7 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -31,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
@@ -45,11 +47,12 @@ import androidx.compose.ui.util.fastMap
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.rainy.mastodroid.R
-import com.rainy.mastodroid.features.home.model.CustomEmojiItemModel
+import com.rainy.mastodroid.core.domain.model.status.statusThread.ReplyType
+import com.rainy.mastodroid.ui.elements.statusListItem.model.CustomEmojiItemModel
 import com.rainy.mastodroid.ui.styledText.annotateMastodonEmojis
 import com.rainy.mastodroid.ui.styledText.textInlineCustomEmojis
 import com.rainy.mastodroid.ui.theme.MastodroidTheme
-import com.rainy.mastodroid.util.ColorSchemePreview
+import com.rainy.mastodroid.util.ColorSchemePreviews
 import com.rainy.mastodroid.util.ImmutableWrap
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -71,6 +74,7 @@ private const val AVATAR_DIMENSIONS_DP = 48
 private const val STATUS_CONTENT_PADDING_DP = 8
 private const val STATUS_SPACING_DP = 4
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatusCard(
     fullAccountName: String,
@@ -86,17 +90,20 @@ fun StatusCard(
     isRebloged: Boolean,
     rebblogedByAccountUserName: String?,
     rebblogedByUsernameEmojis: ImmutableWrap<List<CustomEmojiItemModel>>,
-    isReply: Boolean,
-    isRepliedTo: Boolean,
+    reply: ReplyType,
+    repliedTo: ReplyType,
     onFavoriteClicked: (Boolean) -> Unit,
     onReblogClicked: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
     content: @Composable () -> Unit = {},
 ) {
+    val isReply = reply != ReplyType.NONE
+    val isRepliedTo = repliedTo != ReplyType.NONE
     Card(
         shape = MaterialTheme.shapes.medium, colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
-        ), modifier = modifier.fillMaxWidth()
+        ), modifier = modifier.fillMaxWidth(), onClick = onClick
     ) {
         Layout(content = {
             val lineColor = MaterialTheme.colorScheme.secondaryContainer
@@ -149,8 +156,11 @@ fun StatusCard(
 
             Canvas(modifier = Modifier.layoutId(TOP_REPLY_LINE_ID), onDraw = {
                 drawLine(
-                    lineColor,
-                    start = Offset((size.width / 2), 0.dp.toPx()),
+                    color = lineColor,
+                    start = Offset(
+                        (size.width / 2),
+                        if (reply == ReplyType.INDIRECT_REPLY) 2.dp.toPx() else 0.dp.toPx()
+                    ),
                     end = Offset((size.width / 2), size.height - 4.dp.toPx()),
                     cap = StrokeCap.Round,
                     strokeWidth = 3.dp.toPx()
@@ -158,11 +168,20 @@ fun StatusCard(
             })
             Canvas(modifier = Modifier.layoutId(BOTTOM_REPLY_LINE_ID), onDraw = {
                 drawLine(
-                    lineColor,
+                    color = lineColor,
                     start = Offset((size.width / 2), 4.dp.toPx()),
                     end = Offset((size.width / 2), size.height),
                     cap = StrokeCap.Round,
-                    strokeWidth = 3.dp.toPx()
+                    strokeWidth = 3.dp.toPx(),
+                    pathEffect = when (repliedTo) {
+                        ReplyType.DIRECT_REPLY -> null
+                        ReplyType.INDIRECT_REPLY -> PathEffect.dashPathEffect(
+                            floatArrayOf(4.dp.toPx(), 6.dp.toPx()),
+                            0f
+                        )
+
+                        ReplyType.NONE -> null
+                    }
                 )
             })
         }, measurePolicy = { measurables, constraints ->
@@ -422,7 +441,7 @@ fun StatusCardTimeCounter(lastUpdated: ImmutableWrap<Instant>, modifier: Modifie
 }
 
 @Composable
-@ColorSchemePreview
+@ColorSchemePreviews
 private fun StatusCardPreview() {
     MastodroidTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
@@ -443,8 +462,8 @@ private fun StatusCardPreview() {
                 onReblogClicked = {},
                 rebblogedByAccountUserName = "Test",
                 rebblogedByUsernameEmojis = ImmutableWrap(listOf()),
-                isReply = true,
-                isRepliedTo = true
+                reply = ReplyType.DIRECT_REPLY,
+                repliedTo = ReplyType.INDIRECT_REPLY
             )
         }
 

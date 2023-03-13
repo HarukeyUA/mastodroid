@@ -1,5 +1,6 @@
 package com.rainy.mastodroid.network
 
+import com.rainy.mastodroid.core.data.model.response.status.StatusContextResponse
 import com.rainy.mastodroid.core.data.model.response.status.StatusResponse
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -33,6 +34,16 @@ interface MastodonApi {
 
     @POST("api/v1/statuses/{id}/unreblog")
     suspend fun unreblogStatus(
+        @Path("id") id: String
+    ): StatusResponse
+
+    @GET("api/v1/statuses/{id}/context")
+    suspend fun getStatusContext(
+        @Path("id") id: String
+    ): StatusContextResponse
+
+    @GET("api/v1/statuses/{id}")
+    suspend fun getStatusDetails(
         @Path("id") id: String
     ): StatusResponse
 }

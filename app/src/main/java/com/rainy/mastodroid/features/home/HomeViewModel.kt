@@ -7,9 +7,10 @@ import com.rainy.mastodroid.core.domain.interactor.HomeTimelineInteractor
 import com.rainy.mastodroid.core.domain.model.status.Status
 import com.rainy.mastodroid.core.navigation.RouteNavigator
 import com.rainy.mastodroid.features.home.model.CurrentlyPlayingMedia
-import com.rainy.mastodroid.features.home.model.StatusListItemModel
-import com.rainy.mastodroid.features.home.model.VideoAttachmentItemModel
-import com.rainy.mastodroid.features.home.model.toStatusListItemModel
+import com.rainy.mastodroid.ui.elements.statusListItem.model.StatusListItemModel
+import com.rainy.mastodroid.ui.elements.statusListItem.model.VideoAttachmentItemModel
+import com.rainy.mastodroid.ui.elements.statusListItem.model.toStatusListItemModel
+import com.rainy.mastodroid.features.statusDetails.StatusDetailsRoute
 import com.rainy.mastodroid.util.ErrorModel
 import com.rainy.mastodroid.util.ImmutableWrap
 import com.rainy.mastodroid.util.NetworkExceptionIdentifier
@@ -111,6 +112,12 @@ class HomeViewModel(
             it.toMutableSet().apply {
                 add(id)
             }
+        }
+    }
+
+    fun onStatusClicked(id: String) {
+        performNavigation {
+            navigate(StatusDetailsRoute.getRoute(id))
         }
     }
 

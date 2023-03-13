@@ -26,8 +26,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.rainy.mastodroid.core.navigation.NavRoute
 import com.rainy.mastodroid.extensions.observeWithLifecycle
 import com.rainy.mastodroid.features.home.model.CurrentlyPlayingMedia
-import com.rainy.mastodroid.features.home.model.StatusListItemModel
-import com.rainy.mastodroid.features.home.model.VideoAttachmentItemModel
+import com.rainy.mastodroid.ui.elements.statusListItem.model.StatusListItemModel
+import com.rainy.mastodroid.ui.elements.statusListItem.model.VideoAttachmentItemModel
 import com.rainy.mastodroid.features.home.ui.HomeScreen
 import com.rainy.mastodroid.util.ImmutableWrap
 import com.rainy.mastodroid.util.logi
@@ -84,7 +84,8 @@ object HomeRoute : NavRoute<HomeViewModel> {
             },
             onFavoriteClicked = viewModel::setFavorite,
             onReblogClicked = viewModel::setReblog,
-            onSensitiveExpandClicked = viewModel::expandSensitiveStatus
+            onSensitiveExpandClicked = viewModel::expandSensitiveStatus,
+            onClick = viewModel::onStatusClicked
         )
     }
 

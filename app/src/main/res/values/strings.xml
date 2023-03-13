@@ -29,4 +29,7 @@
     <string name="sensitive_content_warning">Sensitive Content</string>
     <string name="tap_to_reveal">Tap to reveal</string>
     <string name="reblogged_by">%s reblogged</string>
+    <string name="posted_on_app">Posted on %1$tB %1$te, %1$tY %1$tH:%1$tM via %2$s</string>
+    <string name="posted_on">Posted on %1$tB %1$te, %1$tY %1$tH:%1$tM</string>
+    <string name="edited_on">Edited on %1$tB %1$te, %1$tY %1$tH:%1$tM</string>
 </resources>

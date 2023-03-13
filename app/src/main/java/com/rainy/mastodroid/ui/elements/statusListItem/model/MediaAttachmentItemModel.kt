@@ -1,4 +1,4 @@
-package com.rainy.mastodroid.features.home.model
+package com.rainy.mastodroid.ui.elements.statusListItem.model
 
 import androidx.compose.runtime.Stable
 

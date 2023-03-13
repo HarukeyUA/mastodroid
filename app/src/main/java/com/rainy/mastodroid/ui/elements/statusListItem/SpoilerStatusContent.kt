@@ -1,4 +1,4 @@
-package com.rainy.mastodroid.features.home.ui
+package com.rainy.mastodroid.ui.elements.statusListItem
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.rainy.mastodroid.R
 import com.rainy.mastodroid.ui.theme.MastodroidTheme
-import com.rainy.mastodroid.util.ColorSchemePreview
+import com.rainy.mastodroid.util.ColorSchemePreviews
 
 @Composable
 fun SpoilerStatusContent(
@@ -64,7 +64,7 @@ fun SpoilerStatusContent(
     }
 }
 
-@ColorSchemePreview
+@ColorSchemePreviews
 @Composable
 private fun SpoilerStatusContentPreview() {
     MastodroidTheme {

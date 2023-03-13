@@ -10,4 +10,4 @@ import androidx.compose.ui.tooling.preview.Preview
     uiMode = UI_MODE_NIGHT_YES,
     backgroundColor = 0x282731
 )
-annotation class ColorSchemePreview
+annotation class ColorSchemePreviews

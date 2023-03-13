@@ -1,4 +1,4 @@
-package com.rainy.mastodroid.features.home.ui
+package com.rainy.mastodroid.ui.elements.statusListItem
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -21,9 +21,9 @@ import androidx.compose.ui.util.fastForEach
 import androidx.media3.exoplayer.ExoPlayer
 import com.rainy.mastodroid.R
 import com.rainy.mastodroid.extensions.ifTrue
-import com.rainy.mastodroid.features.home.model.ImageAttachmentItemModel
-import com.rainy.mastodroid.features.home.model.MediaAttachmentItemModel
-import com.rainy.mastodroid.features.home.model.VideoAttachmentItemModel
+import com.rainy.mastodroid.ui.elements.statusListItem.model.ImageAttachmentItemModel
+import com.rainy.mastodroid.ui.elements.statusListItem.model.MediaAttachmentItemModel
+import com.rainy.mastodroid.ui.elements.statusListItem.model.VideoAttachmentItemModel
 import com.rainy.mastodroid.ui.elements.AsyncBlurImage
 import com.rainy.mastodroid.ui.elements.MediaPreviewGrid
 import com.rainy.mastodroid.ui.elements.VideoPlayer
@@ -99,7 +99,9 @@ fun VideoAttachment(
     mediaAttachment: VideoAttachmentItemModel,
     modifier: Modifier = Modifier
 ) {
-    if ((attachments.content.firstOrNull() as? VideoAttachmentItemModel)?.currentlyPlaying == true && exoPlayer != null) {
+    if ((attachments.content.firstOrNull() as? VideoAttachmentItemModel)?.currentlyPlaying == true &&
+        exoPlayer != null
+    ) {
         VideoPlayer(
             exoPlayer.content,
             modifier = modifier

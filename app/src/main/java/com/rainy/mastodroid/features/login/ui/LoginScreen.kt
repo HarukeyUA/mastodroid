@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.rainy.mastodroid.R
 import com.rainy.mastodroid.features.login.model.LoginUiState
 import com.rainy.mastodroid.ui.theme.MastodroidTheme
-import com.rainy.mastodroid.util.ColorSchemePreview
+import com.rainy.mastodroid.util.ColorSchemePreviews
 import com.rainy.mastodroid.util.ErrorModel
 
 @Composable
@@ -92,7 +92,7 @@ fun InstanceHostTextField(
     )
 }
 
-@ColorSchemePreview
+@ColorSchemePreviews
 @Composable
 private fun LoginFormPreview() {
     MastodroidTheme {

@@ -23,7 +23,9 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemsIndexed
-import com.rainy.mastodroid.features.home.model.StatusListItemModel
+import com.rainy.mastodroid.core.domain.model.status.statusThread.ReplyType
+import com.rainy.mastodroid.ui.elements.statusListItem.StatusListItem
+import com.rainy.mastodroid.ui.elements.statusListItem.model.StatusListItemModel
 import com.rainy.mastodroid.util.ImmutableWrap
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -39,6 +41,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     exoPlayer: ImmutableWrap<ExoPlayer>? = null,
+    onClick: (String) -> Unit = {},
 ) {
     val pullRefreshState = rememberPullRefreshState(
         isRefreshing, onRefresh = onRefreshInvoked
@@ -54,7 +57,8 @@ fun HomeScreen(
             onUrlClicked = onUrlClicked,
             onFavoriteClicked = onFavoriteClicked,
             onReblogClicked = onReblogClicked,
-            onSensitiveExpandClicked = onSensitiveExpandClicked
+            onSensitiveExpandClicked = onSensitiveExpandClicked,
+            onClick = onClick
         )
         PullRefreshIndicator(
             refreshing = isRefreshing,
@@ -77,6 +81,7 @@ fun Timeline(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     exoPlayer: ImmutableWrap<ExoPlayer>? = null,
+    onClick: (String) -> Unit = {},
 ) {
     LazyColumn(
         state = lazyListState,
@@ -98,12 +103,13 @@ fun Timeline(
                 StatusListItem(
                     item = item,
                     exoPlayer = exoPlayer,
-                    isReply = isReply,
-                    isRepliedTo = isRepliedTo,
+                    reply = if (isReply) ReplyType.DIRECT_REPLY else ReplyType.NONE,
+                    repliedTo = if (isRepliedTo) ReplyType.DIRECT_REPLY else ReplyType.NONE,
                     onUrlClicked = onUrlClicked,
                     onFavoriteClicked = onFavoriteClicked,
                     onReblogClicked = onReblogClicked,
-                    onSensitiveExpandClicked = onSensitiveExpandClicked
+                    onSensitiveExpandClicked = onSensitiveExpandClicked,
+                    onClick = onClick
                 )
             }
         }

@@ -1,4 +1,4 @@
-package com.rainy.mastodroid.features.home.model
+package com.rainy.mastodroid.ui.elements.statusListItem.model
 
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.GifvAttachment
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.VideoAttachment

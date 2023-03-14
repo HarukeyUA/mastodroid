@@ -1,3 +1,8 @@
+/*
+ * Copyright 2023 HarukeyUA
+ * SPDX-License-Identifier: GPL-3.0-only
+ */
+
 package com.rainy.mastodroid.util
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES

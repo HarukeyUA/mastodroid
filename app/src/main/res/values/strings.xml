@@ -1,3 +1,8 @@
+<!--
+  ~ Copyright 2023 HarukeyUA
+  ~ SPDX-License-Identifier: GPL-3.0-only
+  -->
+
 <resources>
     <string name="app_name">Mastodroid</string>
     <string name="not_found">Content not found</string>

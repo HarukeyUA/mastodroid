@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2023 HarukeyUA
+  ~ SPDX-License-Identifier: GPL-3.0-only
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Theme.Mastodroid" parent="android:Theme.Material.Light.NoActionBar">

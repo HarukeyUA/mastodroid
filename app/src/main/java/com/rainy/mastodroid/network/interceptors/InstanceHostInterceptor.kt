@@ -1,3 +1,8 @@
+/*
+ * Copyright 2023 HarukeyUA
+ * SPDX-License-Identifier: GPL-3.0-only
+ */
+
 package com.rainy.mastodroid.network.interceptors
 
 import com.rainy.mastodroid.network.MastodonPublicApi.Companion.HOST_HEADER

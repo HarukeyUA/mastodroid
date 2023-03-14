@@ -12,14 +12,14 @@ import com.rainy.mastodroid.core.domain.model.status.Status
 interface TimelineLocalDataSource {
     fun getPagingSource(): PagingSource<Int, StatusInTimeline>
 
-    suspend fun replaceStatuses(list: List<Status>)
-    suspend fun insertStatuses(list: List<Status>)
+    suspend fun replaceTimelineStatuses(list: List<Status>)
+    suspend fun insertTimelineStatuses(list: List<Status>)
 
     suspend fun updateStatus(status: Status)
 
     suspend fun getStatusById(id: String): Status?
 
-    suspend fun getLastStatus(): Status?
+    suspend fun getLastTimeLineElementId(): String?
     suspend fun setFavourite(id: String)
     suspend fun unFavourite(id: String)
     suspend fun setRebloged(id: String)

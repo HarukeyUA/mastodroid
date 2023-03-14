@@ -40,8 +40,8 @@ interface TimelineDao {
     @Query("SELECT * FROM StatusEntity WHERE originalId = :id")
     suspend fun getTimelineStatusById(id: String): StatusEntity?
 
-    @Query("SELECT * FROM StatusEntity ORDER BY LENGTH(originalId) ASC, originalId ASC LIMIT 1")
-    suspend fun getLastStatus(): StatusEntity?
+    @Query("SELECT * FROM TimelineElementEntity ORDER BY LENGTH(timelineStatusId) ASC, timelineStatusId ASC LIMIT 1")
+    suspend fun getLastTimelineElement(): TimelineElementEntity?
 
     @Query("UPDATE StatusEntity SET favourited = 1, favouritesCount = favouritesCount + 1 WHERE originalId = :originalId")
     suspend fun setFavourite(originalId: String)
@@ -56,9 +56,9 @@ interface TimelineDao {
     suspend fun unReblog(originalId: String)
 
     @Transaction
-    suspend fun replaceStatuses(statuses: List<StatusEntity>) {
+    suspend fun replaceStatuses(statuses: List<StatusEntity>, timelineEntities: List<TimelineElementEntity>) {
         removeAllElements()
-        insertAllElements(statuses.map { TimelineElementEntity(statusId = it.originalId) })
+        insertAllElements(timelineEntities)
         insertAllStatuses(statuses)
     }
 }

@@ -16,6 +16,7 @@ import com.rainy.mastodroid.core.domain.data.remote.TimelineLocalDataSource
 import com.rainy.mastodroid.core.domain.data.remote.TimelineRemoteDataSource
 import com.rainy.mastodroid.core.domain.model.status.Status
 import com.rainy.mastodroid.core.domain.model.status.toDomain
+import com.rainy.mastodroid.core.domain.model.user.toDomain
 import com.rainy.mastodroid.util.dispatchOrThrow
 import com.rainy.mastodroid.util.onErrorValue
 import com.rainy.mastodroid.util.wrapResult
@@ -51,7 +52,14 @@ class HomeTimelineInteractorImpl(
     }.flow
 
     override fun getTimeLinePaging(scope: CoroutineScope) =
-        rawPagingSource.map { it.map { it.statusEntity.toDomain() } }.cachedIn(scope)
+        rawPagingSource.map { paging ->
+            paging.map { timelineElement ->
+                timelineElement.statusEntity.toDomain(
+                    rebloggedStatusId = timelineElement.timelineElementEntity.reblogInfo?.reblogId,
+                    reblogAuthorAccount = timelineElement.timelineElementEntity.reblogInfo?.reblogAuthor?.toDomain()
+                )
+            }
+        }.cachedIn(scope)
 
     override suspend fun setFavoriteStatus(id: String, actionId: String, action: Boolean) {
         if (action) {

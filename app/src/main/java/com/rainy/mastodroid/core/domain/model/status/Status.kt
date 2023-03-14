@@ -29,8 +29,8 @@ import com.rainy.mastodroid.util.loge
 import kotlinx.datetime.Instant
 
 data class Status(
-    val originalId: String,
-    val rebloggedStatusId: String?,
+    val id: String,
+    val reblogId: String?,
     val reblogAuthorAccount: User?,
     val uri: String,
     val createdAt: Instant?,
@@ -60,7 +60,7 @@ data class Status(
     val pinned: Boolean,
     val mediaAttachments: List<MediaAttachment>
 ) {
-    val actionId get() = rebloggedStatusId ?: originalId
+    val timelineId get() = reblogId ?: id
 }
 
 fun StatusResponse.toDomain(): Status? {
@@ -71,8 +71,8 @@ fun StatusResponse.toDomain(): Status? {
         }
 
         return Status(
-            originalId = this@toDomain.id,
-            rebloggedStatusId = this@toDomain.reblog?.id,
+            id = this@toDomain.reblog?.id ?: this@toDomain.id,
+            reblogId = if (this@toDomain.reblog == null) null else this@toDomain.id,
             reblogAuthorAccount = if (this@toDomain.reblog != null) this@toDomain.account?.toDomain() else null,
             uri = uri ?: "",
             createdAt = createdAt,
@@ -113,11 +113,14 @@ fun StatusResponse.toDomain(): Status? {
     }
 }
 
-fun StatusEntity.toDomain(): Status {
+fun StatusEntity.toDomain(
+    rebloggedStatusId: String? = null,
+    reblogAuthorAccount: User? = null
+): Status {
     return Status(
-        originalId = originalId,
-        rebloggedStatusId = rebloggedStatusId,
-        reblogAuthorAccount = reblogAuthorAccount?.toDomain(),
+        id = originalId,
+        reblogId = rebloggedStatusId,
+        reblogAuthorAccount = reblogAuthorAccount,
         uri = uri,
         createdAt = createdAt,
         account = account.toDomain(),

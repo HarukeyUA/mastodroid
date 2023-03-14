@@ -37,7 +37,7 @@ class StatusInteractorImpl(
     override fun buildStatusForest(statuses: List<Status>): List<StatusNode> {
         val repliesIndexes = mutableMapOf<String, StatusNode>()
         statuses.forEach {
-            repliesIndexes[it.originalId] =
+            repliesIndexes[it.id] =
                 StatusNode(content = it)
         }
         repliesIndexes.forEach { (_, statusNode) ->

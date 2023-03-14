@@ -23,6 +23,7 @@ val utilsModule = module {
     factoryOf(::RouteNavigatorImpl) { bind<RouteNavigator>() }
     single {
         Json {
+            coerceInputValues = true
             ignoreUnknownKeys = true
             explicitNulls = false
             serializersModule = SerializersModule {

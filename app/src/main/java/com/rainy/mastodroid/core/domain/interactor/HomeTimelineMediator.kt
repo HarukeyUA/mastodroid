@@ -30,7 +30,7 @@ class HomeTimelineMediator(
             val loadKey = when (loadType) {
                 LoadType.REFRESH -> null
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
-                LoadType.APPEND -> timelineLocalDataSource.getLastStatus()?.originalId
+                LoadType.APPEND -> timelineLocalDataSource.getLastTimeLineElementId()
                     ?: return MediatorResult.Success(endOfPaginationReached = true)
             }
 
@@ -40,9 +40,9 @@ class HomeTimelineMediator(
             )
 
             if (loadType == LoadType.REFRESH) {
-                timelineLocalDataSource.replaceStatuses(reorderStatuses(statuses))
+                timelineLocalDataSource.replaceTimelineStatuses(reorderStatuses(statuses))
             } else {
-                timelineLocalDataSource.insertStatuses(reorderStatuses(statuses))
+                timelineLocalDataSource.insertTimelineStatuses(reorderStatuses(statuses))
             }
 
             return MediatorResult.Success(endOfPaginationReached = statuses.isEmpty())
@@ -55,7 +55,7 @@ class HomeTimelineMediator(
 
     private fun reorderStatuses(statuses: List<Status>): List<Status> {
         val repliesIndexes = mutableMapOf<String, StatusNode>()
-        statuses.forEach { repliesIndexes[it.originalId] = StatusNode(content = it) }
+        statuses.forEach { repliesIndexes[it.id] = StatusNode(content = it) }
         repliesIndexes.forEach { (_, statusNode) ->
             val parent = repliesIndexes[statusNode.content.inReplyToId]
             parent?.also {

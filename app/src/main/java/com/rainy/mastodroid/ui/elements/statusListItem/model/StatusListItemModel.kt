@@ -45,8 +45,8 @@ data class StatusListItemModel(
 
 fun Status.toStatusListItemModel(): StatusListItemModel {
     return StatusListItemModel(
-        id = originalId,
-        actionId = actionId,
+        id = reblogId ?: id,
+        actionId = id,
         inReplyToId = inReplyToId,
         authorDisplayName = account.displayName,
         authorAccountHandle = account.accountUri,

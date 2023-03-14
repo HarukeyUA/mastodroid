@@ -8,7 +8,6 @@ package com.rainy.mastodroid.core.data.model.entity.status
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.rainy.mastodroid.core.data.model.response.StatusVisibility
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.GifvAttachment
@@ -22,22 +21,11 @@ import kotlinx.datetime.Instant
 
 const val STATUS_ENTITY_ORIGINAL_ID = "originalId"
 
-@Entity(
-    foreignKeys = [
-        ForeignKey(
-            entity = TimelineElementEntity::class,
-            parentColumns = [TIMELINE_ELEMENT_STATUS_ID],
-            childColumns = [STATUS_ENTITY_ORIGINAL_ID],
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
-)
+@Entity
 data class StatusEntity(
     @PrimaryKey
     @ColumnInfo(name = STATUS_ENTITY_ORIGINAL_ID)
     val originalId: String,
-    val rebloggedStatusId: String?,
-    val reblogAuthorAccount: StatusAccountEntity?,
     val uri: String,
     val createdAt: Instant?,
     val account: StatusAccountEntity,
@@ -71,9 +59,7 @@ data class StatusEntity(
 
 fun Status.toStatusEntity(): StatusEntity {
     return StatusEntity(
-        originalId = originalId,
-        rebloggedStatusId = rebloggedStatusId,
-        reblogAuthorAccount = reblogAuthorAccount?.toStatusAccountEntity(),
+        originalId = id,
         uri = uri,
         createdAt = createdAt,
         account = account.toStatusAccountEntity(),

@@ -21,7 +21,6 @@ import kotlinx.datetime.Instant
 @Stable
 data class FocusedStatusItemModel(
     val id: String,
-    val actionId: String,
     val inReplyToId: String?,
     val authorDisplayName: String,
     val authorDisplayNameEmojis: ImmutableWrap<List<CustomEmojiItemModel>>,
@@ -51,8 +50,7 @@ data class FocusedStatusItemModel(
 
 fun Status.toFocusedStatusItemModel(): FocusedStatusItemModel {
     return FocusedStatusItemModel(
-        id = originalId,
-        actionId = actionId,
+        id = id,
         inReplyToId = inReplyToId,
         authorDisplayName = account.displayName,
         authorAccountHandle = account.accountUri,

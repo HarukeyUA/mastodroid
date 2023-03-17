@@ -42,8 +42,8 @@ import com.rainy.mastodroid.ui.styledText.annotateMastodonContent
 fun StatusDetailsScreen(
     pullRefreshState: PullRefreshState,
     statusDetailsState: StatusDetailsState,
-    onFavoriteClicked: (id: String, actionId: String, action: Boolean) -> Unit,
-    onReblogClicked: (id: String, actionId: String, action: Boolean) -> Unit,
+    onFavoriteClicked: (id: String, action: Boolean) -> Unit,
+    onReblogClicked: (id: String, action: Boolean) -> Unit,
     onSensitiveExpandClicked: (id: String) -> Unit,
     onUrlClicked: (url: String) -> Unit,
     onStatusClicked: (id: String) -> Unit,
@@ -85,8 +85,8 @@ fun StatusDetailsScreen(
 fun StatusDetailThread(
     statusDetailsState: StatusDetailsState.Ready,
     lazyColumnState: LazyListState,
-    onFavoriteClicked: (id: String, actionId: String, action: Boolean) -> Unit,
-    onReblogClicked: (id: String, actionId: String, action: Boolean) -> Unit,
+    onFavoriteClicked: (id: String, action: Boolean) -> Unit,
+    onReblogClicked: (id: String, action: Boolean) -> Unit,
     onSensitiveExpandClicked: (id: String) -> Unit,
     onUrlClicked: (url: String) -> Unit,
     onStatusClicked: (id: String) -> Unit,
@@ -114,7 +114,13 @@ fun StatusDetailThread(
                     .height(8.dp)
                     .fillMaxWidth()
             )
-            FocusedStatusListItem(statusDetailsState, onSensitiveExpandClicked, onUrlClicked)
+            FocusedStatusListItem(
+                statusDetailsState = statusDetailsState,
+                onSensitiveExpandClicked = onSensitiveExpandClicked,
+                onUrlClicked = onUrlClicked,
+                onFavoriteClicked = onFavoriteClicked,
+                onReblogClicked = onReblogClicked
+            )
             Spacer(
                 modifier = Modifier
                     .height(8.dp)
@@ -159,7 +165,9 @@ fun StatusDetailThread(
 private fun FocusedStatusListItem(
     statusDetailsState: StatusDetailsState.Ready,
     onSensitiveExpandClicked: (id: String) -> Unit,
-    onUrlClicked: (url: String) -> Unit
+    onUrlClicked: (url: String) -> Unit,
+    onFavoriteClicked: (id: String, action: Boolean) -> Unit,
+    onReblogClicked: (id: String, action: Boolean) -> Unit,
 ) {
     val focusedStatus = statusDetailsState.statusInContext.focusedStatus
     val view = LocalView.current
@@ -184,7 +192,13 @@ private fun FocusedStatusListItem(
         replies = focusedStatus.replies,
         statusAppText = focusedStatus.applicationName,
         createdAt = focusedStatus.createdAt,
-        editedAt = focusedStatus.updatedAt
+        editedAt = focusedStatus.updatedAt,
+        onFavoriteClicked = {
+            onFavoriteClicked(focusedStatus.id, it)
+        },
+        onReblogClicked = {
+            onReblogClicked(focusedStatus.id, it)
+        }
     ) {
         if (focusedStatus.isSensitive) {
             SpoilerStatusContent(

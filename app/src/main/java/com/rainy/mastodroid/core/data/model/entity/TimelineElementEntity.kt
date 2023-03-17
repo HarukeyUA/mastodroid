@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-package com.rainy.mastodroid.core.data.model.entity.status
+package com.rainy.mastodroid.core.data.model.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.rainy.mastodroid.core.data.model.entity.status.StatusAccountEntity
 
 const val TIMELINE_STATUS_ID = "timelineStatusId"
 const val TIMELINE_ELEMENT_STATUS_ID = "statusId"

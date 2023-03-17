@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.map
 import com.rainy.mastodroid.core.domain.interactor.HomeTimelineInteractor
+import com.rainy.mastodroid.core.domain.interactor.StatusInteractor
 import com.rainy.mastodroid.core.domain.model.status.Status
 import com.rainy.mastodroid.core.navigation.RouteNavigator
 import com.rainy.mastodroid.features.home.model.CurrentlyPlayingMedia
@@ -33,6 +34,7 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val homeTimelineInteractor: HomeTimelineInteractor,
+    private val statusInteractor: StatusInteractor,
     private val exceptionIdentifier: NetworkExceptionIdentifier,
     routeNavigator: RouteNavigator
 ) : ViewModel(), RouteNavigator by routeNavigator {
@@ -100,15 +102,15 @@ class HomeViewModel(
         }
     }
 
-    fun setFavorite(id: String, actionId: String, action: Boolean) {
+    fun setFavorite(id: String, action: Boolean) {
         viewModelScope.launch(exceptionHandler) {
-            homeTimelineInteractor.setFavoriteStatus(id, actionId, action)
+            statusInteractor.setFavoriteStatus(id, action)
         }
     }
 
-    fun setReblog(id: String, actionId: String, action: Boolean) {
+    fun setReblog(id: String,  action: Boolean) {
         viewModelScope.launch(exceptionHandler) {
-            homeTimelineInteractor.setReblogStatus(id, actionId, action)
+            statusInteractor.setReblogStatus(id, action)
         }
     }
 

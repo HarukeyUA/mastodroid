@@ -9,8 +9,8 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import com.rainy.mastodroid.core.data.model.entity.status.StatusInTimeline
-import com.rainy.mastodroid.core.domain.data.remote.TimelineLocalDataSource
+import com.rainy.mastodroid.core.data.model.entity.StatusInTimeline
+import com.rainy.mastodroid.core.domain.data.remote.StatusLocalDataSource
 import com.rainy.mastodroid.core.domain.data.remote.TimelineRemoteDataSource
 import com.rainy.mastodroid.core.domain.model.status.Status
 import retrofit2.HttpException
@@ -19,7 +19,7 @@ import java.io.IOException
 @OptIn(ExperimentalPagingApi::class)
 class HomeTimelineMediator(
     private val timelineRemoteDataSource: TimelineRemoteDataSource,
-    private val timelineLocalDataSource: TimelineLocalDataSource
+    private val statusLocalDataSource: StatusLocalDataSource
 ) : RemoteMediator<Int, StatusInTimeline>() {
 
     override suspend fun load(
@@ -30,7 +30,7 @@ class HomeTimelineMediator(
             val loadKey = when (loadType) {
                 LoadType.REFRESH -> null
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
-                LoadType.APPEND -> timelineLocalDataSource.getLastTimeLineElementId()
+                LoadType.APPEND -> statusLocalDataSource.getLastTimeLineElementId()
                     ?: return MediatorResult.Success(endOfPaginationReached = true)
             }
 
@@ -40,9 +40,9 @@ class HomeTimelineMediator(
             )
 
             if (loadType == LoadType.REFRESH) {
-                timelineLocalDataSource.replaceTimelineStatuses(reorderStatuses(statuses))
+                statusLocalDataSource.replaceTimelineStatuses(reorderStatuses(statuses))
             } else {
-                timelineLocalDataSource.insertTimelineStatuses(reorderStatuses(statuses))
+                statusLocalDataSource.insertTimelineStatuses(reorderStatuses(statuses))
             }
 
             return MediatorResult.Success(endOfPaginationReached = statuses.isEmpty())

@@ -6,35 +6,100 @@
 package com.rainy.mastodroid.core.domain.interactor
 
 import com.rainy.mastodroid.core.domain.data.remote.StatusRemoteDataSource
+import com.rainy.mastodroid.core.domain.data.remote.StatusLocalDataSource
 import com.rainy.mastodroid.core.domain.model.status.Status
 import com.rainy.mastodroid.core.domain.model.status.statusThread.StatusNode
 import com.rainy.mastodroid.core.domain.model.status.statusThread.StatusThreadedContext
+import com.rainy.mastodroid.util.dispatchOrThrow
+import com.rainy.mastodroid.util.onErrorValue
+import com.rainy.mastodroid.util.wrapResult
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 interface StatusInteractor {
-    suspend fun getStatusDetails(id: String): Status
+    suspend fun fetchStatusDetails(id: String)
 
-    suspend fun getContextTreesForStatus(id: String): StatusThreadedContext
-    fun buildStatusForest(statuses: List<Status>): List<StatusNode>
+    suspend fun getContextTreesForStatus(id: String)
+    fun getStatusContextFlow(id: String): Flow<StatusThreadedContext>
+    fun getStatusFlow(id: String): Flow<Status?>
+    suspend fun setReblogStatus(id: String, action: Boolean)
+    suspend fun setFavoriteStatus(id: String, action: Boolean)
 }
 
 class StatusInteractorImpl(
-    private val statusRemoteDataSource: StatusRemoteDataSource
+    private val statusRemoteDataSource: StatusRemoteDataSource,
+    private val statusLocalDataSource: StatusLocalDataSource
 ) : StatusInteractor {
 
-    override suspend fun getStatusDetails(id: String): Status {
-        return statusRemoteDataSource.getStatusDetails(id)
+    override suspend fun fetchStatusDetails(id: String) {
+        val status = statusRemoteDataSource.getStatusDetails(id)
+        statusLocalDataSource.insertStatus(status)
     }
 
-    override suspend fun getContextTreesForStatus(id: String): StatusThreadedContext {
+    override suspend fun getContextTreesForStatus(id: String) {
         val statuses = statusRemoteDataSource.getStatusContext(id)
-        val descendantsForest = buildStatusForest(statuses.descendants)
-        return StatusThreadedContext(
-            ancestors = statuses.ancestors,
-            descendants = descendantsForest
-        )
+        statusLocalDataSource.insertStatusContext(statuses, id)
     }
 
-    override fun buildStatusForest(statuses: List<Status>): List<StatusNode> {
+    override fun getStatusContextFlow(id: String): Flow<StatusThreadedContext> {
+        return statusLocalDataSource.getContextFlowForStatus(id)
+            .map {
+                StatusThreadedContext(
+                    ancestors = it.ancestors,
+                    descendants = buildStatusForest(it.descendants)
+                )
+            }
+    }
+
+    override fun getStatusFlow(id: String): Flow<Status?> {
+        return statusLocalDataSource.getStatusFlowById(id)
+    }
+
+    override suspend fun setFavoriteStatus(id: String, action: Boolean) {
+        if (action) {
+            statusLocalDataSource.setFavourite(id)
+        } else {
+            statusLocalDataSource.unFavourite(id)
+        }
+        wrapResult {
+            if (action) {
+                statusRemoteDataSource.favoriteStatus(id)
+            } else {
+                statusRemoteDataSource.unfavoriteStatus(id)
+            }
+            return@wrapResult
+        }.onErrorValue {
+            if (!action) {
+                statusLocalDataSource.setFavourite(id)
+            } else {
+                statusLocalDataSource.unFavourite(id)
+            }
+        }.dispatchOrThrow()
+    }
+
+    override suspend fun setReblogStatus(id: String, action: Boolean) {
+        if (action) {
+            statusLocalDataSource.setRebloged(id)
+        } else {
+            statusLocalDataSource.unReblog(id)
+        }
+        wrapResult {
+            if (action) {
+                statusRemoteDataSource.reblogStatus(id)
+            } else {
+                statusRemoteDataSource.unreblogStatus(id)
+            }
+            return@wrapResult
+        }.onErrorValue {
+            if (!action) {
+                statusLocalDataSource.setRebloged(id)
+            } else {
+                statusLocalDataSource.unReblog(id)
+            }
+        }.dispatchOrThrow()
+    }
+
+    private fun buildStatusForest(statuses: List<Status>): List<StatusNode> {
         val repliesIndexes = mutableMapOf<String, StatusNode>()
         statuses.forEach {
             repliesIndexes[it.id] =

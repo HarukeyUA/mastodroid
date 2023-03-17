@@ -20,6 +20,7 @@ import retrofit2.Retrofit
 
 val UNAUTHENTICATED_CLIENT = named("UNAUTHENTICATED")
 val AUTHENTICATED_CLIENT = named("AUTHENTICATED")
+val DEFAULT_CLIENT = named("DEFAULT")
 private const val LOCALHOST = "https://127.0.0.1/"
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -32,13 +33,6 @@ val networkModule = module {
             .build()
     }
 
-    single(UNAUTHENTICATED_CLIENT) {
-        OkHttpClient.Builder()
-            .addInterceptor(get<InstanceHostInterceptor>())
-            .addInterceptor(get<HttpLoggingInterceptor>())
-            .build()
-    }
-
     single(AUTHENTICATED_CLIENT) {
         Retrofit.Builder()
             .addConverterFactory(get())
@@ -47,11 +41,24 @@ val networkModule = module {
             .build()
     }
 
+    single(UNAUTHENTICATED_CLIENT) {
+        get<OkHttpClient>(DEFAULT_CLIENT)
+            .newBuilder()
+            .addInterceptor(get<InstanceHostInterceptor>())
+            .addInterceptor(get<HttpLoggingInterceptor>())
+            .build()
+    }
+
     single(AUTHENTICATED_CLIENT) {
-        OkHttpClient.Builder()
+        get<OkHttpClient>(DEFAULT_CLIENT)
+            .newBuilder()
             .addInterceptor(get<AuthenticatedInstanceInterceptor>())
             .addInterceptor(get<HttpLoggingInterceptor>())
             .build()
+    }
+
+    single(DEFAULT_CLIENT) {
+        OkHttpClient()
     }
 
     single {

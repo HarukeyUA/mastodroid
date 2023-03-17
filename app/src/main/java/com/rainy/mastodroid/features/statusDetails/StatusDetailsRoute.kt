@@ -43,7 +43,7 @@ object StatusDetailsRoute : NavRoute<StatusDetailsViewModel> {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content(viewModel: StatusDetailsViewModel) {
-        val statusDetailsState = viewModel.statusDetailsState.collectAsStateWithLifecycle().value
+        val statusDetailsState = viewModel.statusContextFlow.collectAsStateWithLifecycle().value
         val loadingState by viewModel.loadingState.collectAsStateWithLifecycle()
         val context = LocalContext.current
         viewModel.errorEventFlow.observeWithLifecycle {

@@ -23,15 +23,20 @@ import com.rainy.mastodroid.util.ErrorModel
 import com.rainy.mastodroid.util.ImmutableWrap
 import com.rainy.mastodroid.util.NetworkExceptionIdentifier
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class StatusDetailsViewModel(
     private val savedStateHandle: SavedStateHandle,
-    private val statusInteractorImpl: StatusInteractor,
+    private val statusInteractor: StatusInteractor,
     private val exceptionIdentifier: NetworkExceptionIdentifier,
     routeNavigator: RouteNavigator
 ) : BaseViewModel(), RouteNavigator by routeNavigator {
@@ -44,9 +49,34 @@ class StatusDetailsViewModel(
     val errorEventFlow = errorEventChannel.receiveAsFlow()
 
     private val statusId: String by lazy { savedStateHandle.getOrThrow(StatusDetailsRoute.STATUS_ID_ARG) }
-    private val _statusDetailsState =
-        MutableStateFlow<StatusDetailsState>(StatusDetailsState.Loading)
-    val statusDetailsState = _statusDetailsState.asStateFlow()
+    private val statusIdFlow = savedStateHandle.getStateFlow(StatusDetailsRoute.STATUS_ID_ARG, "")
+    private val statusFlow = statusIdFlow.flatMapLatest {
+        statusInteractor.getStatusFlow(it)
+    }
+    val statusContextFlow =
+        statusIdFlow.flatMapLatest {
+            if (it.isNotEmpty()) {
+                statusInteractor.getStatusContextFlow(it)
+            } else {
+                flowOf()
+            }
+        }.combine(statusFlow) { statusContext, status ->
+            if (status != null) {
+                StatusDetailsState.Ready(
+                    StatusInContextItemModel(
+                        ancestors = ImmutableWrap(statusContext.ancestors.map(Status::toStatusListItemModel)),
+                        descendants = ImmutableWrap(flattenReplyForest(statusContext.descendants)),
+                        focusedStatus = status.toFocusedStatusItemModel()
+                    )
+                )
+            } else {
+                StatusDetailsState.Loading
+            }
+        }.flowOn(Dispatchers.Default)
+            .catch {
+                errorEventChannel.trySend(exceptionIdentifier.identifyException(it))
+            }
+            .stateIn(StatusDetailsState.Loading)
 
     init {
         loadStatus()
@@ -55,17 +85,12 @@ class StatusDetailsViewModel(
     fun loadStatus() {
         viewModelScope.launch(exceptionHandler) {
             loadingTask {
-                val statusDetails =
-                    statusInteractorImpl.getStatusDetails(statusId)
-                val statusContext = statusInteractorImpl.getContextTreesForStatus(statusId)
-                val flattenRepliesThread = flattenReplyForest(statusContext.descendants)
-                _statusDetailsState.value = StatusDetailsState.Ready(
-                    StatusInContextItemModel(
-                        ancestors = ImmutableWrap(statusContext.ancestors.map(Status::toStatusListItemModel)),
-                        descendants = ImmutableWrap(flattenRepliesThread),
-                        focusedStatus = statusDetails.toFocusedStatusItemModel()
-                    )
-                )
+                val statusDetailsDeffered =
+                    async { statusInteractor.fetchStatusDetails(statusId) }
+                val statusContextDeffered =
+                    async { statusInteractor.getContextTreesForStatus(statusId) }
+                statusContextDeffered.await()
+                statusDetailsDeffered.await()
             }
         }
     }
@@ -109,12 +134,16 @@ class StatusDetailsViewModel(
         }
     }
 
-    fun onFavoriteClicked(id: String, actionId: String, action: Boolean) {
-
+    fun onFavoriteClicked(id: String, action: Boolean) {
+        viewModelScope.launch(exceptionHandler) {
+            statusInteractor.setFavoriteStatus(id, action)
+        }
     }
 
-    fun onReblogClicked(id: String, actionId: String, action: Boolean) {
-
+    fun onReblogClicked(id: String, action: Boolean) {
+        viewModelScope.launch(exceptionHandler) {
+            statusInteractor.setReblogStatus(id, action)
+        }
     }
 
     fun onSensitiveExpandClicked(id: String) {

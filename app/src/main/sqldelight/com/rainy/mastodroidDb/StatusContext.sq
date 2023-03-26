@@ -1,0 +1,26 @@
+import com.rainy.mastodroid.core.domain.model.status.ContextStatusType;
+
+
+CREATE TABLE statusContextEntity (
+    statusId TEXT NOT NULL,
+    contextForStatusId TEXT NOT NULL,
+    contextStatusType TEXT AS ContextStatusType NOT NULL,
+    orderIndex INTEGER NOT NULL,
+    PRIMARY KEY (statusId, contextForStatusId),
+    FOREIGN KEY (contextForStatusId) REFERENCES statusEntity(id)
+);
+
+deleteAllForStatus:
+DELETE FROM statusContextEntity WHERE contextForStatusId = :contextForStatusId;
+
+insertOrReplace:
+INSERT OR REPLACE INTO statusContextEntity VALUES ?;
+
+contextForStatusId:
+SELECT
+statusWithAccount.*
+FROM statusContextEntity
+INNER JOIN statusWithAccount
+ON statusContextEntity.statusId = statusWithAccount.id
+WHERE statusContextEntity.contextForStatusId = :statusId AND contextStatusType = :contextStatusType
+ORDER BY orderIndex ASC;

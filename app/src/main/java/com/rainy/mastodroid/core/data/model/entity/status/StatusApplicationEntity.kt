@@ -6,7 +6,9 @@
 package com.rainy.mastodroid.core.data.model.entity.status
 
 import com.rainy.mastodroid.core.domain.model.status.StatusApplication
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class StatusApplicationEntity(
     val name: String,
     val website: String

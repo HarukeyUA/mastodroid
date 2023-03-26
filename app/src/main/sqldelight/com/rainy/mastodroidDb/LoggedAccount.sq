@@ -1,0 +1,20 @@
+CREATE TABLE loggedAccountEntity (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    remoteId TEXT NOT NULL,
+    instanceHost TEXT NOT NULL,
+    authToken TEXT NOT NULL
+);
+
+insertAccount:
+INSERT INTO loggedAccountEntity (
+    remoteId,
+    instanceHost,
+    authToken
+) VALUES (
+    :remoteId,
+    :instaceHost,
+    :authToken
+);
+
+getUser:
+SELECT * FROM loggedAccountEntity LIMIT 1;

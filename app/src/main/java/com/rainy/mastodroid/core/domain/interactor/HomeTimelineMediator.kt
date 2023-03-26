@@ -9,10 +9,10 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import com.rainy.mastodroid.core.data.model.entity.StatusInTimeline
 import com.rainy.mastodroid.core.domain.data.remote.StatusLocalDataSource
 import com.rainy.mastodroid.core.domain.data.remote.TimelineRemoteDataSource
 import com.rainy.mastodroid.core.domain.model.status.Status
+import com.rainy.mastodroidDb.TimelineWithOffset
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -20,11 +20,11 @@ import java.io.IOException
 class HomeTimelineMediator(
     private val timelineRemoteDataSource: TimelineRemoteDataSource,
     private val statusLocalDataSource: StatusLocalDataSource
-) : RemoteMediator<Int, StatusInTimeline>() {
+) : RemoteMediator<Int, Status>() {
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, StatusInTimeline>
+        state: PagingState<Int, Status>
     ): MediatorResult {
         try {
             val loadKey = when (loadType) {

@@ -46,13 +46,13 @@ class AuthInteractorImpl(
             )
         val userInfo = remoteAuthRemoteDataSource.verifyCredentials(instanceHost, authToken)
         localUserLocalDataSource.insertUser(
-            user = userInfo,
+            account = userInfo,
             authToken = authToken,
             instanceHost = instanceHost
         )
     }
 
     override suspend fun isLoggedIn(): Boolean {
-        return localUserLocalDataSource.getUser() != null
+        return localUserLocalDataSource.isLoggedIn()
     }
 }

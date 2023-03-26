@@ -6,7 +6,7 @@
 package com.rainy.mastodroid.core.domain.data.remote
 
 import com.rainy.mastodroid.core.domain.model.auth.AppAuthCredentials
-import com.rainy.mastodroid.core.domain.model.user.User
+import com.rainy.mastodroid.core.domain.model.user.Account
 
 interface AuthRemoteDataSource {
     suspend fun authenticateApp(instanceHost: String): AppAuthCredentials
@@ -21,5 +21,5 @@ interface AuthRemoteDataSource {
     suspend fun verifyCredentials(
         instanceHost: String,
         authToken: String
-    ): User
+    ): Account
 }

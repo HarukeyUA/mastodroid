@@ -7,7 +7,9 @@ package com.rainy.mastodroid.core.data.model.entity.status
 
 import com.rainy.mastodroid.core.data.model.response.status.PreviewType
 import com.rainy.mastodroid.core.domain.model.status.UrlPreviewCard
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class UrlPreviewCardEntity(
     val url: String,
     val title: String,

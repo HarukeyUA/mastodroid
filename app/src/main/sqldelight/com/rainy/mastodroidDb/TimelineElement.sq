@@ -1,0 +1,60 @@
+CREATE TABLE timelineElementEntity (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    statusId TEXT NOT NULL,
+    reblogId TEXT,
+    reblogAuthorId TEXT,
+    FOREIGN KEY (statusId) REFERENCES statusEntity(id),
+    FOREIGN KEY (reblogAuthorId) REFERENCES accountEntity(id)
+);
+
+removeAllTimelineElements:
+DELETE FROM timelineElementEntity;
+
+timelineWithOffset:
+SELECT
+    statusWithAccount.*,
+    timelineElementEntity.reblogId AS reblogId,
+    reblogAccount.id AS reblogAccountId,
+    reblogAccount.accountUri AS reblogAccountUri,
+    reblogAccount.avatarUrl AS reblogAccountAvatarUrl,
+    reblogAccount.avatarStaticUrl AS reblogAccountAvatarStatisUrl,
+    reblogAccount.bot AS reblogAccountBot,
+    reblogAccount.createdAt AS reblogAccountCreatedAt,
+    reblogAccount.displayName AS reblogAccountDisplayName,
+    reblogAccount.customEmojis AS reblogAccountCustomEmojis,
+    reblogAccount.fields AS reblogAccountFields,
+    reblogAccount.followersCount AS reblogAccountFollowersCount,
+    reblogAccount.followingCount AS reblogAccountFollowingCount,
+    reblogAccount.headerUrl AS reblogAccountHeaderUrl,
+    reblogAccount.headerStaticUrl AS reblogAccountHeaderStaticUrl,
+    reblogAccount.locked AS reblogAccountLocked,
+    reblogAccount.note AS reblogAccountNote,
+    reblogAccount.statusesCount AS reblogAccountStatusesCount,
+    reblogAccount.url AS reblogAccountUrl,
+    reblogAccount.username AS reblogAccountUsername,
+    reblogAccount.groupActor AS reblogAccountGroupActor,
+    reblogAccount.discoverable AS reblogAccountDiscoverable,
+    reblogAccount.suspended AS reblogAccountSuspended,
+    reblogAccount.limited AS reblogAccountLimited
+FROM timelineElementEntity
+INNER JOIN statusWithAccount ON timelineElementEntity.statusId = statusWithAccount.id
+LEFT JOIN accountEntity AS reblogAccount ON timelineElementEntity.reblogAuthorId = reblogAccount.id
+ORDER BY timelineElementEntity.id ASC
+LIMIT :limit OFFSET :offset;
+
+countTimeline:
+SELECT count(*) FROM timelineElementEntity;
+
+lastTimelineElement:
+SELECT * FROM timelineElementEntity ORDER BY ifnull(reblogId, statusId) ASC, ifnull(reblogId, statusId) ASC LIMIT 1;
+
+insertOrReplace:
+INSERT OR REPLACE INTO timelineElementEntity (
+    statusId,
+    reblogId,
+    reblogAuthorId
+) VALUES (
+    :statusId,
+    :reblogId,
+    :reblogAuthorId
+);

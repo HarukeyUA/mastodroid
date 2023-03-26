@@ -1,8 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'com.google.devtools.ksp'
     id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'app.cash.sqldelight'
 }
 
 android {
@@ -47,14 +47,17 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
-    applicationVariants.configureEach { variant ->
-        variant.sourceSets.java.each {
-            it.srcDirs += "build/generated/ksp/${variant.name}/kotlin"
-        }
-    }
     lint {
         enable += "ComposeM2Api"
         error += "ComposeM2Api"
+    }
+}
+
+sqldelight {
+    databases {
+        Database { // This will be the name of the generated database class.
+            packageName = "com.rainy.mastodroid"
+        }
     }
 }
 
@@ -99,12 +102,6 @@ dependencies {
     def koin_android_compose_version = '3.4.2'
     implementation "io.insert-koin:koin-androidx-compose:$koin_android_compose_version"
 
-    def room_version = '2.5.0'
-    implementation "androidx.room:room-runtime:$room_version"
-    implementation "androidx.room:room-ktx:$room_version"
-    ksp "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-paging:$room_version"
-
     def data_store_version = "1.0.0"
     implementation "androidx.datastore:datastore-preferences:$data_store_version"
 
@@ -128,6 +125,14 @@ dependencies {
 
     def browser_version = "1.5.0"
     implementation "androidx.browser:browser:$browser_version"
+
+    def sqldelight_version = "2.0.0-alpha05"
+    implementation "app.cash.sqldelight:android-driver:$sqldelight_version"
+    implementation "app.cash.sqldelight:coroutines-extensions:$sqldelight_version"
+    implementation "app.cash.sqldelight:primitive-adapters:$sqldelight_version"
+
+    def sqlite_version = "2.3.1"
+    implementation "androidx.sqlite:sqlite-framework:$sqlite_version"
 
     def compose_bom_version = "2023.02.00-rc02"
     implementation platform("dev.chrisbanes.compose:compose-bom:$compose_bom_version")

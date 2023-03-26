@@ -5,11 +5,6 @@
 
 package com.rainy.mastodroid.core.domain.model.status
 
-import com.rainy.mastodroid.core.data.model.entity.status.MediaAttachmentEntity
-import com.rainy.mastodroid.core.data.model.entity.status.StatusCustomEmojiEntity
-import com.rainy.mastodroid.core.data.model.entity.status.StatusEntity
-import com.rainy.mastodroid.core.data.model.entity.status.StatusMentionEntity
-import com.rainy.mastodroid.core.data.model.entity.status.StatusTagEntity
 import com.rainy.mastodroid.core.data.model.response.CustomEmojiResponse
 import com.rainy.mastodroid.core.data.model.response.StatusVisibility
 import com.rainy.mastodroid.core.data.model.response.mediaAttachment.AudioAttachmentResponse
@@ -22,8 +17,8 @@ import com.rainy.mastodroid.core.data.model.response.status.StatusResponse
 import com.rainy.mastodroid.core.data.model.response.status.StatusTagResponse
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.MediaAttachment
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.toDomain
+import com.rainy.mastodroid.core.domain.model.user.Account
 import com.rainy.mastodroid.core.domain.model.user.CustomEmoji
-import com.rainy.mastodroid.core.domain.model.user.User
 import com.rainy.mastodroid.core.domain.model.user.toDomain
 import com.rainy.mastodroid.util.loge
 import kotlinx.datetime.Instant
@@ -31,10 +26,10 @@ import kotlinx.datetime.Instant
 data class Status(
     val id: String,
     val reblogId: String?,
-    val reblogAuthorAccount: User?,
+    val reblogAuthorAccount: Account?,
     val uri: String,
     val createdAt: Instant?,
-    val account: User,
+    val account: Account,
     val content: String,
     val visibility: StatusVisibility,
     val sensitive: Boolean,
@@ -111,48 +106,4 @@ fun StatusResponse.toDomain(): Status? {
             } ?: listOf()
         )
     }
-}
-
-fun StatusEntity.toDomain(
-    rebloggedStatusId: String? = null,
-    reblogAuthorAccount: User? = null
-): Status {
-    return Status(
-        id = originalId,
-        reblogId = rebloggedStatusId,
-        reblogAuthorAccount = reblogAuthorAccount,
-        uri = uri,
-        createdAt = createdAt,
-        account = account.toDomain(),
-        content = content,
-        visibility = visibility,
-        sensitive = sensitive,
-        spoilerText = spoilerText,
-        application = application?.toDomain(),
-        mentions = mentions.map(StatusMentionEntity::toDomain),
-        tags = tags.map(StatusTagEntity::toDomain),
-        customEmojis = customEmojis.map(StatusCustomEmojiEntity::toDomain),
-        reblogsCount = reblogsCount,
-        favouritesCount = favouritesCount,
-        repliesCount = repliesCount,
-        url = url,
-        inReplyToId = inReplyToId,
-        inReplyToAccountId = inReplyToAccountId,
-        urlPreviewCard = urlPreviewCard?.toDomain(),
-        language = language,
-        text = text,
-        editedAt = editedAt,
-        favourited = favourited,
-        reblogged = reblogged,
-        muted = muted,
-        bookmarked = bookmarked,
-        mediaAttachments = mediaAttachments.map {
-            when (it) {
-                is MediaAttachmentEntity.GifvAttachmentEntity -> it.toDomain()
-                is MediaAttachmentEntity.ImageAttachmentEntity -> it.toDomain()
-                is MediaAttachmentEntity.VideoAttachmentEntity -> it.toDomain()
-            }
-        },
-        pinned = pinned
-    )
 }

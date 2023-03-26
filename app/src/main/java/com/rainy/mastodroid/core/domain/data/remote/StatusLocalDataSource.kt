@@ -6,18 +6,16 @@
 package com.rainy.mastodroid.core.domain.data.remote
 
 import androidx.paging.PagingSource
-import com.rainy.mastodroid.core.data.model.entity.StatusInTimeline
 import com.rainy.mastodroid.core.domain.model.status.Status
 import com.rainy.mastodroid.core.domain.model.status.StatusContext
+import com.rainy.mastodroidDb.TimelineWithOffset
 import kotlinx.coroutines.flow.Flow
 
 interface StatusLocalDataSource {
-    fun getPagingSource(): PagingSource<Int, StatusInTimeline>
+    fun getHomeTimelinePagingSource(): PagingSource<Int, Status>
 
-    suspend fun replaceTimelineStatuses(list: List<Status>)
-    suspend fun insertTimelineStatuses(list: List<Status>)
-
-    suspend fun updateStatus(status: Status)
+    suspend fun replaceTimelineStatuses(statuses: List<Status>)
+    suspend fun insertTimelineStatuses(statuses: List<Status>)
 
     suspend fun getStatusById(id: String): Status?
 

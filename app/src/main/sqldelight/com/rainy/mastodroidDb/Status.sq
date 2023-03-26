@@ -1,0 +1,175 @@
+import com.rainy.mastodroid.core.data.model.entity.status.MediaAttachmentEntity;
+import com.rainy.mastodroid.core.data.model.entity.status.StatusApplicationEntity;
+import com.rainy.mastodroid.core.data.model.entity.status.StatusCustomEmojiEntity;
+import com.rainy.mastodroid.core.data.model.entity.status.StatusMentionEntity;
+import com.rainy.mastodroid.core.data.model.entity.status.StatusTagEntity;
+import com.rainy.mastodroid.core.data.model.entity.status.UrlPreviewCardEntity;
+import com.rainy.mastodroid.core.data.model.response.StatusVisibility;
+import kotlin.collections.List;
+import kotlinx.datetime.Instant;
+import kotlin.Boolean;
+
+CREATE TABLE statusEntity (
+    id TEXT PRIMARY KEY NOT NULL,
+    uri TEXT NOT NULL,
+    createdAt TEXT AS Instant,
+    content TEXT NOT NULL,
+    visibility TEXT AS StatusVisibility NOT NULL,
+    sensitive INTEGER AS Boolean NOT NULL,
+    spoilerText TEXT NOT NULL,
+    reblogsCount INTEGER NOT NULL,
+    favouritesCount INTEGER NOT NULL,
+    repliesCount INTEGER NOT NULL,
+    url TEXT,
+    inReplyToId TEXT,
+    inReplyToAccountId TEXT,
+    language TEXT,
+    text TEXT,
+    editedAt TEXT AS Instant,
+    favourited INTEGER AS Boolean NOT NULL,
+    reblogged INTEGER AS Boolean NOT NULL,
+    muted INTEGER AS Boolean NOT NULL,
+    bookmarked INTEGER AS Boolean NOT NULL,
+    pinned INTEGER AS Boolean NOT NULL,
+    application TEXT AS StatusApplicationEntity,
+    mentions TEXT AS List<StatusMentionEntity> NOT NULL,
+    tags TEXT AS List<StatusTagEntity> NOT NULL,
+    customEmojis TEXT AS List<StatusCustomEmojiEntity> NOT NULL,
+    urlPreviewCard TEXT AS UrlPreviewCardEntity,
+    mediaAttachments TEXT AS List<MediaAttachmentEntity> NOT NULL,
+    accountId TEXT NOT NULL,
+    FOREIGN KEY (accountId) REFERENCES accountEntity(id)
+);
+
+CREATE VIEW statusWithAccount AS SELECT
+    statusEntity.*,
+    accountEntity.accountUri AS accountUri,
+    accountEntity.avatarUrl AS accountAvatarUrl,
+    accountEntity.avatarStaticUrl AS accountAvatarStatisUrl,
+    accountEntity.bot AS accountBot,
+    accountEntity.createdAt AS accountCreatedAt,
+    accountEntity.displayName AS accountDisplayName,
+    accountEntity.customEmojis AS accountCustomEmojis,
+    accountEntity.fields AS accountFields,
+    accountEntity.followersCount AS accountFollowersCount,
+    accountEntity.followingCount AS accountFollowingCount,
+    accountEntity.headerUrl AS accountHeaderUrl,
+    accountEntity.headerStaticUrl AS accountHeaderStaticUrl,
+    accountEntity.locked AS accountLocked,
+    accountEntity.note AS accountNote,
+    accountEntity.statusesCount AS accountStatusesCount,
+    accountEntity.url AS accountUrl,
+    accountEntity.username AS accountUsername,
+    accountEntity.groupActor AS accountGroupActor,
+    accountEntity.discoverable AS accountDiscoverable,
+    accountEntity.suspended AS accountSuspended,
+    accountEntity.limited AS accountLimited
+FROM statusEntity
+INNER JOIN accountEntity ON statusEntity.accountId = accountEntity.id;
+
+upsertStatus {
+    UPDATE statusEntity SET
+        uri = :uri,
+        createdAt = :createdAt,
+        content = :content,
+        visibility = :visibility,
+        sensitive = :sensitive,
+        spoilerText = :spoilerText,
+        reblogsCount = :reblogsCount,
+        url = :url,
+        inReplyToId = :inReplyToId,
+        inReplyToAccountId = :inReplyToAccountId,
+        language = :language,
+        favouritesCount = :favouritesCount,
+        repliesCount = :repliesCount,
+        text = :text,
+        editedAt = :editedAt,
+        favourited = :favourited,
+        reblogged = :reblogged,
+        muted = :muted,
+        bookmarked = :bookmarked,
+        pinned = :pinned,
+        application = :application,
+        mentions = :mentions,
+        tags = :tags,
+        customEmojis = :customEmojis,
+        urlPreviewCard = :urlPreviewCard,
+        mediaAttachments = :mediaAttachments,
+        accountId = :accountId
+    WHERE id = :id;
+
+    INSERT OR IGNORE INTO statusEntity (
+        id,
+        uri,
+        createdAt,
+        content,
+        visibility,
+        sensitive,
+        spoilerText,
+        reblogsCount,
+        url,
+        inReplyToId,
+        inReplyToAccountId,
+        language,
+        favouritesCount,
+        repliesCount,
+        text,
+        editedAt,
+        favourited,
+        reblogged,
+        muted,
+        bookmarked,
+        pinned,
+        application,
+        mentions,
+        tags,
+        customEmojis,
+        urlPreviewCard,
+        mediaAttachments,
+        accountId
+    ) VALUES (
+        :id,
+        :uri,
+        :createdAt,
+        :content,
+        :visibility,
+        :sensitive,
+        :spoilerText,
+        :reblogsCount,
+        :url,
+        :inReplyToId,
+        :inReplyToAccountId,
+        :language,
+        :favouritesCount,
+        :repliesCount,
+        :text,
+        :editedAt,
+        :favourited,
+        :reblogged,
+        :muted,
+        :bookmarked,
+        :pinned,
+        :application,
+        :mentions,
+        :tags,
+        :customEmojis,
+        :urlPreviewCard,
+        :mediaAttachments,
+        :accountId
+    );
+}
+
+statusWithAccountById:
+SELECT * FROM statusWithAccount WHERE statusWithAccount.id = :id;
+
+setFavorite:
+UPDATE statusEntity SET favourited = 1, favouritesCount = favouritesCount + 1 WHERE id = :id;
+
+unFavorite:
+UPDATE statusEntity SET favourited = 0, favouritesCount = favouritesCount - 1 WHERE id = :id;
+
+setReblog:
+UPDATE statusEntity SET reblogged = 1, reblogsCount = reblogsCount + 1 WHERE id = :id;
+
+unReblog:
+UPDATE statusEntity SET reblogged = 0, reblogsCount = reblogsCount - 1 WHERE id = :id;

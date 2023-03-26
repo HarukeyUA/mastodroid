@@ -29,9 +29,9 @@ data class AccountResponse(
     @SerialName("fields")
     val fields: List<AccountFieldResponse>?,
     @SerialName("followers_count")
-    val followersCount: Int?,
+    val followersCount: Long?,
     @SerialName("following_count")
-    val followingCount: Int?,
+    val followingCount: Long?,
     @SerialName("header")
     val header: String?,
     @SerialName("header_static")
@@ -45,7 +45,7 @@ data class AccountResponse(
     @SerialName("source")
     val source: AccountSourceResponse?,
     @SerialName("statuses_count")
-    val statusesCount: Int?,
+    val statusesCount: Long?,
     @SerialName("url")
     val url: String?,
     @SerialName("username")

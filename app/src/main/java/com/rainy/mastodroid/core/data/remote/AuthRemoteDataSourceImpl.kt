@@ -8,7 +8,7 @@ package com.rainy.mastodroid.core.data.remote
 import com.rainy.mastodroid.core.domain.data.remote.AuthRemoteDataSource
 import com.rainy.mastodroid.core.domain.model.auth.AppAuthCredentials
 import com.rainy.mastodroid.core.domain.model.auth.toDomain
-import com.rainy.mastodroid.core.domain.model.user.User
+import com.rainy.mastodroid.core.domain.model.user.Account
 import com.rainy.mastodroid.core.domain.model.user.toDomain
 import com.rainy.mastodroid.network.MastodonPublicApi
 
@@ -44,7 +44,7 @@ class AuthRemoteDataSourceImpl(
     override suspend fun verifyCredentials(
         instanceHost: String,
         authToken: String
-    ): User {
+    ): Account {
         return publicApi.verifyCredentials(
             host = instanceHost,
             authToken = "Bearer ${authToken.trim()}"

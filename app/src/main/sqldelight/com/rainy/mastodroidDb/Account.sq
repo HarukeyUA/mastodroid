@@ -1,0 +1,104 @@
+import com.rainy.mastodroid.core.data.model.entity.status.StatusAccountUserFieldEntity;
+import com.rainy.mastodroid.core.data.model.entity.status.StatusCustomEmojiEntity;
+import kotlin.collections.List;
+import kotlinx.datetime.Instant;
+import kotlin.Boolean;
+
+CREATE TABLE accountEntity (
+    id TEXT PRIMARY KEY NOT NULL,
+    accountUri TEXT NOT NULL,
+    avatarUrl TEXT NOT NULL,
+    avatarStaticUrl TEXT NOT NULL,
+    bot INTEGER AS Boolean NOT NULL,
+    createdAt TEXT AS Instant,
+    displayName TEXT NOT NULL,
+    customEmojis TEXT AS List<StatusCustomEmojiEntity> NOT NULL,
+    fields TEXT AS List<StatusAccountUserFieldEntity> NOT NULL,
+    followersCount INTEGER NOT NULL,
+    followingCount INTEGER NOT NULL,
+    headerUrl TEXT NOT NULL,
+    headerStaticUrl TEXT NOT NULL,
+    locked INTEGER AS Boolean NOT NULL,
+    note TEXT NOT NULL,
+    statusesCount INTEGER NOT NULL,
+    url TEXT NOT NULL,
+    username TEXT NOT NULL,
+    groupActor INTEGER AS Boolean NOT NULL,
+    discoverable INTEGER AS Boolean NOT NULL,
+    suspended INTEGER AS Boolean NOT NULL,
+    limited INTEGER AS Boolean  NOT NULL
+);
+
+upsertAccount {
+    UPDATE accountEntity SET
+        accountUri = :accountUri,
+        avatarUrl = :avatarUrl,
+        avatarStaticUrl = :avatarStaticUrl,
+        bot = :bot,
+        createdAt = :createdAt,
+        displayName = :displayName,
+        customEmojis = :customEmojis,
+        fields = :fields,
+        followersCount = :followersCount,
+        followingCount = :followingCount,
+        headerUrl = :headerUrl,
+        headerStaticUrl = :headerStaticUrl,
+        locked = :locked,
+        note = :note,
+        statusesCount = :statusesCount,
+        url = :url,
+        username = :username,
+        groupActor = :groupActor,
+        discoverable = :discoverable,
+        suspended = :suspended,
+        limited = :limited
+    WHERE id = :id;
+
+    INSERT OR IGNORE INTO accountEntity (
+        id,
+        accountUri,
+        avatarUrl,
+        avatarStaticUrl,
+        bot,
+        createdAt,
+        displayName,
+        customEmojis,
+        fields,
+        followersCount,
+        followingCount,
+        headerUrl,
+        headerStaticUrl,
+        locked,
+        note,
+        statusesCount,
+        url,
+        username,
+        groupActor,
+        discoverable,
+        suspended,
+        limited
+    ) VALUES (
+        :id,
+        :accountUri,
+        :avatarUrl,
+        :avatarStaticUrl,
+        :bot,
+        :createdAt,
+        :displayName,
+        :customEmojis,
+        :fields,
+        :followersCount,
+        :followingCount,
+        :headerUrl,
+        :headerStaticUrl,
+        :locked,
+        :note,
+        :statusesCount,
+        :url,
+        :username,
+        :groupActor,
+        :discoverable,
+        :suspended,
+        :limited
+    );
+}

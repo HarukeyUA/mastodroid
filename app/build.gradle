@@ -143,7 +143,7 @@ dependencies {
     implementation "androidx.compose.material:material"
     implementation "androidx.compose.ui:ui-util"
 
-    def activity_compose_version = "1.6.1"
+    def activity_compose_version = "1.7.0"
     implementation "androidx.activity:activity-compose:$activity_compose_version"
 
     def accompanist_version = '0.30.0'

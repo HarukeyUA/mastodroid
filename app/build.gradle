@@ -134,7 +134,7 @@ dependencies {
     def sqlite_version = "2.3.1"
     implementation "androidx.sqlite:sqlite-framework:$sqlite_version"
 
-    def compose_bom_version = "2023.02.00-rc02"
+    def compose_bom_version = "2023.03.00"
     implementation platform("dev.chrisbanes.compose:compose-bom:$compose_bom_version")
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'

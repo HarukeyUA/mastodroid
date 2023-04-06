@@ -146,7 +146,7 @@ dependencies {
     def activity_compose_version = "1.7.0"
     implementation "androidx.activity:activity-compose:$activity_compose_version"
 
-    def accompanist_version = '0.30.0'
+    def accompanist_version = '0.30.1'
     implementation "com.google.accompanist:accompanist-webview:$accompanist_version"
 
     androidTestImplementation platform("dev.chrisbanes.compose:compose-bom:$compose_bom_version")

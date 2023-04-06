@@ -41,6 +41,7 @@ fun StatusListItem(
     onSensitiveExpandClicked: (id: String) -> Unit,
     exoPlayer: ImmutableWrap<ExoPlayer>? = null,
     onClick: (String) -> Unit = {},
+    onAccountClick: (String) -> Unit = {}
 ) {
     val view = LocalView.current
     val contentText by remember {
@@ -74,6 +75,7 @@ fun StatusListItem(
             onReblogClicked(item.actionId, action)
         },
         onClick = { onClick(item.actionId) },
+        onAccountClick = { onAccountClick(item.authorId) },
         content = {
             if (item.isSensitive) {
                 SpoilerStatusContent(
@@ -219,7 +221,8 @@ internal class StatusListItemPreviewProvider :
             isSensitiveExpanded = false,
             rebblogedByDisplayNameEmojis = ImmutableWrap(listOf()),
             rebblogedByDisplayName = null,
-            inReplyToId = null
+            inReplyToId = null,
+            authorId = "101"
         )
     )
 }

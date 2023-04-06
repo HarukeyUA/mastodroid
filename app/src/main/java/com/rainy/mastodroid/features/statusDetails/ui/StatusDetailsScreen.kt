@@ -47,6 +47,7 @@ fun StatusDetailsScreen(
     onSensitiveExpandClicked: (id: String) -> Unit,
     onUrlClicked: (url: String) -> Unit,
     onStatusClicked: (id: String) -> Unit,
+    onAccountClicked: (String) -> Unit,
     loadingState: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -67,7 +68,8 @@ fun StatusDetailsScreen(
                     onReblogClicked = onReblogClicked,
                     onSensitiveExpandClicked = onSensitiveExpandClicked,
                     onUrlClicked = onUrlClicked,
-                    onStatusClicked = onStatusClicked
+                    onStatusClicked = onStatusClicked,
+                    onAccountClicked = onAccountClicked
                 )
             }
         }
@@ -90,7 +92,8 @@ fun StatusDetailThread(
     onSensitiveExpandClicked: (id: String) -> Unit,
     onUrlClicked: (url: String) -> Unit,
     onStatusClicked: (id: String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAccountClicked: (String) -> Unit = {}
 ) {
     LazyColumn(state = lazyColumnState, modifier = modifier) {
         itemsIndexed(
@@ -105,7 +108,8 @@ fun StatusDetailThread(
                 onFavoriteClicked = onFavoriteClicked,
                 onReblogClicked = onReblogClicked,
                 onSensitiveExpandClicked = onSensitiveExpandClicked,
-                onClick = onStatusClicked
+                onClick = onStatusClicked,
+                onAccountClick = onAccountClicked
             )
         }
         item(key = statusDetailsState.statusInContext.focusedStatus.id) {
@@ -119,7 +123,8 @@ fun StatusDetailThread(
                 onSensitiveExpandClicked = onSensitiveExpandClicked,
                 onUrlClicked = onUrlClicked,
                 onFavoriteClicked = onFavoriteClicked,
-                onReblogClicked = onReblogClicked
+                onReblogClicked = onReblogClicked,
+                onAccountClicked = onAccountClicked
             )
             Spacer(
                 modifier = Modifier
@@ -147,7 +152,8 @@ fun StatusDetailThread(
                 onFavoriteClicked = onFavoriteClicked,
                 onReblogClicked = onReblogClicked,
                 onSensitiveExpandClicked = onSensitiveExpandClicked,
-                onClick = onStatusClicked
+                onClick = onStatusClicked,
+                onAccountClick = onAccountClicked
             )
 
             if (statusThreadElement.repliedTo == ReplyType.NONE) {
@@ -168,6 +174,7 @@ private fun FocusedStatusListItem(
     onUrlClicked: (url: String) -> Unit,
     onFavoriteClicked: (id: String, action: Boolean) -> Unit,
     onReblogClicked: (id: String, action: Boolean) -> Unit,
+    onAccountClicked: (String) -> Unit = {}
 ) {
     val focusedStatus = statusDetailsState.statusInContext.focusedStatus
     val view = LocalView.current
@@ -198,6 +205,9 @@ private fun FocusedStatusListItem(
         },
         onReblogClicked = {
             onReblogClicked(focusedStatus.id, it)
+        },
+        onAccountClick = {
+            onAccountClicked(focusedStatus.authorId)
         }
     ) {
         if (focusedStatus.isSensitive) {

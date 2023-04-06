@@ -26,7 +26,7 @@ CREATE TABLE accountEntity (
     groupActor INTEGER AS Boolean NOT NULL,
     discoverable INTEGER AS Boolean NOT NULL,
     suspended INTEGER AS Boolean NOT NULL,
-    limited INTEGER AS Boolean  NOT NULL
+    limited INTEGER AS Boolean NOT NULL
 );
 
 upsertAccount {
@@ -102,3 +102,6 @@ upsertAccount {
         :limited
     );
 }
+
+accountById:
+SELECT * FROM accountEntity WHERE id = :id;

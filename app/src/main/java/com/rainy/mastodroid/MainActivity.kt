@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.rainy.mastodroid.features.accountDetails.AccountDetailsRoute
 import com.rainy.mastodroid.features.home.HomeRoute
 import com.rainy.mastodroid.features.statusDetails.StatusDetailsRoute
 import com.rainy.mastodroid.ui.navigation.AuthFlowNavGraph
@@ -45,6 +46,7 @@ class MainActivity : ComponentActivity() {
                             AuthFlowNavGraph.navigation(this, navController)
                             HomeRoute.composable(this, navController)
                             StatusDetailsRoute.composable(this, navController)
+                            AccountDetailsRoute.composable(this, navController)
                         }
                     }
 

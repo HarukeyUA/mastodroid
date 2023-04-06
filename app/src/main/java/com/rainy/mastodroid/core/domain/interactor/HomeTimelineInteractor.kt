@@ -10,7 +10,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.rainy.mastodroid.core.domain.data.remote.StatusLocalDataSource
+import com.rainy.mastodroid.core.domain.data.local.StatusLocalDataSource
 import com.rainy.mastodroid.core.domain.data.remote.TimelineRemoteDataSource
 import com.rainy.mastodroid.core.domain.model.status.Status
 import kotlinx.coroutines.CoroutineScope

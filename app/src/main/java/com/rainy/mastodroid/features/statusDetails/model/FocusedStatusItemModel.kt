@@ -43,6 +43,7 @@ data class FocusedStatusItemModel(
     val createdAt: ImmutableWrap<Instant>?,
     val updatedAt: ImmutableWrap<Instant>?,
     val applicationName: String?,
+    val authorId: String
 ) {
     val isSubjectForAutoPlay =
         attachments.content.size == 1 && attachments.content.firstOrNull() is VideoAttachmentItemModel && (!isSensitive || isSensitiveExpanded)
@@ -81,7 +82,8 @@ fun Status.toFocusedStatusItemModel(): FocusedStatusItemModel {
                 ?: listOf()
         ),
         createdAt = createdAt?.let(::ImmutableWrap),
-        applicationName = application?.name
+        applicationName = application?.name,
+        authorId = account.id
     )
 }
 

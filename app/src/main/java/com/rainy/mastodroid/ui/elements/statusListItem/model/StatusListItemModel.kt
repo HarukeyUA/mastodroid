@@ -19,6 +19,7 @@ data class StatusListItemModel(
     val id: String,
     val actionId: String,
     val inReplyToId: String?,
+    val authorId: String,
     val authorDisplayName: String,
     val authorDisplayNameEmojis: ImmutableWrap<List<CustomEmojiItemModel>>,
     val rebblogedByDisplayName: String?,
@@ -76,5 +77,6 @@ fun Status.toStatusListItemModel(): StatusListItemModel {
             reblogAuthorAccount?.customEmojis?.map(CustomEmoji::toItemModel)
                 ?: listOf()
         ),
+        authorId = account.id
     )
 }

@@ -66,7 +66,8 @@ object StatusDetailsRoute : NavRoute<StatusDetailsViewModel> {
                 customTabsIntent.launchUrl(context, url.toUri())
             },
             loadingState = loadingState,
-            onStatusClicked = viewModel::onStatusClicked
+            onStatusClicked = viewModel::onStatusClicked,
+            onAccountClicked = viewModel::onAccountClicked
         )
     }
 }

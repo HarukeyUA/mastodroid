@@ -20,7 +20,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -29,7 +28,7 @@ import com.rainy.mastodroid.ui.elements.ResizableIconButton
 import com.rainy.mastodroid.ui.elements.ResizableIconToggleButton
 import com.rainy.mastodroid.ui.theme.MastodroidTheme
 import com.rainy.mastodroid.util.ColorSchemePreviews
-import java.text.DecimalFormat
+import com.rainy.mastodroid.util.abbreviateCount
 
 @Composable
 fun StatusQuickActions(
@@ -60,7 +59,7 @@ fun StatusQuickActions(
                             contentDescription = null
                         )
                         Text(
-                            text = abbreviateCount(replies),
+                            text = replies.abbreviateCount(),
                             modifier = Modifier
                                 .align(Alignment.CenterVertically),
                             maxLines = 1,
@@ -89,7 +88,7 @@ fun StatusQuickActions(
                             )
                         }
                         Text(
-                            text = abbreviateCount(reblogs),
+                            text = reblogs.abbreviateCount(),
                             modifier = Modifier
                                 .align(Alignment.CenterVertically),
                             maxLines = 1,
@@ -118,7 +117,7 @@ fun StatusQuickActions(
                             )
                         }
                         Text(
-                            text = abbreviateCount(favorites),
+                            text = favorites.abbreviateCount(),
                             modifier = Modifier
                                 .align(Alignment.CenterVertically),
                             maxLines = 1,
@@ -131,28 +130,6 @@ fun StatusQuickActions(
         }
     }
 
-}
-
-private const val MILLION = 1_000_000
-private const val THOUSAND = 1_000
-
-@Composable
-private fun abbreviateCount(favorites: Int) = when {
-    favorites >= MILLION -> {
-        stringResource(
-            id = R.string.count_millions,
-            DecimalFormat("#.#").format(favorites / MILLION.toFloat())
-        )
-    }
-
-    favorites >= THOUSAND -> {
-        stringResource(
-            id = R.string.count_thousands,
-            DecimalFormat("#.#").format(favorites / THOUSAND.toFloat())
-        )
-    }
-
-    else -> favorites.toString()
 }
 
 @ColorSchemePreviews

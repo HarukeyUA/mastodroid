@@ -6,6 +6,7 @@
 package com.rainy.mastodroid.ui.elements.statusListItem
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -101,6 +102,7 @@ fun StatusCard(
     onReblogClicked: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
+    onAccountClick: () -> Unit = {},
     content: @Composable () -> Unit = {},
 ) {
     val isReply = reply != ReplyType.NONE
@@ -138,6 +140,7 @@ fun StatusCard(
                     .size(AVATAR_DIMENSIONS_DP.dp)
                     .clip(MaterialTheme.shapes.large)
                     .layoutId(AVATAR_ID)
+                    .clickable(onClick = onAccountClick)
             )
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp),

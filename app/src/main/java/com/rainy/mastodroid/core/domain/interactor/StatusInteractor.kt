@@ -6,7 +6,7 @@
 package com.rainy.mastodroid.core.domain.interactor
 
 import com.rainy.mastodroid.core.domain.data.remote.StatusRemoteDataSource
-import com.rainy.mastodroid.core.domain.data.remote.StatusLocalDataSource
+import com.rainy.mastodroid.core.domain.data.local.StatusLocalDataSource
 import com.rainy.mastodroid.core.domain.model.status.Status
 import com.rainy.mastodroid.core.domain.model.status.statusThread.StatusNode
 import com.rainy.mastodroid.core.domain.model.status.statusThread.StatusThreadedContext

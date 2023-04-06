@@ -5,6 +5,8 @@
 
 package com.rainy.mastodroid.di
 
+import com.rainy.mastodroid.core.domain.interactor.AccountInteractor
+import com.rainy.mastodroid.core.domain.interactor.AccountInteractorImpl
 import com.rainy.mastodroid.core.domain.interactor.AuthInteractor
 import com.rainy.mastodroid.core.domain.interactor.AuthInteractorImpl
 import com.rainy.mastodroid.core.domain.interactor.HomeTimelineInteractor
@@ -19,4 +21,5 @@ val interactorModule = module {
     factoryOf(::AuthInteractorImpl) { bind<AuthInteractor>() }
     factoryOf(::HomeTimelineInteractorImpl) { bind<HomeTimelineInteractor>() }
     factoryOf(::StatusInteractorImpl) { bind<StatusInteractor>() }
+    factoryOf(::AccountInteractorImpl) { bind<AccountInteractor>() }
 }

@@ -12,6 +12,7 @@ import com.rainy.mastodroid.core.domain.interactor.HomeTimelineInteractor
 import com.rainy.mastodroid.core.domain.interactor.StatusInteractor
 import com.rainy.mastodroid.core.domain.model.status.Status
 import com.rainy.mastodroid.core.navigation.RouteNavigator
+import com.rainy.mastodroid.features.accountDetails.AccountDetailsRoute
 import com.rainy.mastodroid.features.home.model.CurrentlyPlayingMedia
 import com.rainy.mastodroid.ui.elements.statusListItem.model.StatusListItemModel
 import com.rainy.mastodroid.ui.elements.statusListItem.model.VideoAttachmentItemModel
@@ -125,6 +126,12 @@ class HomeViewModel(
     fun onStatusClicked(id: String) {
         performNavigation {
             navigate(StatusDetailsRoute.getRoute(id))
+        }
+    }
+
+    fun onAccountClicked(id: String) {
+        performNavigation {
+            navigate(AccountDetailsRoute.getRoute(id))
         }
     }
 

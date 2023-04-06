@@ -5,8 +5,11 @@
 
 package com.rainy.mastodroid.network
 
+import com.rainy.mastodroid.core.data.model.response.FeaturedTagResponse
 import com.rainy.mastodroid.core.data.model.response.status.StatusContextResponse
 import com.rainy.mastodroid.core.data.model.response.status.StatusResponse
+import com.rainy.mastodroid.core.data.model.response.user.AccountRelationshipResponse
+import com.rainy.mastodroid.core.data.model.response.user.AccountResponse
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -51,4 +54,31 @@ interface MastodonApi {
     suspend fun getStatusDetails(
         @Path("id") id: String
     ): StatusResponse
+
+    @GET("api/v1/accounts/{id}")
+    suspend fun getAccount(
+        @Path("id") id: String
+    ): AccountResponse
+
+    @GET("api/v1/accounts/{id}/featured_tags")
+    suspend fun getFeaturedTagsForAccount(
+        @Path("id") id: String
+    ): List<FeaturedTagResponse>
+
+    @POST("api/v1/accounts/{id}/follow")
+    suspend fun followAccount(
+        @Path("id") id: String
+    ): AccountRelationshipResponse
+
+    @POST("api/v1/accounts/{id}/unfollow")
+    suspend fun unfollowAccount(
+        @Path("id") id: String
+    ): AccountRelationshipResponse
+
+    @GET("api/v1/accounts/relationships")
+    suspend fun getRelationships(
+        @Query("id[]") list: List<String>
+    ): List<AccountRelationshipResponse>
+
+
 }

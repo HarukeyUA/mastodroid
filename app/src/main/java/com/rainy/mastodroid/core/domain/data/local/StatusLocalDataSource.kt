@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-package com.rainy.mastodroid.core.domain.data.remote
+package com.rainy.mastodroid.core.domain.data.local
 
 import androidx.paging.PagingSource
 import com.rainy.mastodroid.core.domain.model.status.Status

@@ -37,4 +37,16 @@
     <string name="posted_on_app">Posted on %1$tB %1$te, %1$tY %1$tH:%1$tM via %2$s</string>
     <string name="posted_on">Posted on %1$tB %1$te, %1$tY %1$tH:%1$tM</string>
     <string name="edited_on">Edited on %1$tB %1$te, %1$tY %1$tH:%1$tM</string>
+    <string name="followers">Followers</string>
+    <string name="following">Following</string>
+    <string name="posts">Posts</string>
+    <string name="hashtag">#%s</string>
+    <string name="following_account">Following</string>
+    <string name="follow_account">Follow</string>
+    <string name="follow_account_requested">Requested</string>
+    <string name="followed_by_account">Follows you</string>
+    <string name="posts_account_tab">Posts</string>
+    <string name="posts_and_replies_account_tab">Posts and Replies</string>
+    <string name="media_account_tab">Media</string>
+    <string name="info_account_tab">Info</string>
 </resources>

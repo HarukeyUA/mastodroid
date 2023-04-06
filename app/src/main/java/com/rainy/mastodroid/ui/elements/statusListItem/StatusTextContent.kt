@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import com.rainy.mastodroid.ui.elements.statusListItem.model.CustomEmojiItemModel
@@ -23,12 +24,13 @@ fun StatusTextContent(
     text: AnnotatedString,
     customEmoji: ImmutableWrap<List<CustomEmojiItemModel>>,
     modifier: Modifier = Modifier,
+    style: TextStyle = MaterialTheme.typography.bodyMedium,
     onTextClicked: () -> Unit = {},
-    onUrlClicked: (url: String) -> Unit
+    onUrlClicked: (url: String) -> Unit = {}
 ) {
     ClickableText(
         text = styleTextByAnnotations(text),
-        style = MaterialTheme.typography.bodyMedium,
+        style = style,
         modifier = modifier,
         onClick = { offset ->
             text.getStringAnnotations(offset, offset).firstOrNull()

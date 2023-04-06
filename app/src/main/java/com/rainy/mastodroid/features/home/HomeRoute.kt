@@ -90,7 +90,8 @@ object HomeRoute : NavRoute<HomeViewModel> {
             onFavoriteClicked = viewModel::setFavorite,
             onReblogClicked = viewModel::setReblog,
             onSensitiveExpandClicked = viewModel::expandSensitiveStatus,
-            onClick = viewModel::onStatusClicked
+            onClick = viewModel::onStatusClicked,
+            onAccountClick = viewModel::onAccountClicked
         )
     }
 

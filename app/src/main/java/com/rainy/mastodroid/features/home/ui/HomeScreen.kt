@@ -47,6 +47,7 @@ fun HomeScreen(
     lazyListState: LazyListState = rememberLazyListState(),
     exoPlayer: ImmutableWrap<ExoPlayer>? = null,
     onClick: (String) -> Unit = {},
+    onAccountClick: (String) -> Unit = {}
 ) {
     val pullRefreshState = rememberPullRefreshState(
         isRefreshing, onRefresh = onRefreshInvoked
@@ -63,7 +64,8 @@ fun HomeScreen(
             onFavoriteClicked = onFavoriteClicked,
             onReblogClicked = onReblogClicked,
             onSensitiveExpandClicked = onSensitiveExpandClicked,
-            onClick = onClick
+            onClick = onClick,
+            onAccountClick = onAccountClick
         )
         PullRefreshIndicator(
             refreshing = isRefreshing,
@@ -87,6 +89,7 @@ fun Timeline(
     lazyListState: LazyListState = rememberLazyListState(),
     exoPlayer: ImmutableWrap<ExoPlayer>? = null,
     onClick: (String) -> Unit = {},
+    onAccountClick: (String) -> Unit = {}
 ) {
     LazyColumn(
         state = lazyListState,
@@ -114,7 +117,8 @@ fun Timeline(
                     onFavoriteClicked = onFavoriteClicked,
                     onReblogClicked = onReblogClicked,
                     onSensitiveExpandClicked = onSensitiveExpandClicked,
-                    onClick = onClick
+                    onClick = onClick,
+                    onAccountClick = onAccountClick
                 )
             }
         }

@@ -5,6 +5,7 @@
 
 package com.rainy.mastodroid.features.statusDetails.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,6 +62,7 @@ fun FocusedStatus(
     modifier: Modifier = Modifier,
     onFavoriteClicked: (Boolean) -> Unit = {},
     onReblogClicked: (Boolean) -> Unit = {},
+    onAccountClick: () -> Unit = {},
     content: @Composable () -> Unit = {},
 ) {
     ElevatedCard(elevation = CardDefaults.elevatedCardElevation(
@@ -70,7 +72,13 @@ fun FocusedStatus(
             modifier = Modifier.padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            FocusedStatusHeader(accountAvatarUrl, fullAccountName, usernameEmojis, accountUserName)
+            FocusedStatusHeader(
+                accountAvatarUrl = accountAvatarUrl,
+                fullAccountName = fullAccountName,
+                usernameEmojis = usernameEmojis,
+                accountUserName = accountUserName,
+                onAccountClick = onAccountClick
+            )
             content()
             StatusQuickActions(
                 favorites = favorites,
@@ -126,7 +134,8 @@ fun FocusedStatusHeader(
     fullAccountName: String,
     usernameEmojis: ImmutableWrap<List<CustomEmojiItemModel>>,
     accountUserName: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAccountClick: () -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -141,6 +150,7 @@ fun FocusedStatusHeader(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(48.dp)
+                .clickable(onClick = onAccountClick)
                 .clip(MaterialTheme.shapes.large)
         )
         Column(modifier = Modifier.weight(1f)) {

@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.takeOrElse
@@ -30,7 +31,10 @@ import com.rainy.mastodroid.ui.elements.statusListItem.model.CustomEmojiItemMode
 import com.rainy.mastodroid.util.ImmutableWrap
 
 @Composable
-fun textInlineCustomEmojis(emojis: ImmutableWrap<List<CustomEmojiItemModel>>): Map<String, InlineTextContent> {
+fun textInlineCustomEmojis(
+    emojis: ImmutableWrap<List<CustomEmojiItemModel>>,
+    size: TextUnit = LocalTextStyle.current.fontSize
+): Map<String, InlineTextContent> {
     val context = LocalContext.current
     val surfaceColor =
         MaterialTheme.colorScheme.surfaceColorAtElevation(LocalAbsoluteTonalElevation.current + 4.dp)
@@ -44,8 +48,8 @@ fun textInlineCustomEmojis(emojis: ImmutableWrap<List<CustomEmojiItemModel>>): M
             put(
                 emoji.shortcode, InlineTextContent(
                     placeholder = Placeholder(
-                        width = LocalTextStyle.current.fontSize.takeOrElse { 14.sp },
-                        height = LocalTextStyle.current.fontSize.takeOrElse { 14.sp },
+                        width = size.takeOrElse { 14.sp },
+                        height = size.takeOrElse { 14.sp },
                         PlaceholderVerticalAlign.TextCenter
                     ),
                     children = {

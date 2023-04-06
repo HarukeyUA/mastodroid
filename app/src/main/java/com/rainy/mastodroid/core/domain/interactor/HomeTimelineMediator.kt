@@ -9,10 +9,9 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import com.rainy.mastodroid.core.domain.data.remote.StatusLocalDataSource
+import com.rainy.mastodroid.core.domain.data.local.StatusLocalDataSource
 import com.rainy.mastodroid.core.domain.data.remote.TimelineRemoteDataSource
 import com.rainy.mastodroid.core.domain.model.status.Status
-import com.rainy.mastodroidDb.TimelineWithOffset
 import retrofit2.HttpException
 import java.io.IOException
 

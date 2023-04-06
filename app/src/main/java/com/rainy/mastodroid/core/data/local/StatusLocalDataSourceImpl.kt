@@ -21,7 +21,7 @@ import com.rainy.mastodroid.core.data.model.entity.status.toStatusMentionEntity
 import com.rainy.mastodroid.core.data.model.entity.status.toStatusTagEntity
 import com.rainy.mastodroid.core.data.model.entity.status.toUrlPreviewCardEntity
 import com.rainy.mastodroid.core.data.model.entity.status.toVideoAttachmentEntity
-import com.rainy.mastodroid.core.domain.data.remote.StatusLocalDataSource
+import com.rainy.mastodroid.core.domain.data.local.StatusLocalDataSource
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.GifvAttachment
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.ImageAttachment
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.VideoAttachment

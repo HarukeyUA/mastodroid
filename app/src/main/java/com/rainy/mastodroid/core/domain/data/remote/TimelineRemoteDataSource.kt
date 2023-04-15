@@ -14,4 +14,13 @@ interface TimelineRemoteDataSource {
         newerThanId: String? = null,
         @IntRange(1, 40) limit: Int = 20
     ): List<Status>
+
+    suspend fun getAccountStatuses(
+        accountId: String,
+        olderThanId: String?,
+        newerThanId: String?,
+        limit: Int,
+        excludeReplies: Boolean,
+        onlyMedia: Boolean
+    ): List<Status>
 }

@@ -26,4 +26,22 @@ class TimelineRemoteDataSourceImpl(private val mastodonApi: MastodonApi) :
             limit = limit
         ).mapNotNull(StatusResponse::toDomain)
     }
+
+    override suspend fun getAccountStatuses(
+        accountId: String,
+        olderThanId: String?,
+        newerThanId: String?,
+        @IntRange(1, 40) limit: Int,
+        excludeReplies: Boolean,
+        onlyMedia: Boolean
+    ): List<Status> {
+        return mastodonApi.getAccountStatuses(
+            accountId = accountId,
+            maxId = olderThanId,
+            sinceId = newerThanId,
+            limit = limit,
+            excludeReplies = excludeReplies,
+            onlyMedia = onlyMedia
+        ).mapNotNull(StatusResponse::toDomain)
+    }
 }

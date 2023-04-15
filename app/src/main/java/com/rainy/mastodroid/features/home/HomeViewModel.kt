@@ -7,8 +7,9 @@ package com.rainy.mastodroid.features.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import androidx.paging.map
-import com.rainy.mastodroid.core.domain.interactor.HomeTimelineInteractor
+import com.rainy.mastodroid.core.domain.interactor.TimelineInteractor
 import com.rainy.mastodroid.core.domain.interactor.StatusInteractor
 import com.rainy.mastodroid.core.domain.model.status.Status
 import com.rainy.mastodroid.core.navigation.RouteNavigator
@@ -34,7 +35,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val homeTimelineInteractor: HomeTimelineInteractor,
+    private val timelineInteractor: TimelineInteractor,
     private val statusInteractor: StatusInteractor,
     private val exceptionIdentifier: NetworkExceptionIdentifier,
     routeNavigator: RouteNavigator
@@ -50,10 +51,12 @@ class HomeViewModel(
     val currentlyPlayingItem = MutableStateFlow<CurrentlyPlayingMedia?>(null)
     private val expandedItems = MutableStateFlow<Set<String>>(setOf())
 
-    val homeStatusesFlow = homeTimelineInteractor.getTimeLinePaging(viewModelScope)
+    val homeStatusesFlow = timelineInteractor.homeTimelinePaging
         .map { statusPagingData ->
             statusPagingData.map(Status::toStatusListItemModel)
-        }.combine(currentlyPlayingItem) { timeline, currentlyPlaying ->
+        }
+        .cachedIn(viewModelScope)
+        .combine(currentlyPlayingItem) { timeline, currentlyPlaying ->
             timeline.map { status ->
                 if (status.id == currentlyPlaying?.statusId) {
                     setCurrentlyPlayingAttachment(status, currentlyPlaying.mediaId)

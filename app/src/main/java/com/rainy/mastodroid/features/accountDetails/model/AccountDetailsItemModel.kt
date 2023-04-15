@@ -13,6 +13,7 @@ import com.rainy.mastodroid.util.ImmutableWrap
 
 @Stable
 data class AccountDetailsItemModel(
+    val id: String,
     val bannerUrl: String,
     val avatarUrl: String,
     val statusesCount: Long,

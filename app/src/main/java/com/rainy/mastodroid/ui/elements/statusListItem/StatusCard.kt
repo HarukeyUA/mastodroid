@@ -46,6 +46,7 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
@@ -83,7 +84,7 @@ private const val STATUS_SPACING_DP = 4
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatusCard(
-    fullAccountName: String,
+    fullAccountName: AnnotatedString,
     accountUserName: String,
     accountAvatarUrl: String,
     updatedTime: ImmutableWrap<Instant>?,
@@ -291,7 +292,7 @@ fun StatusCard(
 
 @Composable
 fun StatusHeadInfo(
-    fullAccountName: String,
+    fullAccountName: AnnotatedString,
     usernameEmojis: ImmutableWrap<List<CustomEmojiItemModel>>,
     accountUserName: String,
     updatedTime: ImmutableWrap<Instant>?,
@@ -306,7 +307,7 @@ fun StatusHeadInfo(
                 .padding(start = 4.dp)
         ) {
             Text(
-                text = fullAccountName.annotateMastodonEmojis(emojiShortCodes = usernameEmojis.content.fastMap { it.shortcode }),
+                text = fullAccountName,
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -454,7 +455,7 @@ private fun StatusCardPreview() {
     MastodroidTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             StatusCard(
-                fullAccountName = "Historias mori!",
+                fullAccountName = AnnotatedString("Historias mori!"),
                 accountUserName = "Ecce, emeritis gabalium!",
                 accountAvatarUrl = "",
                 updatedTime = ImmutableWrap(Instant.parse("2021-12-17T23:11:43.130Z")),

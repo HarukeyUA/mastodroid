@@ -9,16 +9,17 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import com.rainy.mastodroid.core.domain.data.local.StatusLocalDataSource
-import com.rainy.mastodroid.core.domain.data.remote.TimelineRemoteDataSource
 import com.rainy.mastodroid.core.domain.model.status.Status
 import retrofit2.HttpException
 import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
-class HomeTimelineMediator(
-    private val timelineRemoteDataSource: TimelineRemoteDataSource,
-    private val statusLocalDataSource: StatusLocalDataSource
+class TimelineRemoteMediator(
+    private val shouldReorderStatuses: Boolean = true,
+    private val lastCachedElementId: suspend () -> String?,
+    private val getRemoteStatuses: suspend (olderThanId: String?, limit: Int) -> List<Status>,
+    private val replaceCachedStatuses: suspend (statuses: List<Status>) -> Unit,
+    private val insertStatusCache: suspend (statuses: List<Status>) -> Unit
 ) : RemoteMediator<Int, Status>() {
 
     override suspend fun load(
@@ -29,19 +30,28 @@ class HomeTimelineMediator(
             val loadKey = when (loadType) {
                 LoadType.REFRESH -> null
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
-                LoadType.APPEND -> statusLocalDataSource.getLastTimeLineElementId()
+                LoadType.APPEND -> lastCachedElementId()
                     ?: return MediatorResult.Success(endOfPaginationReached = true)
             }
 
-            val statuses = timelineRemoteDataSource.getHomeStatuses(
-                olderThanId = loadKey,
-                limit = state.config.pageSize
-            )
+            val statuses = getRemoteStatuses(loadKey, state.config.pageSize)
 
             if (loadType == LoadType.REFRESH) {
-                statusLocalDataSource.replaceTimelineStatuses(reorderStatuses(statuses))
+                replaceCachedStatuses(
+                    if (shouldReorderStatuses) {
+                        reorderStatuses(statuses)
+                    } else {
+                        statuses
+                    }
+                )
             } else {
-                statusLocalDataSource.insertTimelineStatuses(reorderStatuses(statuses))
+                insertStatusCache(
+                    if (shouldReorderStatuses) {
+                        reorderStatuses(statuses)
+                    } else {
+                        statuses
+                    }
+                )
             }
 
             return MediatorResult.Success(endOfPaginationReached = statuses.isEmpty())

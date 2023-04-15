@@ -20,6 +20,7 @@ import com.rainy.mastodroid.database.getStatusTagsAdapter
 import com.rainy.mastodroid.database.getStatusUrlPreviewCardAdapter
 import com.rainy.mastodroid.database.instantAdapter
 import com.rainy.mastodroidDb.AccountEntity
+import com.rainy.mastodroidDb.AccountTimelineEntity
 import com.rainy.mastodroidDb.StatusContextEntity
 import com.rainy.mastodroidDb.StatusEntity
 import kotlinx.serialization.json.Json
@@ -69,6 +70,9 @@ val dbModule = module {
             ),
             statusContextEntityAdapter = StatusContextEntity.Adapter(
                 contextStatusTypeAdapter = EnumColumnAdapter()
+            ),
+            accountTimelineEntityAdapter = AccountTimelineEntity.Adapter(
+                timelineTypeAdapter = EnumColumnAdapter()
             )
         )
     }

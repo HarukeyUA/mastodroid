@@ -80,5 +80,17 @@ interface MastodonApi {
         @Query("id[]") list: List<String>
     ): List<AccountRelationshipResponse>
 
-
+    @GET("api/v1/accounts/{id}/statuses")
+    suspend fun getAccountStatuses(
+        @Path("id") accountId: String,
+        @Query("max_id") maxId: String? = null,
+        @Query("since_id") sinceId: String? = null,
+        @Query("min_id") minId: String? = null,
+        @Query("limit") limit: Int = 20,
+        @Query("only_media") onlyMedia: Boolean = false,
+        @Query("exclude_replies") excludeReplies: Boolean = false,
+        @Query("exclude_reblogs") excludeReblogs: Boolean = false,
+        @Query("pinned") pinned: Boolean = false,
+        @Query("tagged") tagged: String? = null
+    ): List<StatusResponse>
 }

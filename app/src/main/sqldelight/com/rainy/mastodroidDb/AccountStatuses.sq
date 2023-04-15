@@ -1,0 +1,70 @@
+import com.rainy.mastodroid.core.data.model.entity.status.AccountStatusTimelineType;
+
+CREATE TABLE accountTimelineEntity (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    accountId TEXT NOT NULL,
+    statusId TEXT NOT NULL,
+    reblogId TEXT,
+    timelineType TEXT AS AccountStatusTimelineType NOT NULL,
+    FOREIGN KEY (statusId) REFERENCES statusEntity(id),
+    FOREIGN KEY (accountId) REFERENCES accountEntity(id)
+);
+
+lastAccountTimelineElement:
+SELECT * FROM accountTimelineEntity
+WHERE accountId = :accountId AND timelineType = :timelineType
+ORDER BY ifnull(reblogId, statusId) LIMIT 1;
+
+countAccountTimeline:
+SELECT count(*) FROM accountTimelineEntity
+WHERE accountId = :accountId AND timelineType = :timelineType;
+
+removeAllAccountTimelineElements:
+DELETE FROM accountTimelineEntity
+WHERE accountId = :accountId AND timelineType = :timelineType;
+
+insertOrReplaceAccountTimelineEntity:
+INSERT OR REPLACE INTO accountTimelineEntity (
+    accountId,
+    statusId,
+    reblogId,
+    timelineType
+) VALUES (
+    :accountId,
+    :statusId,
+    :reblogId,
+    :timelineType
+);
+
+accountTimelineWithOffset:
+SELECT
+    statusWithAccount.*,
+    accountTimelineEntity.reblogId AS reblogId,
+    timelineAccount.id AS reblogAccountId,
+    timelineAccount.accountUri AS reblogAccountUri,
+    timelineAccount.avatarUrl AS reblogAccountAvatarUrl,
+    timelineAccount.avatarStaticUrl AS reblogAccountAvatarStatisUrl,
+    timelineAccount.bot AS reblogAccountBot,
+    timelineAccount.createdAt AS reblogAccountCreatedAt,
+    timelineAccount.displayName AS reblogAccountDisplayName,
+    timelineAccount.customEmojis AS reblogAccountCustomEmojis,
+    timelineAccount.fields AS reblogAccountFields,
+    timelineAccount.followersCount AS reblogAccountFollowersCount,
+    timelineAccount.followingCount AS reblogAccountFollowingCount,
+    timelineAccount.headerUrl AS reblogAccountHeaderUrl,
+    timelineAccount.headerStaticUrl AS reblogAccountHeaderStaticUrl,
+    timelineAccount.locked AS reblogAccountLocked,
+    timelineAccount.note AS reblogAccountNote,
+    timelineAccount.statusesCount AS reblogAccountStatusesCount,
+    timelineAccount.url AS reblogAccountUrl,
+    timelineAccount.username AS reblogAccountUsername,
+    timelineAccount.groupActor AS reblogAccountGroupActor,
+    timelineAccount.discoverable AS reblogAccountDiscoverable,
+    timelineAccount.suspended AS reblogAccountSuspended,
+    timelineAccount.limited AS reblogAccountLimited
+FROM accountTimelineEntity
+INNER JOIN statusWithAccount ON accountTimelineEntity.statusId = statusWithAccount.id
+LEFT JOIN accountEntity AS timelineAccount ON accountTimelineEntity.accountId = timelineAccount.id
+WHERE accountTimelineEntity.accountId = :account AND timelineType = :timelineType
+ORDER BY accountTimelineEntity.id ASC
+LIMIT :limit OFFSET :offset;

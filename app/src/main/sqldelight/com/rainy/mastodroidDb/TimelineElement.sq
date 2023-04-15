@@ -46,7 +46,7 @@ countTimeline:
 SELECT count(*) FROM timelineElementEntity;
 
 lastTimelineElement:
-SELECT * FROM timelineElementEntity ORDER BY ifnull(reblogId, statusId) ASC, ifnull(reblogId, statusId) ASC LIMIT 1;
+SELECT * FROM timelineElementEntity ORDER BY ifnull(reblogId, statusId) ASC LIMIT 1;
 
 insertOrReplace:
 INSERT OR REPLACE INTO timelineElementEntity (

@@ -7,7 +7,7 @@ package com.rainy.mastodroid.core.data.local
 
 import androidx.paging.PagingSource
 import com.rainy.mastodroid.Database
-import com.rainy.mastodroid.core.domain.model.status.ContextStatusType
+import com.rainy.mastodroid.core.data.model.entity.status.AccountStatusTimelineType
 import com.rainy.mastodroid.core.data.model.entity.status.MediaAttachmentEntity
 import com.rainy.mastodroid.core.data.model.entity.status.StatusAccountUserFieldEntity
 import com.rainy.mastodroid.core.data.model.entity.status.StatusCustomEmojiEntity
@@ -26,18 +26,20 @@ import com.rainy.mastodroid.core.domain.model.mediaAttachment.GifvAttachment
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.ImageAttachment
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.VideoAttachment
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.toDomain
+import com.rainy.mastodroid.core.domain.model.status.ContextStatusType
 import com.rainy.mastodroid.core.domain.model.status.Status
 import com.rainy.mastodroid.core.domain.model.status.StatusContext
 import com.rainy.mastodroid.core.domain.model.status.StatusMention
 import com.rainy.mastodroid.core.domain.model.status.StatusTag
 import com.rainy.mastodroid.core.domain.model.status.toDomain
-import com.rainy.mastodroid.core.domain.model.user.CustomEmoji
 import com.rainy.mastodroid.core.domain.model.user.Account
+import com.rainy.mastodroid.core.domain.model.user.CustomEmoji
 import com.rainy.mastodroid.core.domain.model.user.toDomain
 import com.rainy.mastodroid.database.MastodroidDatabase
 import com.rainy.mastodroid.database.OffsetQueryPagingSource
 import com.rainy.mastodroid.database.extensions.upsertAccount
 import com.rainy.mastodroid.database.toInt
+import com.rainy.mastodroidDb.AccountTimelineWithOffset
 import com.rainy.mastodroidDb.StatusContextEntity
 import com.rainy.mastodroidDb.StatusWithAccount
 import com.rainy.mastodroidDb.TimelineWithOffset
@@ -50,7 +52,6 @@ class StatusLocalDataSourceImpl(
 ) : StatusLocalDataSource {
 
     override fun getHomeTimelinePagingSource(): PagingSource<Int, Status> {
-        db.timelineElementQueries.countTimeline()
         return OffsetQueryPagingSource(
             countQuery = db.timelineElementQueries.countTimeline().toInt(),
             db = db,
@@ -58,6 +59,28 @@ class StatusLocalDataSourceImpl(
                 db.timelineElementQueries.timelineWithOffset(limit.toLong(), offset.toLong())
             },
             mapper = { timelineElement: TimelineWithOffset ->
+                timelineElementToStatus(timelineElement)
+            })
+    }
+
+    override fun getAccountTimelinePagingSource(
+        accountId: String,
+        timelineType: AccountStatusTimelineType
+    ): PagingSource<Int, Status> {
+        return OffsetQueryPagingSource(
+            countQuery = db.accountStatusesQueries.countAccountTimeline(
+                accountId, timelineType
+            ).toInt(),
+            db = db,
+            queryProvider = { limit, offset ->
+                db.accountStatusesQueries.accountTimelineWithOffset(
+                    account = accountId,
+                    timelineType = timelineType,
+                    limit = limit.toLong(),
+                    offset = offset.toLong()
+                )
+            },
+            mapper = { timelineElement: AccountTimelineWithOffset ->
                 timelineElementToStatus(timelineElement)
             })
     }
@@ -70,6 +93,59 @@ class StatusLocalDataSourceImpl(
                 insertTimelineElement(it)
             }
         }
+    }
+
+    override suspend fun replaceAccountTimelineStatuses(
+        statuses: List<Status>,
+        accountId: String,
+        accountStatusTimelineType: AccountStatusTimelineType
+    ) {
+        db.await(true) {
+            accountStatusesQueries.removeAllAccountTimelineElements(
+                accountId,
+                accountStatusTimelineType
+            )
+            statuses.forEach {
+                upsertStatusWithAccount(it)
+                accountStatusesQueries.insertOrReplaceAccountTimelineEntity(
+                    accountId = accountId,
+                    statusId = it.id,
+                    reblogId = it.reblogId,
+                    timelineType = accountStatusTimelineType
+                )
+            }
+        }
+    }
+
+    override suspend fun insertAccountTimelineStatuses(
+        statuses: List<Status>,
+        accountId: String,
+        accountStatusTimelineType: AccountStatusTimelineType
+    ) {
+        db.await(true) {
+            statuses.forEach {
+                upsertStatusWithAccount(it)
+                accountStatusesQueries.insertOrReplaceAccountTimelineEntity(
+                    accountId = accountId,
+                    statusId = it.id,
+                    reblogId = it.reblogId,
+                    timelineType = accountStatusTimelineType
+                )
+            }
+        }
+    }
+
+    override suspend fun getLastAccountTimeLineElementId(
+        accountId: String,
+        accountStatusTimelineType: AccountStatusTimelineType
+    ): String? {
+        val lastElement = db.awaitAsOneOrNull {
+            accountStatusesQueries.lastAccountTimelineElement(
+                accountId = accountId,
+                timelineType = accountStatusTimelineType
+            )
+        }
+        return lastElement?.reblogId ?: lastElement?.statusId
     }
 
     private fun Database.upsertStatusWithAccount(status: Status) {
@@ -295,6 +371,116 @@ class StatusLocalDataSourceImpl(
                     }
                 },
             )
+        }
+
+    private fun timelineElementToStatus(timelineElement: AccountTimelineWithOffset) =
+        with(timelineElement) {
+            Status(
+                id = id,
+                reblogId = reblogId,
+                reblogAuthorAccount = extractReblogAccount(timelineElement),
+                uri = uri,
+                createdAt = createdAt,
+                account = extractAccount(timelineElement),
+                content = content,
+                visibility = visibility,
+                sensitive = sensitive,
+                spoilerText = spoilerText,
+                application = application?.toDomain(),
+                mentions = mentions.map(StatusMentionEntity::toDomain),
+                tags = tags.map(StatusTagEntity::toDomain),
+                customEmojis = customEmojis.map(StatusCustomEmojiEntity::toDomain),
+                reblogsCount = reblogsCount.toInt(),
+                favouritesCount = favouritesCount.toInt(),
+                repliesCount = repliesCount.toInt(),
+                url = url,
+                inReplyToId = inReplyToId,
+                inReplyToAccountId = inReplyToAccountId,
+                urlPreviewCard = urlPreviewCard?.toDomain(),
+                language = language,
+                text = text,
+                editedAt = editedAt,
+                favourited = favourited,
+                reblogged = reblogged,
+                muted = muted,
+                bookmarked = bookmarked,
+                pinned = pinned,
+                mediaAttachments = mediaAttachments.map {
+                    when (it) {
+                        is MediaAttachmentEntity.GifvAttachmentEntity -> it.toDomain()
+                        is MediaAttachmentEntity.ImageAttachmentEntity -> it.toDomain()
+                        is MediaAttachmentEntity.VideoAttachmentEntity -> it.toDomain()
+                    }
+                },
+            )
+        }
+
+    private fun extractAccount(timelineElement: AccountTimelineWithOffset) =
+        with(timelineElement) {
+            Account(
+                accountUri = accountUri,
+                avatarUrl = accountAvatarUrl,
+                avatarStaticUrl = accountAvatarStatisUrl,
+                bot = accountBot,
+                createdAt = accountCreatedAt,
+                displayName = accountDisplayName,
+                customEmojis = accountCustomEmojis.map(StatusCustomEmojiEntity::toDomain),
+                fields = accountFields.map(StatusAccountUserFieldEntity::toDomain),
+                followersCount = accountFollowersCount,
+                followingCount = accountFollowingCount,
+                headerUrl = accountHeaderUrl,
+                headerStaticUrl = accountHeaderStaticUrl,
+                id = accountId,
+                locked = accountLocked,
+                note = accountNote,
+                source = null,
+                statusesCount = accountStatusesCount,
+                url = accountUrl,
+                username = accountUsername,
+                group = accountGroupActor,
+                discoverable = accountDiscoverable,
+                suspended = accountSuspended,
+                limited = accountLimited
+            )
+        }
+
+    private fun extractReblogAccount(timelineElement: AccountTimelineWithOffset) =
+        with(timelineElement) {
+            if (reblogId != null) {
+                Account(
+                    accountUri = reblogAccountUri ?: "",
+                    avatarUrl = reblogAccountAvatarUrl ?: "",
+                    avatarStaticUrl = reblogAccountAvatarStatisUrl ?: "",
+                    bot = reblogAccountBot ?: false,
+                    createdAt = reblogAccountCreatedAt,
+                    displayName = reblogAccountDisplayName ?: "",
+                    customEmojis = reblogAccountCustomEmojis?.map(
+                        StatusCustomEmojiEntity::toDomain
+                    )
+                        ?: listOf(),
+                    fields = reblogAccountFields?.map(
+                        StatusAccountUserFieldEntity::toDomain
+                    )
+                        ?: listOf(),
+                    followersCount = reblogAccountFollowersCount ?: 0,
+                    followingCount = reblogAccountFollowingCount ?: 0,
+                    headerUrl = reblogAccountHeaderUrl ?: "",
+                    headerStaticUrl = reblogAccountHeaderStaticUrl ?: "",
+                    id = reblogAccountId ?: "",
+                    locked = reblogAccountLocked ?: false,
+                    note = reblogAccountNote ?: "",
+                    source = null,
+                    statusesCount = reblogAccountStatusesCount ?: 0,
+                    url = reblogAccountUrl ?: "",
+                    username = reblogAccountUsername ?: "",
+                    group = reblogAccountGroupActor ?: false,
+                    discoverable = reblogAccountDiscoverable ?: false,
+                    suspended = reblogAccountSuspended ?: false,
+                    limited = reblogAccountLimited ?: false
+                )
+            } else {
+                null
+            }
         }
 
     private fun extractAccount(timelineElement: TimelineWithOffset) =

@@ -72,6 +72,7 @@ class AccountDetailsViewModel(
         account?.let {
             val emojiShortCodes = it.customEmojis.map { it.shortcode }
             AccountDetailsItemModel(
+                id = it.id,
                 bannerUrl = it.headerUrl,
                 avatarUrl = it.avatarUrl,
                 statusesCount = it.statusesCount,

@@ -18,6 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEachIndexed
+import androidx.compose.ui.util.fastMap
 import com.rainy.mastodroid.ui.theme.MastodroidTheme
 
 private const val MAX_PREVIEWS_NUM = 4
@@ -42,7 +44,7 @@ fun MediaPreviewGrid(
                     }
             )
 
-            2 -> measurables.map {
+            2 -> measurables.fastMap {
                 it.measure(
                     Constraints.fixed(
                         (constraints.maxWidth / 2) - (gap.roundToPx() / 2),
@@ -51,25 +53,31 @@ fun MediaPreviewGrid(
                 )
             }
 
-            3 -> measurables.mapIndexed { index, measurable ->
-                if (index == 0) {
-                    measurable.measure(
-                        Constraints.fixed(
-                            (constraints.maxWidth / 2) - (gap.roundToPx() / 2),
-                            height
+
+            3 -> {
+                var mediaIndex = 0
+                measurables.fastMap { measurable ->
+                    val mesaurable = if (mediaIndex == 0) {
+                        measurable.measure(
+                            Constraints.fixed(
+                                (constraints.maxWidth / 2) - (gap.roundToPx() / 2),
+                                height
+                            )
                         )
-                    )
-                } else {
-                    measurable.measure(
-                        Constraints.fixed(
-                            (constraints.maxWidth / 2) - (gap.roundToPx() / 2),
-                            (height / 2) - (gap.roundToPx() / 2)
+                    } else {
+                        measurable.measure(
+                            Constraints.fixed(
+                                (constraints.maxWidth / 2) - (gap.roundToPx() / 2),
+                                (height / 2) - (gap.roundToPx() / 2)
+                            )
                         )
-                    )
+                    }
+                    mediaIndex++
+                    mesaurable
                 }
             }
 
-            else -> measurables.take(MAX_PREVIEWS_NUM).map {
+            else -> measurables.take(MAX_PREVIEWS_NUM).fastMap {
                 it.measure(
                     Constraints.fixed(
                         (constraints.maxWidth / 2) - (gap.roundToPx() / 2),
@@ -98,7 +106,7 @@ fun MediaPreviewGrid(
 
                 4 -> {
                     val columnY = Array(2) { 0 }
-                    placeables.forEachIndexed { index, placeable ->
+                    placeables.fastForEachIndexed { index, placeable ->
                         val column = index % 2
                         placeable.placeRelative(
                             x = (column * placeable.width).plus(if (column != 0) gap.roundToPx() else 0),

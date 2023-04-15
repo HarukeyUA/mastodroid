@@ -36,6 +36,7 @@ import com.rainy.mastodroid.ui.elements.statusListItem.model.VideoAttachmentItem
 import com.rainy.mastodroid.features.home.ui.HomeScreen
 import com.rainy.mastodroid.util.ImmutableWrap
 import com.rainy.mastodroid.util.logi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.koin.androidx.compose.koinViewModel
 import kotlin.math.abs
@@ -49,7 +50,7 @@ object HomeRoute : NavRoute<HomeViewModel> {
 
     @Composable
     override fun Content(viewModel: HomeViewModel) {
-        val statusItems = viewModel.homeStatusesFlow.collectAsLazyPagingItems()
+        val statusItems = viewModel.homeStatusesFlow.collectAsLazyPagingItems(Dispatchers.Default)
         val lazyListState = rememberLazyListState()
         val exoPlayer = rememberExoPlayerInstance()
         val currentlyPlaying by viewModel.currentlyPlayingItem.collectAsState()
@@ -73,20 +74,21 @@ object HomeRoute : NavRoute<HomeViewModel> {
         PlayFocusedVideo(currentlyPlaying, exoPlayer)
         ExoPlayerLifecycleEvents(exoPlayer)
 
+        val onUrlClicked = remember {
+            { url: String ->
+                val builder: CustomTabsIntent.Builder = CustomTabsIntent.Builder()
+                val customTabsIntent: CustomTabsIntent = builder.build()
+                customTabsIntent.launchUrl(context, url.toUri())
+            }
+        }
 
         HomeScreen(
             statusesPagingList = statusItems,
             isRefreshing = statusItems.loadState.refresh == LoadState.Loading,
             lazyListState = lazyListState,
             exoPlayer = ImmutableWrap(exoPlayer),
-            onRefreshInvoked = {
-                statusItems.refresh()
-            },
-            onUrlClicked = { url ->
-                val builder: CustomTabsIntent.Builder = CustomTabsIntent.Builder()
-                val customTabsIntent: CustomTabsIntent = builder.build()
-                customTabsIntent.launchUrl(context, url.toUri())
-            },
+            onRefreshInvoked = statusItems::refresh,
+            onUrlClicked = onUrlClicked,
             onFavoriteClicked = viewModel::setFavorite,
             onReblogClicked = viewModel::setReblog,
             onSensitiveExpandClicked = viewModel::expandSensitiveStatus,

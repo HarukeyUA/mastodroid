@@ -49,6 +49,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -59,6 +60,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -75,6 +77,7 @@ import com.rainy.mastodroid.ui.elements.FlowerShape
 import com.rainy.mastodroid.ui.elements.statusListItem.StatusListItem
 import com.rainy.mastodroid.ui.elements.statusListItem.StatusTextContent
 import com.rainy.mastodroid.ui.styledText.textInlineCustomEmojis
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -163,13 +166,13 @@ private fun AccountTimelinesPager(
 
             else -> throw IllegalStateException("Max page limit reached")
         }
-        val statuses = viewModel.timeline.collectAsLazyPagingItems()
+        val statuses = viewModel.timeline.collectAsLazyPagingItems(Dispatchers.Default)
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(statuses, key = { it.id }) {
-                it?.also {
+            items(statuses, key = { it.id }) { status ->
+                status?.also {
                     StatusListItem(
-                        item = it,
+                        item = status,
                         reply = ReplyType.NONE,
                         repliedTo = ReplyType.NONE,
                         onUrlClicked = onUrlClicked,
@@ -195,18 +198,6 @@ fun AccountDetailsTopContent(
     pagerState: PagerState,
     modifier: Modifier = Modifier
 ) {
-    val infiniteTransition = rememberInfiniteTransition()
-    val avatarShapeRotation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(easing = LinearEasing, durationMillis = 50 * 1000),
-            repeatMode = RepeatMode.Restart
-        ), label = ""
-    )
-    val avatarAnimation = remember {
-        derivedStateOf { lerp(4.dp, 0.dp, scrollBehavior.state.collapsedFraction) }
-    }
     ProfileCollapsingToolbar(
         banner = {
             AsyncImage(
@@ -221,29 +212,7 @@ fun AccountDetailsTopContent(
             Box(
                 modifier = Modifier.size(125.dp)
             ) {
-                AsyncImage(
-                    model = accountDetails.avatarUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(
-                            FlowerShape(
-                                amplitudeDp = avatarAnimation.value,
-                                rotationDegrees = avatarShapeRotation
-                            )
-                        )
-                        .ifTrue(avatarAnimation.value != 0.dp) {
-                            background(MaterialTheme.colorScheme.secondary)
-                        }
-                        .padding(avatarAnimation.value)
-                        .clip(
-                            FlowerShape(
-                                amplitudeDp = avatarAnimation.value,
-                                rotationDegrees = avatarShapeRotation
-                            )
-                        )
-                )
+                AnimatedAvatar(accountDetails.avatarUrl, scrollBehavior)
             }
 
         },
@@ -355,6 +324,48 @@ fun AccountDetailsTopContent(
             }
         },
         scrollBehavior = scrollBehavior
+    )
+}
+
+@Composable
+private fun AnimatedAvatar(
+    avatarUrl: String,
+    scrollBehavior: ProfileCollapsingToolbarScrollBehavior
+) {
+    val infiniteTransition = rememberInfiniteTransition()
+    val avatarShapeRotation by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(easing = LinearEasing, durationMillis = 50 * 1000),
+            repeatMode = RepeatMode.Restart
+        ), label = ""
+    )
+    val avatarAnimation = remember {
+        derivedStateOf { lerp(4.dp, 0.dp, scrollBehavior.state.collapsedFraction) }
+    }
+    AsyncImage(
+        model = avatarUrl,
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .fillMaxSize()
+            .clip(
+                FlowerShape(
+                    amplitudeDp = avatarAnimation.value,
+                    rotationDegrees = avatarShapeRotation
+                )
+            )
+            .ifTrue(avatarAnimation.value != 0.dp) {
+                background(MaterialTheme.colorScheme.secondary)
+            }
+            .padding(avatarAnimation.value)
+            .clip(
+                FlowerShape(
+                    amplitudeDp = avatarAnimation.value,
+                    rotationDegrees = avatarShapeRotation
+                )
+            )
     )
 }
 

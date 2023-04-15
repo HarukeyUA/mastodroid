@@ -28,6 +28,9 @@ fun VideoPlayer(
                 useController = false
             }
         },
+        onReset = {
+            it.player = exoPlayer
+        },
         modifier = modifier
     )
 }

@@ -31,13 +31,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.lerp
 import com.rainy.mastodroid.ui.theme.MastodroidTheme
 import kotlin.math.abs
@@ -184,7 +183,7 @@ fun ProfileCollapsingToolbar(
             val topItemsPaddingPx = topBarItemPadding.roundToPx()
 
             val navigationIconPlaceable =
-                measurables.firstOrNull { it.layoutId == NAVIGATION_ICON_ID }
+                measurables.fastFirstOrNull { it.layoutId == NAVIGATION_ICON_ID }
                     ?.measure(
                         constraints.copy(
                             maxHeight = collapsedToolbarHeightPx,
@@ -192,7 +191,7 @@ fun ProfileCollapsingToolbar(
                         )
                     )
 
-            val topActionsPlaceable = measurables.firstOrNull { it.layoutId == ACTIONS_ID }
+            val topActionsPlaceable = measurables.fastFirstOrNull { it.layoutId == ACTIONS_ID }
                 ?.measure(
                     constraints.copy(
                         maxHeight = collapsedToolbarHeightPx,
@@ -200,15 +199,15 @@ fun ProfileCollapsingToolbar(
                     )
                 )
 
-            val bannerPlaceable = measurables.firstOrNull { it.layoutId == BANNER_ID }
+            val bannerPlaceable = measurables.fastFirstOrNull { it.layoutId == BANNER_ID }
                 ?.measure(constraints) ?: throw IllegalStateException("Banner measurable not found")
 
             val accountActionsPlaceable =
-                measurables.firstOrNull { it.layoutId == ACCOUNT_ACTIONS_ID }
+                measurables.fastFirstOrNull { it.layoutId == ACCOUNT_ACTIONS_ID }
                     ?.measure(constraints.copy(maxWidth = constraints.maxWidth - startPaddingPx))
                     ?: throw IllegalStateException("Account actions measurable not found")
 
-            val avatarPlaceable = measurables.firstOrNull { it.layoutId == AVATAR_ID }
+            val avatarPlaceable = measurables.fastFirstOrNull { it.layoutId == AVATAR_ID }
                 ?.measure(
                     constraints.copy(
                         maxWidth = constraints.maxWidth - (startPaddingPx + innerItemsPaddingPx + accountActionsPlaceable.width),
@@ -217,7 +216,7 @@ fun ProfileCollapsingToolbar(
                 ) ?: throw IllegalStateException("Avatar measurable not found")
 
 
-            val usernamePlaceable = measurables.firstOrNull { it.layoutId == EXPANDED_TITLE_ID }
+            val usernamePlaceable = measurables.fastFirstOrNull { it.layoutId == EXPANDED_TITLE_ID }
                 ?.measure(constraints.copy(maxWidth = constraints.maxWidth - (startPaddingPx * 2)))
                 ?: throw IllegalStateException("Expanded username measurable not found")
 
@@ -227,7 +226,7 @@ fun ProfileCollapsingToolbar(
                 avatarPlaceable
             ).size
             val collapsedUserNamePlaceable =
-                measurables.firstOrNull { it.layoutId == COLLAPSED_TITLE_ID }
+                measurables.fastFirstOrNull { it.layoutId == COLLAPSED_TITLE_ID }
                     ?.measure(
                         constraints.copy(
                             maxWidth = constraints.maxWidth - ((navigationIconPlaceable?.width
@@ -238,12 +237,12 @@ fun ProfileCollapsingToolbar(
                     ) ?: throw IllegalStateException("Collapsed username measurable not found")
 
             val hideOnScrollContentPlaceable =
-                measurables.firstOrNull { it.layoutId == HIDE_ON_SCROLL_CONTENT_ID }
+                measurables.fastFirstOrNull { it.layoutId == HIDE_ON_SCROLL_CONTENT_ID }
                     ?.measure(constraints)
                     ?: throw IllegalStateException("Hide on scroll content measurable not found")
 
             val persistentContentPlaceable =
-                measurables.firstOrNull { it.layoutId == PERSISTENT_CONTENT_ID }
+                measurables.fastFirstOrNull { it.layoutId == PERSISTENT_CONTENT_ID }
                     ?.measure(constraints)
                     ?: throw IllegalStateException("Persistent content measurable not found")
 

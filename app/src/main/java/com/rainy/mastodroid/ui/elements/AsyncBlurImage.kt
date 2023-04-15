@@ -21,7 +21,7 @@ import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import com.rainy.mastodroid.util.BlurHashDecoder
 
-private const val BLUR_BITMAP_SIZE = 32
+private const val BLUR_BITMAP_SIZE = 16
 
 @Composable
 fun AsyncBlurImage(
@@ -48,7 +48,6 @@ fun AsyncBlurImage(
     AsyncImage(
         ImageRequest.Builder(LocalContext.current)
             .data(url)
-            .crossfade(true)
             .placeholder(
                 blurPlaceholder
             )

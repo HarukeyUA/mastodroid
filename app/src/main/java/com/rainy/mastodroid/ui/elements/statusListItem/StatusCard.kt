@@ -43,16 +43,15 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastMap
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.rainy.mastodroid.R
 import com.rainy.mastodroid.core.domain.model.status.statusThread.ReplyType
 import com.rainy.mastodroid.ui.elements.statusListItem.model.CustomEmojiItemModel
@@ -102,7 +101,7 @@ fun StatusCard(
     onFavoriteClicked: (Boolean) -> Unit,
     onReblogClicked: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
+    onStatusClicked: () -> Unit = {},
     onAccountClick: () -> Unit = {},
     content: @Composable () -> Unit = {},
 ) {
@@ -111,7 +110,7 @@ fun StatusCard(
     Card(
         shape = MaterialTheme.shapes.medium, colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
-        ), modifier = modifier.fillMaxWidth(), onClick = onClick
+        ), modifier = modifier.fillMaxWidth(), onClick = onStatusClicked
     ) {
         Layout(content = {
             val lineColor = MaterialTheme.colorScheme.secondaryContainer
@@ -133,8 +132,7 @@ fun StatusCard(
                 modifier = Modifier.layoutId(STATUS_INFO_ID)
             )
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current).data(accountAvatarUrl)
-                    .crossfade(true).build(),
+                model = accountAvatarUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -158,7 +156,7 @@ fun StatusCard(
                     isRebloged = isRebloged,
                     onReblogClicked = onReblogClicked,
                     replies = replies,
-                    onReplyClicked = { /*TODO*/ },
+                    onReplyClicked = remember { { /*TODO*/ } },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -195,31 +193,33 @@ fun StatusCard(
             })
         }, measurePolicy = { measurables, constraints ->
             val combinedAxisContentPadding = (STATUS_CONTENT_PADDING_DP * 2).dp.roundToPx()
-            val avatar = measurables.first { it.layoutId == AVATAR_ID }.measure(
+            val avatar = measurables.fastFirstOrNull { it.layoutId == AVATAR_ID }?.measure(
                 Constraints.fixed(
                     AVATAR_DIMENSIONS_DP.dp.roundToPx(), AVATAR_DIMENSIONS_DP.dp.roundToPx()
                 )
-            )
-            val reblogLabel = measurables.firstOrNull { it.layoutId == REBLOG_LABEL_ID }?.measure(
-                if (isReply) {
-                    constraints.copy(
-                        maxWidth = constraints.maxWidth - avatar.width - combinedAxisContentPadding
-                    )
-                } else {
-                    constraints
-                }
-            )
-            val statusInfo = measurables.first { it.layoutId == STATUS_INFO_ID }.measure(
+            ) ?: throw IllegalStateException("Avatar composable not fount")
+            val reblogLabel =
+                measurables.fastFirstOrNull { it.layoutId == REBLOG_LABEL_ID }?.measure(
+                    if (isReply) {
+                        constraints.copy(
+                            maxWidth = constraints.maxWidth - avatar.width - combinedAxisContentPadding
+                        )
+                    } else {
+                        constraints
+                    }
+                )
+            val statusInfo = measurables.fastFirstOrNull { it.layoutId == STATUS_INFO_ID }?.measure(
                 constraints.copy(maxWidth = constraints.maxWidth - (avatar.width) - combinedAxisContentPadding)
-            )
+            ) ?: throw IllegalStateException("Reblog label composable not fount")
 
-            val contentAction = measurables.first { it.layoutId == CONTENT_AND_ACTIONS_ID }.measure(
-                if (isRepliedTo) {
-                    constraints.copy(maxWidth = constraints.maxWidth - (avatar.width) - combinedAxisContentPadding - STATUS_SPACING_DP.dp.roundToPx())
-                } else {
-                    constraints.copy(maxWidth = constraints.maxWidth - combinedAxisContentPadding)
-                }
-            )
+            val contentAction =
+                measurables.fastFirstOrNull { it.layoutId == CONTENT_AND_ACTIONS_ID }?.measure(
+                    if (isRepliedTo) {
+                        constraints.copy(maxWidth = constraints.maxWidth - (avatar.width) - combinedAxisContentPadding - STATUS_SPACING_DP.dp.roundToPx())
+                    } else {
+                        constraints.copy(maxWidth = constraints.maxWidth - combinedAxisContentPadding)
+                    }
+                ) ?: throw IllegalStateException("Content Action composable not fount")
 
             val height = contentAction.height + statusInfo.height + (reblogLabel?.height
                 ?: 0) + combinedAxisContentPadding
@@ -268,22 +268,22 @@ fun StatusCard(
                 contentAction.placeRelative(x = contentX, y = contentY)
 
                 if (isReply) {
-                    val topLine = measurables.first { it.layoutId == TOP_REPLY_LINE_ID }.measure(
+                    val topLine = measurables.fastFirstOrNull { it.layoutId == TOP_REPLY_LINE_ID }?.measure(
                         Constraints.fixed(
                             width = avatar.width, height = avatarY
                         )
                     )
-                    topLine.placeRelative(avatarX, 0)
+                    topLine?.placeRelative(avatarX, 0)
                 }
 
                 if (isRepliedTo) {
                     val bottomLine =
-                        measurables.first { it.layoutId == BOTTOM_REPLY_LINE_ID }.measure(
+                        measurables.fastFirstOrNull { it.layoutId == BOTTOM_REPLY_LINE_ID }?.measure(
                             Constraints.fixed(
                                 width = avatar.width, height = height - (avatarY + avatar.height)
                             )
                         )
-                    bottomLine.placeRelative(avatarX, avatarY + avatar.height)
+                    bottomLine?.placeRelative(avatarX, avatarY + avatar.height)
                 }
             }
         })

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -37,6 +38,21 @@ fun StatusListItem(
     onClick: (String) -> Unit = {},
     onAccountClick: (String) -> Unit = {}
 ) {
+    val onStatusClickedLambda = remember(item) {
+        { onClick(item.actionId) }
+    }
+    val onFavoriteClickedLambda = remember(item) {
+        { action: Boolean -> onFavoriteClicked(item.actionId, action) }
+    }
+    val onReblogClickedLambda = remember(item) {
+        { action: Boolean -> onReblogClicked(item.actionId, action) }
+    }
+    val onAccountClickLambda = remember(item) {
+        { onAccountClick(item.authorId) }
+    }
+    val onSensitiveExpandClickedLambda = remember(item) {
+        { onSensitiveExpandClicked(item.id) }
+    }
     StatusCard(fullAccountName = item.authorDisplayName,
         accountUserName = item.authorAccountHandle,
         accountAvatarUrl = item.authorAvatarUrl,
@@ -52,36 +68,36 @@ fun StatusListItem(
         rebblogedByUsernameEmojis = item.rebblogedByDisplayNameEmojis,
         repliedTo = repliedTo,
         reply = reply,
-        onFavoriteClicked = { action: Boolean ->
-            onFavoriteClicked(item.actionId, action)
-        },
-        onReblogClicked = { action ->
-            onReblogClicked(item.actionId, action)
-        },
-        onClick = { onClick(item.actionId) },
-        onAccountClick = { onAccountClick(item.authorId) },
+        onFavoriteClicked = onFavoriteClickedLambda,
+        onReblogClicked = onReblogClickedLambda,
+        onStatusClicked = onStatusClickedLambda,
+        onAccountClick = onAccountClickLambda,
         content = {
             if (item.isSensitive) {
                 SpoilerStatusContent(
                     text = item.spoilerText,
                     isExpanded = item.isSensitiveExpanded,
-                    onExpandClicked = { onSensitiveExpandClicked(item.id) },
+                    onExpandClicked = onSensitiveExpandClickedLambda,
                     content = {
-                        StatusContent(contentText = item.content,
+                        StatusContent(
+                            contentText = item.content,
                             customEmojis = item.emojis,
                             attachments = item.attachments,
                             onUrlClicked = onUrlClicked,
                             exoPlayer = exoPlayer,
-                            onTextClicked = { onClick(item.actionId) })
+                            onTextClicked = onStatusClickedLambda
+                        )
                     }
                 )
             } else {
-                StatusContent(contentText = item.content,
+                StatusContent(
+                    contentText = item.content,
                     customEmojis = item.emojis,
                     attachments = item.attachments,
                     onUrlClicked = onUrlClicked,
                     exoPlayer = exoPlayer,
-                    onTextClicked = { onClick(item.actionId) })
+                    onTextClicked = onStatusClickedLambda
+                )
             }
         }
 
@@ -130,9 +146,9 @@ private fun StatusListItemAttachmentsWithTextPreview(
                 item = status,
                 reply = ReplyType.NONE,
                 repliedTo = ReplyType.NONE,
-                onFavoriteClicked = { _, _ -> },
+                onFavoriteClicked = { _: String, _: Boolean -> },
                 onUrlClicked = {},
-                onReblogClicked = { _, _ -> },
+                onReblogClicked = { _: String, _: Boolean -> },
                 onSensitiveExpandClicked = {}
             )
         }
@@ -150,9 +166,9 @@ private fun StatusListItemAttachmentsPreview(
                 item = status,
                 reply = ReplyType.NONE,
                 repliedTo = ReplyType.NONE,
-                onFavoriteClicked = { _, _ -> },
+                onFavoriteClicked = { _: String, _: Boolean -> },
                 onUrlClicked = {},
-                onReblogClicked = { _, _ -> },
+                onReblogClicked = { _: String, _: Boolean -> },
                 onSensitiveExpandClicked = {}
             )
         }
@@ -170,9 +186,9 @@ private fun StatusListItemTextPreview(
                 item = status,
                 reply = ReplyType.NONE,
                 repliedTo = ReplyType.NONE,
-                onFavoriteClicked = { _, _ -> },
+                onFavoriteClicked = { _: String, _: Boolean -> },
                 onUrlClicked = {},
-                onReblogClicked = { _, _ -> },
+                onReblogClicked = { _: String, _: Boolean -> },
                 onSensitiveExpandClicked = {}
             )
         }

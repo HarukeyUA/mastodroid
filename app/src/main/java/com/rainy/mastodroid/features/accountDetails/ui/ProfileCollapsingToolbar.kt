@@ -7,9 +7,6 @@ package com.rainy.mastodroid.features.accountDetails.ui
 
 import androidx.annotation.FloatRange
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -43,7 +40,7 @@ import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-private val collapsedToolbarHeight = 64.dp
+val collapsedToolbarHeight = 64.dp
 private val collapsedAvatarSize = 48.dp
 private val startPadding = 16.dp
 private val itemBottomPadding = 8.dp
@@ -53,19 +50,15 @@ private const val EXPANDED_TITLE_ID = "expandedTitle"
 private const val COLLAPSED_TITLE_ID = "collapsedTitle"
 private const val NAVIGATION_ICON_ID = "navigationIcon"
 private const val ACTIONS_ID = "actions"
-private const val PERSISTENT_CONTENT_ID = "persistentContent"
 private const val BANNER_ID = "banner"
 private const val AVATAR_ID = "avatar"
 private const val ACCOUNT_ACTIONS_ID = "accountActions"
-private const val HIDE_ON_SCROLL_CONTENT_ID = "hideOnScrollContent"
 
 @Composable
 fun ProfileCollapsingToolbar(
     banner: @Composable () -> Unit,
     avatar: @Composable () -> Unit,
     accountActions: @Composable () -> Unit,
-    persistentContent: @Composable () -> Unit,
-    hideOnScrollContent: @Composable () -> Unit,
     expandedUsername: @Composable () -> Unit,
     collapsedUsername: @Composable () -> Unit,
     scrollBehavior: ProfileCollapsingToolbarScrollBehavior,
@@ -83,21 +76,8 @@ fun ProfileCollapsingToolbar(
 ) {
     val collapsedFraction = scrollBehavior.state.collapsedFraction
     val isCollapsed = collapsedFraction == 1f
-    val appBarDragModifier = modifier.draggable(
-        orientation = Orientation.Vertical,
-        state = rememberDraggableState { delta ->
-            scrollBehavior.state.heightOffset = scrollBehavior.state.heightOffset + delta
-        },
-        onDragStopped = { velocity ->
-            flingToolbar(
-                scrollBehavior.state,
-                velocity,
-                scrollBehavior.flingAnimationSpec
-            )
-        }
-    )
     Surface(
-        modifier = appBarDragModifier
+        modifier = modifier
     ) {
         Layout(
             content = {
@@ -159,20 +139,6 @@ fun ProfileCollapsingToolbar(
                     modifier = Modifier.layoutId(COLLAPSED_TITLE_ID)
                 ) {
                     collapsedUsername()
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .layoutId(HIDE_ON_SCROLL_CONTENT_ID)
-                ) {
-                    hideOnScrollContent()
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .layoutId(PERSISTENT_CONTENT_ID)
-                ) {
-                    persistentContent()
                 }
             }
         ) { measurables, constraints ->
@@ -236,16 +202,6 @@ fun ProfileCollapsingToolbar(
                         )
                     ) ?: throw IllegalStateException("Collapsed username measurable not found")
 
-            val hideOnScrollContentPlaceable =
-                measurables.fastFirstOrNull { it.layoutId == HIDE_ON_SCROLL_CONTENT_ID }
-                    ?.measure(constraints)
-                    ?: throw IllegalStateException("Hide on scroll content measurable not found")
-
-            val persistentContentPlaceable =
-                measurables.fastFirstOrNull { it.layoutId == PERSISTENT_CONTENT_ID }
-                    ?.measure(constraints)
-                    ?: throw IllegalStateException("Persistent content measurable not found")
-
             val navigationIconX = 0
             val navigationIconY = 0
 
@@ -275,19 +231,7 @@ fun ProfileCollapsingToolbar(
             val usernameCollapsedY =
                 (collapsedToolbarHeightPx - collapsedUserNamePlaceable.height) / 2
 
-
-            val hideOnScrollContentX = 0
-            val hideOnScrollContentY = (usernameY + usernamePlaceable.height)
-
-            val persistentContentX = 0
-            val persistentContentY = hideOnScrollContentY + hideOnScrollContentPlaceable.height
-
-            val persistentContentCollapsedY = collapsedToolbarHeightPx
-
-            val transformPersistentContentY =
-                lerp(persistentContentY, persistentContentCollapsedY, collapsedFraction)
-
-            val totalHeight = persistentContentY + persistentContentPlaceable.height
+            val totalHeight = usernameY + usernamePlaceable.height
 
             val userNameTransformX = quadBezier(
                 usernameX,
@@ -298,12 +242,10 @@ fun ProfileCollapsingToolbar(
             val userNameTransformY =
                 quadBezier(usernameY, avatarY, usernameCollapsedY, collapsedFraction)
 
-            val collapsedHeight =
-                collapsedToolbarHeightPx + persistentContentPlaceable.height
 
-            val transformHeight = lerp(totalHeight, collapsedHeight, collapsedFraction)
+            val transformHeight = lerp(totalHeight, collapsedToolbarHeightPx, collapsedFraction)
 
-            val scrollingHeightOffsetLimit = -(totalHeight - collapsedHeight).toFloat()
+            val scrollingHeightOffsetLimit = -(totalHeight - collapsedToolbarHeightPx).toFloat()
             if (scrollBehavior.state.heightOffsetLimit != scrollingHeightOffsetLimit) {
                 scrollBehavior.state.heightOffsetLimit = scrollingHeightOffsetLimit
             }
@@ -363,20 +305,6 @@ fun ProfileCollapsingToolbar(
                         alpha = collapsedFraction
                     }
                 }
-
-                if (!isCollapsed) {
-                    hideOnScrollContentPlaceable.placeRelativeWithLayer(
-                        x = hideOnScrollContentX,
-                        y = hideOnScrollContentY
-                    ) {
-                        alpha = 1 - collapsedFraction
-                    }
-                }
-
-                persistentContentPlaceable.placeRelative(
-                    persistentContentX,
-                    transformPersistentContentY
-                )
             }
         }
     }
@@ -423,22 +351,6 @@ private fun CustomToolbarPreview() {
                             .background(Color.Green.copy(alpha = 0.5f))
                     )
 
-                },
-                persistentContent = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(24.dp)
-                            .background(Color.Magenta)
-                    )
-                },
-                hideOnScrollContent = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp)
-                            .background(Color.Yellow)
-                    )
                 },
                 expandedUsername = { Text("Test", style = MaterialTheme.typography.headlineSmall) },
                 collapsedUsername = {

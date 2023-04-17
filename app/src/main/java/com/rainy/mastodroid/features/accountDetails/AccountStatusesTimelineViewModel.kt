@@ -12,6 +12,7 @@ import com.rainy.mastodroid.core.base.BaseViewModel
 import com.rainy.mastodroid.core.data.model.entity.status.AccountStatusTimelineType
 import com.rainy.mastodroid.core.domain.interactor.TimelineInteractor
 import com.rainy.mastodroid.core.domain.interactor.StatusInteractor
+import com.rainy.mastodroid.core.domain.model.status.Status
 import com.rainy.mastodroid.ui.elements.statusListItem.model.toStatusListItemModel
 import com.rainy.mastodroid.util.ErrorModel
 import com.rainy.mastodroid.util.NetworkExceptionIdentifier
@@ -46,7 +47,8 @@ class AccountStatusesTimelineViewModel(
     val timeline = timelineInteractor.getAccountTimelinePaging(
         accountId = accountId,
         accountStatusTimelineType = timelineType
-    ).map { pagingData -> pagingData.map { it.toStatusListItemModel() } }
+    ).map { pagingData -> pagingData.map(Status::toStatusListItemModel) }
+        .flowOn(Dispatchers.Default)
         .cachedIn(viewModelScope)
         .combine(expandedItems) { timeline, expandedItems ->
             timeline.map { status ->

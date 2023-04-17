@@ -55,6 +55,7 @@ class HomeViewModel(
         .map { statusPagingData ->
             statusPagingData.map(Status::toStatusListItemModel)
         }
+        .flowOn(Dispatchers.Default)
         .cachedIn(viewModelScope)
         .combine(currentlyPlayingItem) { timeline, currentlyPlaying ->
             timeline.map { status ->

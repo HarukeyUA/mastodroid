@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "mastodroid"
-include ':app'
+include(":app")

@@ -8,13 +8,14 @@ package com.rainy.mastodroid.ui.elements.statusListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
-import com.rainy.mastodroid.ui.elements.statusListItem.model.CustomEmojiItemModel
 import com.rainy.mastodroid.ui.elements.ClickableText
+import com.rainy.mastodroid.ui.elements.statusListItem.model.CustomEmojiItemModel
 import com.rainy.mastodroid.ui.styledText.MastodonContentTag
 import com.rainy.mastodroid.ui.styledText.textInlineCustomEmojis
 import com.rainy.mastodroid.util.ImmutableWrap
@@ -25,20 +26,18 @@ fun StatusTextContent(
     customEmoji: ImmutableWrap<List<CustomEmojiItemModel>>,
     modifier: Modifier = Modifier,
     style: TextStyle = MaterialTheme.typography.bodyMedium,
-    onTextClicked: () -> Unit = {},
-    onUrlClicked: (url: String) -> Unit = {}
+    onUrlClicked: (url: String) -> Unit = {},
+    pointerInput: (suspend PointerInputScope.() -> Unit)? = null
 ) {
     ClickableText(
         text = styleTextByAnnotations(text),
         style = style,
         modifier = modifier,
-        onClick = { offset ->
-            text.getStringAnnotations(offset, offset).firstOrNull()
-                ?.also { annotation ->
-                    onUrlClicked(annotation.item)
-                } ?: run(onTextClicked)
+        onClick = { annotation ->
+            onUrlClicked(annotation.item)
         },
-        inlineContent = textInlineCustomEmojis(emojis = customEmoji)
+        inlineContent = textInlineCustomEmojis(emojis = customEmoji),
+        pointerInput = pointerInput
     )
 }
 

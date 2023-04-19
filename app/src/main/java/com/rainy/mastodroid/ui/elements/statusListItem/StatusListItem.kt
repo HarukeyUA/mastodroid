@@ -5,12 +5,16 @@
 
 package com.rainy.mastodroid.ui.elements.statusListItem
 
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -53,6 +57,21 @@ fun StatusListItem(
     val onSensitiveExpandClickedLambda = remember(item) {
         { onSensitiveExpandClicked(item.id) }
     }
+    val cardInteractionSource = remember {
+        MutableInteractionSource()
+    }
+    val textPointerInput: (suspend PointerInputScope.() -> Unit) = remember(item) {
+        {
+            detectTapGestures(onPress = {
+                val interaction = PressInteraction.Press(it)
+                cardInteractionSource.emit(interaction)
+                tryAwaitRelease()
+                cardInteractionSource.emit(PressInteraction.Release(interaction))
+            }) {
+                onStatusClickedLambda()
+            }
+        }
+    }
     StatusCard(fullAccountName = item.authorDisplayName,
         accountUserName = item.authorAccountHandle,
         accountAvatarUrl = item.authorAvatarUrl,
@@ -72,6 +91,7 @@ fun StatusListItem(
         onReblogClicked = onReblogClickedLambda,
         onStatusClicked = onStatusClickedLambda,
         onAccountClick = onAccountClickLambda,
+        interactionSource = cardInteractionSource,
         content = {
             if (item.isSensitive) {
                 SpoilerStatusContent(
@@ -85,7 +105,7 @@ fun StatusListItem(
                             attachments = item.attachments,
                             onUrlClicked = onUrlClicked,
                             exoPlayer = exoPlayer,
-                            onTextClicked = onStatusClickedLambda
+                            pointerInput = textPointerInput
                         )
                     }
                 )
@@ -96,7 +116,7 @@ fun StatusListItem(
                     attachments = item.attachments,
                     onUrlClicked = onUrlClicked,
                     exoPlayer = exoPlayer,
-                    onTextClicked = onStatusClickedLambda
+                    pointerInput = textPointerInput
                 )
             }
         }
@@ -110,9 +130,9 @@ fun StatusContent(
     customEmojis: ImmutableWrap<List<CustomEmojiItemModel>>,
     attachments: ImmutableWrap<List<MediaAttachmentItemModel>>,
     onUrlClicked: (url: String) -> Unit,
-    onTextClicked: () -> Unit,
     exoPlayer: ImmutableWrap<ExoPlayer>?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    pointerInput: (suspend PointerInputScope.() -> Unit)? = null
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -122,7 +142,7 @@ fun StatusContent(
             StatusTextContent(
                 text = contentText,
                 customEmoji = customEmojis,
-                onTextClicked = onTextClicked,
+                pointerInput = pointerInput,
                 onUrlClicked = onUrlClicked
             )
         }

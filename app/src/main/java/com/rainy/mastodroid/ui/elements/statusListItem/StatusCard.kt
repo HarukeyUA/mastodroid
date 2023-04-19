@@ -7,6 +7,7 @@ package com.rainy.mastodroid.ui.elements.statusListItem
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -101,6 +102,7 @@ fun StatusCard(
     onFavoriteClicked: (Boolean) -> Unit,
     onReblogClicked: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     onStatusClicked: () -> Unit = {},
     onAccountClick: () -> Unit = {},
     content: @Composable () -> Unit = {},
@@ -108,9 +110,13 @@ fun StatusCard(
     val isReply = reply != ReplyType.NONE
     val isRepliedTo = repliedTo != ReplyType.NONE
     Card(
-        shape = MaterialTheme.shapes.medium, colors = CardDefaults.cardColors(
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
-        ), modifier = modifier.fillMaxWidth(), onClick = onStatusClicked
+        ),
+        modifier = modifier.fillMaxWidth(),
+        onClick = onStatusClicked,
+        interactionSource = interactionSource
     ) {
         Layout(content = {
             val lineColor = MaterialTheme.colorScheme.secondaryContainer
@@ -268,21 +274,24 @@ fun StatusCard(
                 contentAction.placeRelative(x = contentX, y = contentY)
 
                 if (isReply) {
-                    val topLine = measurables.fastFirstOrNull { it.layoutId == TOP_REPLY_LINE_ID }?.measure(
-                        Constraints.fixed(
-                            width = avatar.width, height = avatarY
+                    val topLine =
+                        measurables.fastFirstOrNull { it.layoutId == TOP_REPLY_LINE_ID }?.measure(
+                            Constraints.fixed(
+                                width = avatar.width, height = avatarY
+                            )
                         )
-                    )
                     topLine?.placeRelative(avatarX, 0)
                 }
 
                 if (isRepliedTo) {
                     val bottomLine =
-                        measurables.fastFirstOrNull { it.layoutId == BOTTOM_REPLY_LINE_ID }?.measure(
-                            Constraints.fixed(
-                                width = avatar.width, height = height - (avatarY + avatar.height)
+                        measurables.fastFirstOrNull { it.layoutId == BOTTOM_REPLY_LINE_ID }
+                            ?.measure(
+                                Constraints.fixed(
+                                    width = avatar.width,
+                                    height = height - (avatarY + avatar.height)
+                                )
                             )
-                        )
                     bottomLine?.placeRelative(avatarX, avatarY + avatar.height)
                 }
             }

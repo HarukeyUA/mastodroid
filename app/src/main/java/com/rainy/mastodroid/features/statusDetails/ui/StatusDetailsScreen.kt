@@ -221,7 +221,6 @@ private fun FocusedStatusListItem(
                         customEmojis = focusedStatus.emojis,
                         attachments = focusedStatus.attachments,
                         exoPlayer = null,
-                        onTextClicked = {},
                         onUrlClicked = onUrlClicked
                     )
                 }
@@ -232,7 +231,6 @@ private fun FocusedStatusListItem(
                 customEmojis = focusedStatus.emojis,
                 attachments = focusedStatus.attachments,
                 exoPlayer = null,
-                onTextClicked = {},
                 onUrlClicked = onUrlClicked
             )
         }

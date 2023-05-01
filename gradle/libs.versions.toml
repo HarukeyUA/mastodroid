@@ -1,5 +1,5 @@
 [versions]
-com-android-application = "8.0.0"
+com-android-application = "8.0.1"
 org-jetbrains-kotlin-android = "1.8.20"
 org-jetbrains-kotlin-plugin-serialization = "1.8.20"
 app-cash-sqldelight = "2.0.0-alpha05"

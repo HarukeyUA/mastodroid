@@ -14,6 +14,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -158,7 +159,8 @@ private fun AnimatedAvatar(
         animationSpec = infiniteRepeatable(
             animation = tween(easing = LinearEasing, durationMillis = 50 * 1000),
             repeatMode = RepeatMode.Restart
-        ), label = ""
+        ),
+        label = "AvatarAnimation"
     )
     val avatarAnimation = remember {
         derivedStateOf { lerp(4.dp, 0.dp, scrollBehavior.state.collapsedFraction) }
@@ -175,15 +177,22 @@ private fun AnimatedAvatar(
                     rotationDegrees = avatarShapeRotation
                 )
             )
-            .ifTrue(avatarAnimation.value != 0.dp) {
-                background(MaterialTheme.colorScheme.secondary)
+            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f))
+            .run {
+                if (avatarAnimation.value != 0.dp) {
+                    border(
+                        width = avatarAnimation.value,
+                        color = MaterialTheme.colorScheme.secondary,
+                        shape = FlowerShape(
+                            amplitudeDp = avatarAnimation.value,
+                            rotationDegrees = avatarShapeRotation
+                        )
+                    )
+                } else {
+                    this
+                }
             }
-            .padding(avatarAnimation.value)
-            .clip(
-                FlowerShape(
-                    amplitudeDp = avatarAnimation.value,
-                    rotationDegrees = avatarShapeRotation
-                )
-            )
+
+
     )
 }

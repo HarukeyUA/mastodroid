@@ -105,7 +105,9 @@ private fun AccountTimeline(
                     onReblogClicked = onReblogClicked,
                     onSensitiveExpandClicked = onSensitiveExpandClicked,
                     onClick = onClick,
-                    onAccountClick = onAccountClicked
+                    onAccountClick = onAccountClicked,
+                    onAttachmentClicked = { s: String, i: Int -> },
+                    exoPlayer = null
                 )
             }
         }

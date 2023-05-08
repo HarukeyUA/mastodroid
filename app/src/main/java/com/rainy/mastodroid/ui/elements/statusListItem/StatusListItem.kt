@@ -38,6 +38,7 @@ fun StatusListItem(
     onFavoriteClicked: (id: String, action: Boolean) -> Unit,
     onReblogClicked: (id: String, action: Boolean) -> Unit,
     onSensitiveExpandClicked: (id: String) -> Unit,
+    onAttachmentClicked: (statusId: String, index: Int) -> Unit,
     exoPlayer: ImmutableWrap<ExoPlayer>? = null,
     onClick: (String) -> Unit = {},
     onAccountClick: (String) -> Unit = {}
@@ -105,7 +106,10 @@ fun StatusListItem(
                             attachments = item.attachments,
                             onUrlClicked = onUrlClicked,
                             exoPlayer = exoPlayer,
-                            pointerInput = textPointerInput
+                            pointerInput = textPointerInput,
+                            onAttachmentClicked = { index ->
+                                onAttachmentClicked(item.actionId, index)
+                            }
                         )
                     }
                 )
@@ -116,7 +120,10 @@ fun StatusListItem(
                     attachments = item.attachments,
                     onUrlClicked = onUrlClicked,
                     exoPlayer = exoPlayer,
-                    pointerInput = textPointerInput
+                    pointerInput = textPointerInput,
+                    onAttachmentClicked = { index ->
+                        onAttachmentClicked(item.actionId, index)
+                    }
                 )
             }
         }
@@ -131,6 +138,7 @@ fun StatusContent(
     attachments: ImmutableWrap<List<MediaAttachmentItemModel>>,
     onUrlClicked: (url: String) -> Unit,
     exoPlayer: ImmutableWrap<ExoPlayer>?,
+    onAttachmentClicked: (index: Int) -> Unit,
     modifier: Modifier = Modifier,
     pointerInput: (suspend PointerInputScope.() -> Unit)? = null
 ) {
@@ -149,7 +157,8 @@ fun StatusContent(
         if (attachments.content.isNotEmpty()) {
             StatusAttachmentsPreview(
                 attachments = attachments,
-                exoPlayer = exoPlayer
+                exoPlayer = exoPlayer,
+                onAttachmentClicked = onAttachmentClicked
             )
         }
     }
@@ -169,7 +178,11 @@ private fun StatusListItemAttachmentsWithTextPreview(
                 onFavoriteClicked = { _: String, _: Boolean -> },
                 onUrlClicked = {},
                 onReblogClicked = { _: String, _: Boolean -> },
-                onSensitiveExpandClicked = {}
+                onSensitiveExpandClicked = {},
+                onAttachmentClicked = { s: String, i: Int -> },
+                exoPlayer = null,
+                onClick = {},
+                onAccountClick = {}
             )
         }
     }
@@ -189,7 +202,11 @@ private fun StatusListItemAttachmentsPreview(
                 onFavoriteClicked = { _: String, _: Boolean -> },
                 onUrlClicked = {},
                 onReblogClicked = { _: String, _: Boolean -> },
-                onSensitiveExpandClicked = {}
+                onSensitiveExpandClicked = {},
+                onAttachmentClicked = { s: String, i: Int -> },
+                exoPlayer = null,
+                onClick = {},
+                onAccountClick = {}
             )
         }
     }
@@ -209,7 +226,11 @@ private fun StatusListItemTextPreview(
                 onFavoriteClicked = { _: String, _: Boolean -> },
                 onUrlClicked = {},
                 onReblogClicked = { _: String, _: Boolean -> },
-                onSensitiveExpandClicked = {}
+                onSensitiveExpandClicked = {},
+                onAttachmentClicked = { s: String, i: Int -> },
+                exoPlayer = null,
+                onClick = {},
+                onAccountClick = {}
             )
         }
 

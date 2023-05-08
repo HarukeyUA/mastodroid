@@ -49,6 +49,7 @@ fun StatusDetailsScreen(
     onStatusClicked: (id: String) -> Unit,
     onAccountClicked: (String) -> Unit,
     loadingState: Boolean,
+    onAttachmentClicked: (statusId: String, attachmentIndex: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -69,7 +70,8 @@ fun StatusDetailsScreen(
                     onSensitiveExpandClicked = onSensitiveExpandClicked,
                     onUrlClicked = onUrlClicked,
                     onStatusClicked = onStatusClicked,
-                    onAccountClicked = onAccountClicked
+                    onAccountClicked = onAccountClicked,
+                    onAttachmentClicked = onAttachmentClicked
                 )
             }
         }
@@ -92,6 +94,7 @@ fun StatusDetailThread(
     onSensitiveExpandClicked: (id: String) -> Unit,
     onUrlClicked: (url: String) -> Unit,
     onStatusClicked: (id: String) -> Unit,
+    onAttachmentClicked: (statusId: String, attachmentIndex: Int) -> Unit,
     modifier: Modifier = Modifier,
     onAccountClicked: (String) -> Unit = {}
 ) {
@@ -109,7 +112,9 @@ fun StatusDetailThread(
                 onReblogClicked = onReblogClicked,
                 onSensitiveExpandClicked = onSensitiveExpandClicked,
                 onClick = onStatusClicked,
-                onAccountClick = onAccountClicked
+                onAccountClick = onAccountClicked,
+                onAttachmentClicked = onAttachmentClicked,
+                exoPlayer = null
             )
         }
         item(key = statusDetailsState.statusInContext.focusedStatus.id) {
@@ -124,7 +129,8 @@ fun StatusDetailThread(
                 onUrlClicked = onUrlClicked,
                 onFavoriteClicked = onFavoriteClicked,
                 onReblogClicked = onReblogClicked,
-                onAccountClicked = onAccountClicked
+                onAccountClicked = onAccountClicked,
+                onAttachmentClicked = onAttachmentClicked
             )
             Spacer(
                 modifier = Modifier
@@ -153,7 +159,9 @@ fun StatusDetailThread(
                 onReblogClicked = onReblogClicked,
                 onSensitiveExpandClicked = onSensitiveExpandClicked,
                 onClick = onStatusClicked,
-                onAccountClick = onAccountClicked
+                onAccountClick = onAccountClicked,
+                onAttachmentClicked = onAttachmentClicked,
+                exoPlayer = null
             )
 
             if (statusThreadElement.repliedTo == ReplyType.NONE) {
@@ -174,6 +182,7 @@ private fun FocusedStatusListItem(
     onUrlClicked: (url: String) -> Unit,
     onFavoriteClicked: (id: String, action: Boolean) -> Unit,
     onReblogClicked: (id: String, action: Boolean) -> Unit,
+    onAttachmentClicked: (statusId: String, attachmentIndex: Int) -> Unit,
     onAccountClicked: (String) -> Unit = {}
 ) {
     val focusedStatus = statusDetailsState.statusInContext.focusedStatus
@@ -221,7 +230,11 @@ private fun FocusedStatusListItem(
                         customEmojis = focusedStatus.emojis,
                         attachments = focusedStatus.attachments,
                         exoPlayer = null,
-                        onUrlClicked = onUrlClicked
+                        onUrlClicked = onUrlClicked,
+                        onAttachmentClicked = { index ->
+                            onAttachmentClicked(focusedStatus.id, index)
+                        },
+                        pointerInput = null
                     )
                 }
             )
@@ -231,7 +244,9 @@ private fun FocusedStatusListItem(
                 customEmojis = focusedStatus.emojis,
                 attachments = focusedStatus.attachments,
                 exoPlayer = null,
-                onUrlClicked = onUrlClicked
+                onUrlClicked = onUrlClicked, onAttachmentClicked = { index ->
+                    onAttachmentClicked(focusedStatus.id, index)
+                }, pointerInput = null
             )
         }
     }

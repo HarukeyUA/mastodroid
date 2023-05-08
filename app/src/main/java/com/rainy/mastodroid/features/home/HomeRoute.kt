@@ -93,7 +93,8 @@ object HomeRoute : NavRoute<HomeViewModel> {
             onReblogClicked = viewModel::setReblog,
             onSensitiveExpandClicked = viewModel::expandSensitiveStatus,
             onClick = viewModel::onStatusClicked,
-            onAccountClick = viewModel::onAccountClicked
+            onAccountClick = viewModel::onAccountClicked,
+            onAttachmentClicked = viewModel::onAttachmentClicked
         )
     }
 

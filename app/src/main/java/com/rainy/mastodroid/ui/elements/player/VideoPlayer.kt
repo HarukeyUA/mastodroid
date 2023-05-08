@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-package com.rainy.mastodroid.ui.elements
+package com.rainy.mastodroid.ui.elements.player
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
@@ -18,13 +18,14 @@ import androidx.media3.ui.PlayerView
 fun VideoPlayer(
     exoPlayer: ExoPlayer?,
     modifier: Modifier = Modifier,
+    scaleType: Int = AspectRatioFrameLayout.RESIZE_MODE_ZOOM,
 ) {
     AndroidView(
         factory = { context ->
             PlayerView(context).apply {
                 player = exoPlayer
                 setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
-                resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                resizeMode = scaleType
                 useController = false
             }
         },

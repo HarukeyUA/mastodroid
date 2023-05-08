@@ -11,6 +11,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -54,20 +55,25 @@ object StatusDetailsRoute : NavRoute<StatusDetailsViewModel> {
             refreshing = loadingState, onRefresh = viewModel::loadStatus
         )
 
+        val onUrlClicked = remember {
+            { url: String ->
+                val builder: CustomTabsIntent.Builder = CustomTabsIntent.Builder()
+                val customTabsIntent: CustomTabsIntent = builder.build()
+                customTabsIntent.launchUrl(context, url.toUri())
+            }
+        }
+
         StatusDetailsScreen(
             pullRefreshState = pullRefreshState,
             statusDetailsState = statusDetailsState,
             onFavoriteClicked = viewModel::onFavoriteClicked,
             onReblogClicked = viewModel::onReblogClicked,
             onSensitiveExpandClicked = viewModel::onSensitiveExpandClicked,
-            onUrlClicked = { url ->
-                val builder: CustomTabsIntent.Builder = CustomTabsIntent.Builder()
-                val customTabsIntent: CustomTabsIntent = builder.build()
-                customTabsIntent.launchUrl(context, url.toUri())
-            },
+            onUrlClicked = onUrlClicked,
             loadingState = loadingState,
             onStatusClicked = viewModel::onStatusClicked,
-            onAccountClicked = viewModel::onAccountClicked
+            onAccountClicked = viewModel::onAccountClicked,
+            onAttachmentClicked = viewModel::onAttachmentClicked
         )
     }
 }

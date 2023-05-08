@@ -9,6 +9,7 @@ import com.rainy.mastodroid.MainViewModel
 import com.rainy.mastodroid.core.data.model.entity.status.AccountStatusTimelineType
 import com.rainy.mastodroid.features.accountDetails.AccountDetailsViewModel
 import com.rainy.mastodroid.features.accountDetails.AccountStatusesTimelineViewModel
+import com.rainy.mastodroid.features.attachmentDetails.AttachmentDetailsViewModel
 import com.rainy.mastodroid.features.home.HomeViewModel
 import com.rainy.mastodroid.features.login.LoginViewModel
 import com.rainy.mastodroid.features.statusDetails.StatusDetailsViewModel
@@ -34,4 +35,5 @@ val viewModelModule = module {
             timelineType = timelineType
         )
     }
+    viewModelOf(::AttachmentDetailsViewModel)
 }

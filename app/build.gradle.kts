@@ -67,6 +67,8 @@ sqldelight {
 dependencies {
     lintChecks(libs.compose.lint.checks)
 
+    implementation(libs.zoomable)
+
     implementation(libs.core.ktx)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)

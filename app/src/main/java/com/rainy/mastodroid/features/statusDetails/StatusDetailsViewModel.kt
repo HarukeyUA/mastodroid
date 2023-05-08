@@ -15,6 +15,7 @@ import com.rainy.mastodroid.core.domain.model.status.statusThread.StatusNode
 import com.rainy.mastodroid.core.navigation.RouteNavigator
 import com.rainy.mastodroid.core.navigation.getOrThrow
 import com.rainy.mastodroid.features.accountDetails.AccountDetailsRoute
+import com.rainy.mastodroid.features.attachmentDetails.AttachmentDetailsRoute
 import com.rainy.mastodroid.features.statusDetails.model.StatusDetailsState
 import com.rainy.mastodroid.features.statusDetails.model.StatusInContextItemModel
 import com.rainy.mastodroid.features.statusDetails.model.StatusThreadElement
@@ -204,6 +205,12 @@ class StatusDetailsViewModel(
     fun onAccountClicked(id: String) {
         performNavigation {
             navigate(AccountDetailsRoute.getRoute(id))
+        }
+    }
+
+    fun onAttachmentClicked(statusId: String, index: Int) {
+        performNavigation {
+            navigate(AttachmentDetailsRoute.getRoute(statusId, index))
         }
     }
 }

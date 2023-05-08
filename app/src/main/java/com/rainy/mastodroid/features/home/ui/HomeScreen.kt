@@ -43,6 +43,7 @@ fun HomeScreen(
     onFavoriteClicked: (id: String, action: Boolean) -> Unit,
     onReblogClicked: (id: String, action: Boolean) -> Unit,
     onSensitiveExpandClicked: (id: String) -> Unit,
+    onAttachmentClicked: (statusId: String, attachmentIndex: Int) -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     exoPlayer: ImmutableWrap<ExoPlayer>? = null,
@@ -65,7 +66,8 @@ fun HomeScreen(
             onReblogClicked = onReblogClicked,
             onSensitiveExpandClicked = onSensitiveExpandClicked,
             onClick = onClick,
-            onAccountClick = onAccountClick
+            onAccountClick = onAccountClick,
+            onAttachmentClicked = onAttachmentClicked
         )
         PullRefreshIndicator(
             refreshing = isRefreshing,
@@ -85,6 +87,7 @@ fun Timeline(
     onFavoriteClicked: (id: String, action: Boolean) -> Unit,
     onReblogClicked: (id: String, action: Boolean) -> Unit,
     onSensitiveExpandClicked: (id: String) -> Unit,
+    onAttachmentClicked: (statusId: String, attachmentIndex: Int) -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     exoPlayer: ImmutableWrap<ExoPlayer>? = null,
@@ -118,7 +121,8 @@ fun Timeline(
                     onReblogClicked = onReblogClicked,
                     onSensitiveExpandClicked = onSensitiveExpandClicked,
                     onClick = onClick,
-                    onAccountClick = onAccountClick
+                    onAccountClick = onAccountClick,
+                    onAttachmentClicked = onAttachmentClicked
                 )
             }
         }

@@ -31,6 +31,7 @@ androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 compose-lint-checks = "1.2.0"
 compose-compiler = "1.4.5"
+zoomable = "1.6.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -99,6 +100,8 @@ androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 
 compose-lint-checks = { group = "com.slack.lint.compose", name = "compose-lint-checks", version.ref = "compose-lint-checks"}
+
+zoomable = { group = "com.mxalbert.zoomable", name = "zoomable", version.ref = "zoomable" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "com-android-application" }

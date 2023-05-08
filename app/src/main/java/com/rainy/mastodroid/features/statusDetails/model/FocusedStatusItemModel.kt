@@ -6,6 +6,7 @@
 package com.rainy.mastodroid.features.statusDetails.model
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.text.AnnotatedString
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.GifvAttachment
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.ImageAttachment
 import com.rainy.mastodroid.core.domain.model.mediaAttachment.VideoAttachment
@@ -15,6 +16,7 @@ import com.rainy.mastodroid.ui.elements.statusListItem.model.CustomEmojiItemMode
 import com.rainy.mastodroid.ui.elements.statusListItem.model.MediaAttachmentItemModel
 import com.rainy.mastodroid.ui.elements.statusListItem.model.VideoAttachmentItemModel
 import com.rainy.mastodroid.ui.elements.statusListItem.model.toItemModel
+import com.rainy.mastodroid.ui.styledText.annotateMastodonEmojis
 import com.rainy.mastodroid.util.ImmutableWrap
 import kotlinx.datetime.Instant
 
@@ -38,7 +40,7 @@ data class FocusedStatusItemModel(
     val isFavorite: Boolean,
     val isRebloged: Boolean,
     val isSensitive: Boolean,
-    val spoilerText: String,
+    val spoilerText: AnnotatedString,
     val isSensitiveExpanded: Boolean,
     val createdAt: ImmutableWrap<Instant>?,
     val updatedAt: ImmutableWrap<Instant>?,
@@ -74,7 +76,7 @@ fun Status.toFocusedStatusItemModel(): FocusedStatusItemModel {
         isFavorite = favourited,
         isRebloged = reblogged,
         isSensitive = sensitive || spoilerText.isNotEmpty(),
-        spoilerText = spoilerText,
+        spoilerText = spoilerText.annotateMastodonEmojis(customEmojis.map(CustomEmoji::shortcode)),
         isSensitiveExpanded = false,
         rebblogedByDisplayName = reblogAuthorAccount?.displayName,
         rebblogedByDisplayNameEmojis = ImmutableWrap(

@@ -111,7 +111,8 @@ fun StatusListItem(
                                 onAttachmentClicked(item.actionId, index)
                             }
                         )
-                    }
+                    },
+                    emojis = item.emojis
                 )
             } else {
                 StatusContent(
@@ -258,7 +259,7 @@ internal class StatusListItemPreviewProvider :
             isFavorite = false,
             isRebloged = false,
             isSensitive = false,
-            spoilerText = "",
+            spoilerText = AnnotatedString(""),
             isSensitiveExpanded = false,
             rebblogedByDisplayNameEmojis = ImmutableWrap(listOf()),
             rebblogedByDisplayName = null,

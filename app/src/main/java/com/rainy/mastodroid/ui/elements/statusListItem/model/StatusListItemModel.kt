@@ -40,7 +40,7 @@ data class StatusListItemModel(
     val isFavorite: Boolean,
     val isRebloged: Boolean,
     val isSensitive: Boolean,
-    val spoilerText: String,
+    val spoilerText: AnnotatedString,
     val isSensitiveExpanded: Boolean
 ) {
     val isSubjectForAutoPlay =
@@ -77,7 +77,11 @@ fun Status.toStatusListItemModel(): StatusListItemModel {
         isFavorite = favourited,
         isRebloged = reblogged,
         isSensitive = sensitive || spoilerText.isNotEmpty(),
-        spoilerText = spoilerText,
+        spoilerText = spoilerText.annotateMastodonEmojis(
+            customEmojis.map(
+                CustomEmoji::shortcode
+            )
+        ),
         isSensitiveExpanded = false,
         rebblogedByDisplayName = reblogAuthorAccount?.displayName,
         rebblogedByDisplayNameEmojis = ImmutableWrap(

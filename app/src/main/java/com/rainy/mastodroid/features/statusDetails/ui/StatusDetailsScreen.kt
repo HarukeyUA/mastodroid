@@ -236,7 +236,8 @@ private fun FocusedStatusListItem(
                         },
                         pointerInput = null
                     )
-                }
+                },
+                emojis = focusedStatus.emojis
             )
         } else {
             StatusContent(

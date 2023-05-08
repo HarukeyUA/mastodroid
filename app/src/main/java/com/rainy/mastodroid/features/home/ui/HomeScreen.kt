@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.itemsIndexed
+import androidx.paging.compose.itemKey
 import com.rainy.mastodroid.core.domain.model.status.statusThread.ReplyType
 import com.rainy.mastodroid.ui.elements.statusListItem.StatusListItem
 import com.rainy.mastodroid.ui.elements.statusListItem.model.StatusListItemModel
@@ -98,9 +98,13 @@ fun Timeline(
         state = lazyListState,
         modifier = modifier.fillMaxSize()
     ) {
-        itemsIndexed(statusesPagingList, key = { _, status ->
-            status.id
-        }) { index, item ->
+        items(
+            count = statusesPagingList.itemCount,
+            key = statusesPagingList.itemKey { status ->
+                status.id
+            },
+        ) { index ->
+            val item = statusesPagingList[index]
             item?.also {
                 val isReply = statusesPagingList.peekOrNull(index - 1)?.let {
                     it.id == item.inReplyToId

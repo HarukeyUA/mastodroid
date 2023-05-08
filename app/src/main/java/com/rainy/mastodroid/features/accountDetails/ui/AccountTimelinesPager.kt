@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
+import androidx.paging.compose.itemKey
 import com.rainy.mastodroid.core.data.model.entity.status.AccountStatusTimelineType
 import com.rainy.mastodroid.core.domain.model.status.statusThread.ReplyType
 import com.rainy.mastodroid.features.accountDetails.AccountStatusesTimelineViewModel
@@ -94,10 +94,14 @@ private fun AccountTimeline(
     modifier: Modifier = Modifier
 ) {
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = modifier) {
-        items(statuses, key = { it.id }) { status ->
-            status?.also {
+        items(
+            count = statuses.itemCount,
+            key = statuses.itemKey(key = { it.id })
+        ) { index ->
+            val item = statuses[index]
+            item?.also {
                 StatusListItem(
-                    item = status,
+                    item = item,
                     reply = ReplyType.NONE,
                     repliedTo = ReplyType.NONE,
                     onUrlClicked = onUrlClicked,

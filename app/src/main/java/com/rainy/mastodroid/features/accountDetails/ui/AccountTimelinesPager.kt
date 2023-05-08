@@ -5,15 +5,23 @@
 
 package com.rainy.mastodroid.features.accountDetails.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
@@ -77,6 +85,7 @@ fun AccountTimelinesPager(
             onFavoriteClicked = viewModel::setFavorite,
             onReblogClicked = viewModel::setReblog,
             onSensitiveExpandClicked = viewModel::expandSensitiveStatus,
+            isRefresh = statuses.loadState.refresh == LoadState.Loading,
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -91,29 +100,44 @@ private fun AccountTimeline(
     onFavoriteClicked: (id: String, action: Boolean) -> Unit,
     onReblogClicked: (id: String, action: Boolean) -> Unit,
     onSensitiveExpandClicked: (id: String) -> Unit,
+    isRefresh: Boolean,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = modifier) {
-        items(
-            count = statuses.itemCount,
-            key = statuses.itemKey(key = { it.id })
-        ) { index ->
-            val item = statuses[index]
-            item?.also {
-                StatusListItem(
-                    item = item,
-                    reply = ReplyType.NONE,
-                    repliedTo = ReplyType.NONE,
-                    onUrlClicked = onUrlClicked,
-                    onFavoriteClicked = onFavoriteClicked,
-                    onReblogClicked = onReblogClicked,
-                    onSensitiveExpandClicked = onSensitiveExpandClicked,
-                    onClick = onClick,
-                    onAccountClick = onAccountClicked,
-                    onAttachmentClicked = { s: String, i: Int -> },
-                    exoPlayer = null
-                )
+    Box {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(vertical = 8.dp),
+            modifier = modifier
+        ) {
+            items(
+                count = statuses.itemCount,
+                key = statuses.itemKey(key = { it.id })
+            ) { index ->
+                val item = statuses[index]
+                item?.also {
+                    StatusListItem(
+                        item = item,
+                        reply = ReplyType.NONE,
+                        repliedTo = ReplyType.NONE,
+                        onUrlClicked = onUrlClicked,
+                        onFavoriteClicked = onFavoriteClicked,
+                        onReblogClicked = onReblogClicked,
+                        onSensitiveExpandClicked = onSensitiveExpandClicked,
+                        onClick = onClick,
+                        onAccountClick = onAccountClicked,
+                        onAttachmentClicked = { s: String, i: Int -> },
+                        exoPlayer = null
+                    )
+                }
             }
+        }
+        AnimatedVisibility(
+            visible = isRefresh,
+            modifier = Modifier.fillMaxWidth(),
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         }
     }
 }

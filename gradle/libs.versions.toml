@@ -30,7 +30,7 @@ junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 compose-lint-checks = "1.2.0"
-compose-compiler = "1.4.5"
+compose-compiler = "1.4.7"
 zoomable = "1.6.0"
 
 [libraries]
@@ -94,6 +94,7 @@ compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
 accompanist-webview = { group = "com.google.accompanist", name = "accompanist-webview", version.ref = "accompanist" }
+android-compose-compiler = {module="androidx.compose.compiler:compiler", version.ref ="compose-compiler"}
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }

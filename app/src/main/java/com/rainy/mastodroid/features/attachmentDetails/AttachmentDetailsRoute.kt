@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -181,7 +182,7 @@ object AttachmentDetailsRoute : NavRoute<AttachmentDetailsViewModel> {
             modifier = modifier.graphicsLayer {
                 clip = true
 
-            },
+            }.fillMaxSize(),
         ) {
 
             val resources = LocalContext.current.resources
@@ -205,6 +206,7 @@ object AttachmentDetailsRoute : NavRoute<AttachmentDetailsViewModel> {
             Image(
                 painter = painter,
                 contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .aspectRatio(aspectRatio)
                     .fillMaxSize()

@@ -31,7 +31,7 @@ androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 compose-lint-checks = "1.2.0"
 compose-compiler = "1.4.7"
-zoomable = "1.6.0"
+zoomable = "1.6.1"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }

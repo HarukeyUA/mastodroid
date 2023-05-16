@@ -46,7 +46,6 @@ fun AccountTimelinesPager(
 ) {
     HorizontalPager(
         state = pagerState,
-        pageCount = 3,
         modifier = modifier
             .fillMaxSize(),
         key = { it }

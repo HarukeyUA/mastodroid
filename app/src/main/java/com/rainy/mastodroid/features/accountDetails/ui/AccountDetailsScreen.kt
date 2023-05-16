@@ -66,7 +66,7 @@ fun AccountDetailsScreen(
     modifier: Modifier = Modifier
 ) {
     val topBarScrollBehavior = rememberProfileCollapsingToolbarScrollBehavior()
-    val accountTimelinePagerState = rememberPagerState()
+    val accountTimelinePagerState = rememberPagerState(pageCount = { 3 })
     val accountDetailsScrollState = rememberScrollState()
 
     Column {

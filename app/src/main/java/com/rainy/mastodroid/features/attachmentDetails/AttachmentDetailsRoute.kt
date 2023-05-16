@@ -74,7 +74,13 @@ object AttachmentDetailsRoute : NavRoute<AttachmentDetailsViewModel> {
         val attachmentsState by viewModel.attachmentsState.collectAsStateWithLifecycle()
 
         if (attachmentsState.attachments.content.isNotEmpty()) {
-            val pagerState = rememberPagerState(initialPage = attachmentsState.initialPage)
+            val pagerState =
+                rememberPagerState(
+                    initialPage = attachmentsState.initialPage,
+                    pageCount = {
+                        attachmentsState.attachments.content.size
+                    }
+                )
             val exoPlayer = rememberExoPlayerInstance()
             ExoPlayerLifecycleEvents(exoPlayer)
 
@@ -104,15 +110,14 @@ object AttachmentDetailsRoute : NavRoute<AttachmentDetailsViewModel> {
     @Composable
     @OptIn(ExperimentalFoundationApi::class)
     private fun AttachmentsPager(
-        attachmentsWrap: AttachmentDetailsState,
+        attachmentsState: AttachmentDetailsState,
         pagerState: PagerState,
         exoPlayer: ExoPlayer
     ) {
         HorizontalPager(
-            pageCount = attachmentsWrap.attachments.content.size,
             state = pagerState,
             key = {
-                when (val attachment = attachmentsWrap.attachments.content[it]) {
+                when (val attachment = attachmentsState.attachments.content[it]) {
                     is ImageAttachmentItemModel -> attachment.id
                     is VideoAttachmentItemModel -> attachment.id
                 }
@@ -120,7 +125,7 @@ object AttachmentDetailsRoute : NavRoute<AttachmentDetailsViewModel> {
             modifier = Modifier.fillMaxSize(),
         ) {
 
-            when (val attachment = attachmentsWrap.attachments.content[it]) {
+            when (val attachment = attachmentsState.attachments.content[it]) {
                 is ImageAttachmentItemModel -> ImageAttachmentPage(
                     url = attachment.url,
                     blurHash = attachment.blurHash,
@@ -179,10 +184,12 @@ object AttachmentDetailsRoute : NavRoute<AttachmentDetailsViewModel> {
         Zoomable(
             state = zoomState,
             enabled = true,
-            modifier = modifier.graphicsLayer {
-                clip = true
+            modifier = modifier
+                .graphicsLayer {
+                    clip = true
 
-            }.fillMaxSize(),
+                }
+                .fillMaxSize(),
         ) {
 
             val resources = LocalContext.current.resources

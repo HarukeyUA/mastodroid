@@ -19,6 +19,8 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
@@ -75,6 +77,8 @@ fun AccountTimelinesPager(
             else -> throw IllegalStateException("Max page limit reached")
         }
         val statuses = viewModel.timeline.collectAsLazyPagingItems(Dispatchers.Default)
+        val isRefresh = remember { derivedStateOf { statuses.loadState.refresh == LoadState.Loading } }
+
 
         AccountTimeline(
             statuses = statuses,
@@ -84,7 +88,7 @@ fun AccountTimelinesPager(
             onFavoriteClicked = viewModel::setFavorite,
             onReblogClicked = viewModel::setReblog,
             onSensitiveExpandClicked = viewModel::expandSensitiveStatus,
-            isRefresh = statuses.loadState.refresh == LoadState.Loading,
+            isRefresh = isRefresh.value,
             modifier = Modifier.fillMaxSize()
         )
     }

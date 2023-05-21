@@ -10,6 +10,7 @@ import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -129,9 +130,16 @@ suspend fun flingToolbar(
 }
 
 @Composable
-fun rememberProfileCollapsingToolbarScrollBehavior() = ProfileCollapsingToolbarScrollBehavior(
-    state = rememberProfileCollapsingToolbarScrollState(
+fun rememberProfileCollapsingToolbarScrollBehavior(): ProfileCollapsingToolbarScrollBehavior {
+    val state = rememberProfileCollapsingToolbarScrollState(
         initialHeightOffsetLimit = -Float.MAX_VALUE
-    ),
-    flingAnimationSpec = rememberSplineBasedDecay()
-)
+    )
+    val flingDecay = rememberSplineBasedDecay<Float>()
+    return remember(state, flingDecay) {
+        ProfileCollapsingToolbarScrollBehavior(
+            state = state,
+            flingAnimationSpec = flingDecay
+        )
+    }
+
+}

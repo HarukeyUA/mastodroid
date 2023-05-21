@@ -47,9 +47,7 @@ object AccountDetailsRoute : NavRoute<AccountDetailsViewModel> {
             Toast.makeText(context, it.resolveText(context), Toast.LENGTH_SHORT).show()
         }
 
-        accountDetails?.also {
-            AccountDetailsScreen(it, relationships, loading)
-        }
+        AccountDetailsScreen(accountDetails, relationships, loading)
     }
 
 }

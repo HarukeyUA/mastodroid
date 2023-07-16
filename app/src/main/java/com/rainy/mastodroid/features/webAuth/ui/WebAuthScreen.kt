@@ -17,14 +17,37 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.WebViewState
+import com.google.accompanist.web.rememberWebViewState
 import com.rainy.mastodroid.R
 import com.rainy.mastodroid.features.webAuth.OauthWebClient
+import com.rainy.mastodroid.features.webAuth.WebAuthComponent
 import com.rainy.mastodroid.util.ErrorModel
+
+@Composable
+fun WebAuthScreen(
+    webAuthComponent: WebAuthComponent
+) {
+    val webViewState = rememberWebViewState(webAuthComponent.getAuthUrl().toString())
+    val authErrorState by webAuthComponent.errorState.collectAsState()
+    val loadingState by webAuthComponent.loadingState.collectAsState()
+
+    WebAuthScreen(
+        onCodeAcquired = webAuthComponent::onCodeAcquired,
+        onAuthError = webAuthComponent::onAuthError,
+        onPageLoadError = webAuthComponent::onWebViewError,
+        onErrorDialogDismiss = webAuthComponent::onErrorDialogDismiss,
+        webViewState = webViewState,
+        isLoading = loadingState || webViewState.isLoading,
+        error = authErrorState
+    )
+}
 
 @Composable
 fun WebAuthScreen(

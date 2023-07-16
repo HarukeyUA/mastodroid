@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-package com.rainy.mastodroid.features.login.ui
+package com.rainy.mastodroid.features.instanceAuth.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,11 +26,21 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rainy.mastodroid.R
-import com.rainy.mastodroid.features.login.model.LoginUiState
+import com.rainy.mastodroid.features.instanceAuth.LoginComponent
+import com.rainy.mastodroid.features.instanceAuth.model.LoginUiState
 import com.rainy.mastodroid.ui.theme.MastodroidTheme
 import com.rainy.mastodroid.util.ColorSchemePreviews
 import com.rainy.mastodroid.util.ErrorModel
+
+@Composable
+fun LoginScreen(
+    loginComponent: LoginComponent
+) {
+    val loginState by loginComponent.loginStateFlow.collectAsStateWithLifecycle(LoginUiState())
+    LoginScreen(loginState = loginState, onContinueClicked = loginComponent::onInstanceHostSubmit)
+}
 
 @Composable
 fun LoginScreen(

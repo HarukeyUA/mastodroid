@@ -5,6 +5,8 @@
 
 package com.rainy.mastodroid.features.statusDetails.ui
 
+import android.widget.Toast
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +21,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -26,16 +29,59 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastMap
+import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rainy.mastodroid.core.domain.model.status.statusThread.ReplyType
+import com.rainy.mastodroid.extensions.observeWithLifecycle
+import com.rainy.mastodroid.features.statusDetails.StatusContextComponent
 import com.rainy.mastodroid.features.statusDetails.model.StatusDetailsState
 import com.rainy.mastodroid.ui.elements.statusListItem.SpoilerStatusContent
 import com.rainy.mastodroid.ui.elements.statusListItem.StatusContent
 import com.rainy.mastodroid.ui.elements.statusListItem.StatusListItem
 import com.rainy.mastodroid.ui.styledText.annotateMastodonContent
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun StatusDetailsScreen(
+    component: StatusContextComponent
+) {
+    val statusDetailsState = component.statusContextState.collectAsStateWithLifecycle().value
+    val loadingState by component.loadingState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    component.errorEvents.observeWithLifecycle {
+        Toast.makeText(context, it.resolveText(context), Toast.LENGTH_SHORT).show()
+    }
+
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = loadingState, onRefresh = component::loadStatus
+    )
+
+    val onUrlClicked = remember {
+        { url: String ->
+            val builder: CustomTabsIntent.Builder = CustomTabsIntent.Builder()
+            val customTabsIntent: CustomTabsIntent = builder.build()
+            customTabsIntent.launchUrl(context, url.toUri())
+        }
+    }
+
+    StatusDetailsScreen(
+        pullRefreshState = pullRefreshState,
+        statusDetailsState = statusDetailsState,
+        onFavoriteClicked = component::onFavoriteClicked,
+        onReblogClicked = component::onReblogClicked,
+        onSensitiveExpandClicked = component::onSensitiveExpandClicked,
+        onUrlClicked = onUrlClicked,
+        loadingState = loadingState,
+        onStatusClicked = component::onStatusClicked,
+        onAccountClicked = component::onAccountClicked,
+        onAttachmentClicked = component::onAttachmentClicked
+    )
+}
 
 @Composable
 @OptIn(ExperimentalMaterialApi::class)

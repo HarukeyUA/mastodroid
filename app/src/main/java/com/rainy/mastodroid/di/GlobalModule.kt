@@ -10,7 +10,6 @@ val globalModule = listOf(
     dataSourceModule,
     networkModule,
     utilsModule,
-    viewModelModule,
     dbModule,
     interactorModule,
 )

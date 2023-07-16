@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.org.jetbrains.kotlin.android)
     alias(libs.plugins.org.jetbrains.kotlin.plugin.serialization)
     alias(libs.plugins.app.cash.sqldelight)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -22,13 +23,26 @@ android {
         }
     }
 
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("debug.jks")
+            storePassword = "debugdebug"
+            keyAlias = "key0"
+            keyPassword = "debugdebug"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs["debug"]
+        }
         release {
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs["debug"]
         }
     }
     compileOptions {
@@ -66,8 +80,6 @@ sqldelight {
 
 dependencies {
     lintChecks(libs.compose.lint.checks)
-
-    implementation(libs.zoomable)
 
     implementation(libs.core.ktx)
     implementation(libs.kotlinx.coroutines.core)
@@ -110,6 +122,9 @@ dependencies {
     implementation(libs.compose.ui.util)
     implementation(libs.activity.compose)
     implementation(libs.accompanist.webview)
+    implementation(libs.decompose)
+    implementation(libs.decompose.compose.extensions)
+    implementation(libs.androidx.core.splashscreen)
 
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.test.manifest)

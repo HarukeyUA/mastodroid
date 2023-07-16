@@ -1,10 +1,10 @@
 [versions]
 com-android-application = "8.0.1"
-org-jetbrains-kotlin-android = "1.8.21"
-org-jetbrains-kotlin-plugin-serialization = "1.8.21"
+org-jetbrains-kotlin-android = "1.8.22"
+org-jetbrains-kotlin-plugin-serialization = "1.8.22"
 app-cash-sqldelight = "2.0.0-alpha05"
 core-ktx = "1.10.1"
-kotlinx-coroutines = "1.7.1"
+kotlinx-coroutines = "1.7.2"
 lifecycle = "2.6.1"
 retrofit = "2.9.0"
 logging-interceptor = "4.11.0"
@@ -12,26 +12,28 @@ kotlinx-serialization-json = "1.5.1"
 retrofit2-kotlinx-serialization-converter = "1.0.0"
 kotlinx-datetime = "0.4.0"
 desugar-jdk-libs = "2.0.3"
-navigation-compose = "2.5.3"
-koin-androidx-compose = "3.4.4"
+navigation-compose = "2.6.0"
+koin-androidx-compose = "3.4.5"
 datastore-preferences = "1.0.0"
-coil = "2.3.0"
+coil = "2.4.0"
 jsoup = "1.16.1"
-paging-runtime-ktx = "3.2.0-alpha05"
-paging-compose = "1.0.0-alpha19"
-media3 = "1.0.2"
+paging-runtime-ktx = "3.2.0-rc01"
+paging-compose = "3.2.0-rc01"
+media3 = "1.1.0"
 browser = "1.5.0"
 sqldelight = "2.0.0-alpha05"
 sqlite-framework = "2.3.1"
-compose-bom = "2023.04.00-alpha04"
-activity-compose = "1.7.1"
+compose-bom = "2023.04.00-beta02"
+activity-compose = "1.7.2"
 accompanist = "0.30.1"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 compose-lint-checks = "1.2.0"
-compose-compiler = "1.4.7"
+compose-compiler = "1.4.8"
 zoomable = "1.6.1"
+decompose = "2.0.0"
+splashscreen = "1.0.1"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -94,15 +96,17 @@ compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
 accompanist-webview = { group = "com.google.accompanist", name = "accompanist-webview", version.ref = "accompanist" }
-android-compose-compiler = {module="androidx.compose.compiler:compiler", version.ref ="compose-compiler"}
+android-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-compiler" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 
-compose-lint-checks = { group = "com.slack.lint.compose", name = "compose-lint-checks", version.ref = "compose-lint-checks"}
+compose-lint-checks = { group = "com.slack.lint.compose", name = "compose-lint-checks", version.ref = "compose-lint-checks" }
 
-zoomable = { group = "com.mxalbert.zoomable", name = "zoomable", version.ref = "zoomable" }
+decompose = { group = "com.arkivanov.decompose", name = "decompose", version.ref = "decompose" }
+decompose-compose-extensions = { group = "com.arkivanov.decompose", name = "extensions-compose-jetpack", version.ref = "decompose" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "com-android-application" }

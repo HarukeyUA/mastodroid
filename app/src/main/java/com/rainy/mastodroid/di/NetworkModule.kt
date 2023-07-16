@@ -7,9 +7,9 @@ package com.rainy.mastodroid.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.rainy.mastodroid.BuildConfig
+import com.rainy.mastodroid.network.errorHandling.ErrorHandlingCallAdapterFactory
 import com.rainy.mastodroid.network.interceptors.AuthenticatedInstanceInterceptor
 import com.rainy.mastodroid.network.interceptors.InstanceHostInterceptor
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -23,13 +23,13 @@ val AUTHENTICATED_CLIENT = named("AUTHENTICATED")
 val DEFAULT_CLIENT = named("DEFAULT")
 private const val LOCALHOST = "https://127.0.0.1/"
 
-@OptIn(ExperimentalSerializationApi::class)
 val networkModule = module {
     single(UNAUTHENTICATED_CLIENT) {
         Retrofit.Builder()
             .addConverterFactory(get())
             .client(get(UNAUTHENTICATED_CLIENT))
             .baseUrl(LOCALHOST)
+            .addCallAdapterFactory(ErrorHandlingCallAdapterFactory(get()))
             .build()
     }
 
@@ -38,6 +38,7 @@ val networkModule = module {
             .addConverterFactory(get())
             .client(get(AUTHENTICATED_CLIENT))
             .baseUrl(LOCALHOST)
+            .addCallAdapterFactory(ErrorHandlingCallAdapterFactory(get()))
             .build()
     }
 

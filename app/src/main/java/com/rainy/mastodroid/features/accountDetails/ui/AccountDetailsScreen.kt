@@ -5,6 +5,7 @@
 
 package com.rainy.mastodroid.features.accountDetails.ui
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
@@ -35,6 +36,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -44,11 +46,19 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastFirstOrNull
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.arkivanov.decompose.extensions.compose.jetpack.subscribeAsState
+import com.arkivanov.decompose.router.pages.ChildPages
+import com.arkivanov.decompose.value.Value
 import com.rainy.mastodroid.R
+import com.rainy.mastodroid.extensions.observeWithLifecycle
+import com.rainy.mastodroid.features.accountDetails.AccountDetailsComponent
+import com.rainy.mastodroid.features.accountDetails.AccountStatusTimelineComponent
 import com.rainy.mastodroid.features.accountDetails.model.AccountDetailsItemModel
 import com.rainy.mastodroid.features.accountDetails.model.AccountRelationshipsState
 import com.rainy.mastodroid.ui.elements.statusListItem.StatusTextContent
@@ -58,15 +68,41 @@ private const val ACCOUNT_TOP_BAR_ID = "top_bar"
 private const val ACCOUNT_CONTENT_ID = "account_content"
 
 @Composable
+fun AccountDetailsScreen(
+    component: AccountDetailsComponent
+) {
+    val accountDetails by component.accountDetails.collectAsStateWithLifecycle()
+    val relationships by component.accountRelationships.collectAsStateWithLifecycle()
+    val loading by component.loadingState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    component.errorEventFlow.observeWithLifecycle {
+        Toast.makeText(context, it.resolveText(context), Toast.LENGTH_SHORT).show()
+    }
+
+    AccountDetailsScreen(accountDetails, relationships, loading, pages =
+    remember {
+        {
+            component.childPages
+        }
+    },
+        onPageSelected = component::onPageSelected
+    )
+}
+
+@Composable
 @OptIn(ExperimentalFoundationApi::class)
 fun AccountDetailsScreen(
     accountDetails: AccountDetailsItemModel?,
     relationships: AccountRelationshipsState,
     isLoading: Boolean,
+    pages: () -> Value<ChildPages<*, AccountStatusTimelineComponent>>,
+    onPageSelected: (index: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val topBarScrollBehavior = rememberProfileCollapsingToolbarScrollBehavior()
-    val accountTimelinePagerState = rememberPagerState(pageCount = { 3 })
+    val pagesState = pages().subscribeAsState()
+    val accountTimelinePagerState = rememberPagerState(pageCount = { pagesState.value.items.size })
     val accountDetailsScrollState = rememberScrollState()
 
     Column {
@@ -86,6 +122,8 @@ fun AccountDetailsScreen(
                                 accountDetailsScrollState,
                                 accountDetails,
                                 accountTimelinePagerState,
+                                pages = pages,
+                                onPageSelected = onPageSelected,
                                 modifier = Modifier
                                     .layoutId(ACCOUNT_CONTENT_ID)
                                     .padding(top = 4.dp)
@@ -127,6 +165,8 @@ private fun AccountDetailsScreenContent(
     scrollState: ScrollState,
     accountDetails: AccountDetailsItemModel,
     pagerState: PagerState,
+    pages: () -> Value<ChildPages<*, AccountStatusTimelineComponent>>,
+    onPageSelected: (index: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     BoxWithConstraints(modifier = modifier) {
@@ -191,6 +231,8 @@ private fun AccountDetailsScreenContent(
                     onAccountClicked = {},
                     onUrlClicked = {},
                     onClick = {},
+                    pages = pages,
+                    onPageSelected = onPageSelected,
                     modifier = Modifier
                         .nestedScroll(remember {
                             object : NestedScrollConnection {

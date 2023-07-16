@@ -11,44 +11,57 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
-import com.rainy.mastodroid.features.accountDetails.AccountDetailsRoute
-import com.rainy.mastodroid.features.attachmentDetails.AttachmentDetailsRoute
-import com.rainy.mastodroid.features.home.HomeRoute
-import com.rainy.mastodroid.features.statusDetails.StatusDetailsRoute
-import com.rainy.mastodroid.ui.navigation.AuthFlowNavGraph
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.arkivanov.decompose.defaultComponentContext
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.Children
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
+import com.rainy.mastodroid.features.accountDetails.ui.AccountDetailsScreen
+import com.rainy.mastodroid.features.home.ui.HomeScreen
+import com.rainy.mastodroid.features.instanceAuth.InstanceAuthFlow
+import com.rainy.mastodroid.features.statusDetails.ui.StatusDetailsScreen
 import com.rainy.mastodroid.ui.theme.MastodroidTheme
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: MainViewModel by viewModel()
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splash = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        val rootComponent = RootComponent(
+            componentContext = defaultComponentContext()
+        )
+
+        rootComponent.stack.subscribe {
+            splash.setKeepOnScreenCondition {
+                it.active.configuration is RootComponent.Config.Splash
+            }
+        }
+
         setContent {
             MastodroidTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    val isLoggedInState by viewModel.isLoggedInFlow.collectAsState()
 
-                    isLoggedInState?.also { isLoggedIn ->
-                        val navController = rememberNavController()
-                        NavHost(
-                            navController = navController,
-                            startDestination = if (isLoggedIn) HomeRoute.route else AuthFlowNavGraph.route
-                        ) {
-                            AuthFlowNavGraph.navigation(this, navController)
-                            HomeRoute.composable(this, navController)
-                            StatusDetailsRoute.composable(this, navController)
-                            AccountDetailsRoute.composable(this, navController)
-                            AttachmentDetailsRoute.composable(this, navController)
+                    Children(
+                        stack = rootComponent.stack,
+                        animation = stackAnimation { child, otherChild, direction ->
+                            fade()
+                        }
+                    ) {
+                        when (val child = it.instance) {
+                            is RootComponent.Child.Home -> HomeScreen(homeComponent = child.homeComponent)
+                            is RootComponent.Child.InstanceAuth -> InstanceAuthFlow(
+                                instanceAuthFlowComponent = child.instanceAuthFlowComponent
+                            )
+
+                            RootComponent.Child.Splash -> {}
+                            is RootComponent.Child.ProfileDetails -> AccountDetailsScreen(component = child.profileDetailsComponent)
+                            is RootComponent.Child.StatusContext -> StatusDetailsScreen(
+                                component = child.statusContextComponent
+                            )
                         }
                     }
 

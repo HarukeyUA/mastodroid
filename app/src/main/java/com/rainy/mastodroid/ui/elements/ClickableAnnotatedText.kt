@@ -53,10 +53,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEachIndexed
 import com.rainy.mastodroid.extensions.ifNotNull
+import com.rainy.mastodroid.util.StableList
+import com.rainy.mastodroid.util.StableMap
 import com.rainy.mastodroid.util.fastMapRange
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+
+private const val INLINE_CONTENT_TAG = "androidx.compose.foundation.text.inlineContent"
 
 /*
 * ClickableText with material3 theme support
@@ -77,14 +81,14 @@ fun ClickableText(
     overflow: TextOverflow = TextOverflow.Clip,
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
-    inlineContent: Map<String, InlineTextContent> = mapOf(),
+    inlineContent: StableMap<String, InlineTextContent> = StableMap(mapOf()),
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalTextStyle.current,
     onClick: (annotations: AnnotatedString.Range<String>) -> Unit = {},
     pointerInput: (suspend PointerInputScope.() -> Unit)? = null
 ) {
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
-    var pressedTextBounds by remember { mutableStateOf(listOf<Rect>()) }
+    var pressedTextBounds by remember { mutableStateOf(StableList(listOf<Rect>())) }
     val pressOutlineDraw = rememberAnnotationPressOutline(pressedTextBounds)
     val pressIndicator = Modifier
         .ifNotNull(pointerInput) {
@@ -94,14 +98,15 @@ fun ClickableText(
             detectTapAndPress(
                 onPress = { offset ->
                     textLayoutResult?.also { layoutResult ->
-                        val clickedAnnotation = getAnnotationForOffsetOrNull(layoutResult, offset, text)
+                        val clickedAnnotation =
+                            getAnnotationForOffsetOrNull(layoutResult, offset, text)
                         clickedAnnotation?.let {
                             pressedTextBounds = layoutResult.getBoundingBoxes(
                                 it.start, it.end
                             )
                         }
                         tryAwaitRelease()
-                        pressedTextBounds = listOf()
+                        pressedTextBounds = StableList(listOf())
                     }
 
                 },
@@ -173,11 +178,12 @@ private fun getAnnotationForOffsetOrNull(
 ): AnnotatedString.Range<String>? {
     val textOffset = layoutResult.getOffsetForPosition(clickedOffset)
     return text.getStringAnnotations(textOffset, textOffset).firstOrNull()
+        ?.takeUnless { it.tag == INLINE_CONTENT_TAG }
 }
 
 @Composable
 private fun rememberAnnotationPressOutline(
-    textBounds: List<Rect>,
+    textBounds: StableList<Rect>,
     layoutDirection: LayoutDirection = LocalLayoutDirection.current,
     color: Color = MaterialTheme.colorScheme.primary
 ): DrawScope.() -> Unit = remember(textBounds) {
@@ -221,9 +227,9 @@ private fun rememberAnnotationPressOutline(
 private fun TextLayoutResult.getBoundingBoxes(
     startOffset: Int,
     endOffset: Int,
-): List<Rect> {
+): StableList<Rect> {
     if (startOffset == endOffset) {
-        return emptyList()
+        return StableList(emptyList())
     }
 
     val startLineNum = getLineForOffset(startOffset)
@@ -235,7 +241,7 @@ private fun TextLayoutResult.getBoundingBoxes(
     val isLtr =
         multiParagraph.getParagraphDirection(offset = layoutInput.text.lastIndex) == ResolvedTextDirection.Ltr
 
-    return fastMapRange(startLineNum, endLineNum) { lineNum ->
+    return StableList(fastMapRange(startLineNum, endLineNum) { lineNum ->
         Rect(
             top = getLineTop(lineNum),
             bottom = getLineBottom(lineNum),
@@ -251,6 +257,7 @@ private fun TextLayoutResult.getBoundingBoxes(
             }
         )
     }
+    )
 }
 
 private val NoPressGesture: suspend PressGestureScope.(Offset) -> Unit = { }

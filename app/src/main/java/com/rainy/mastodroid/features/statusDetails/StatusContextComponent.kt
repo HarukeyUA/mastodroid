@@ -5,17 +5,15 @@
 
 package com.rainy.mastodroid.features.statusDetails
 
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
-import com.rainy.mastodroid.core.base.BaseViewModel
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.instancekeeper.InstanceKeeper
+import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.rainy.mastodroid.core.domain.interactor.StatusInteractor
 import com.rainy.mastodroid.core.domain.model.status.Status
 import com.rainy.mastodroid.core.domain.model.status.statusThread.ReplyType
 import com.rainy.mastodroid.core.domain.model.status.statusThread.StatusNode
-import com.rainy.mastodroid.core.navigation.RouteNavigator
-import com.rainy.mastodroid.core.navigation.getOrThrow
-import com.rainy.mastodroid.features.accountDetails.AccountDetailsRoute
-import com.rainy.mastodroid.features.attachmentDetails.AttachmentDetailsRoute
+import com.rainy.mastodroid.extensions.coroutineExceptionHandler
+import com.rainy.mastodroid.extensions.launchLoading
 import com.rainy.mastodroid.features.statusDetails.model.StatusDetailsState
 import com.rainy.mastodroid.features.statusDetails.model.StatusInContextItemModel
 import com.rainy.mastodroid.features.statusDetails.model.StatusThreadElement
@@ -23,49 +21,45 @@ import com.rainy.mastodroid.features.statusDetails.model.toFocusedStatusItemMode
 import com.rainy.mastodroid.ui.elements.statusListItem.model.toStatusListItemModel
 import com.rainy.mastodroid.util.ErrorModel
 import com.rainy.mastodroid.util.ImmutableWrap
-import com.rainy.mastodroid.util.NetworkExceptionIdentifier
-import kotlinx.coroutines.CoroutineExceptionHandler
+import com.rainy.mastodroid.util.toErrorModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class StatusDetailsViewModel(
-    private val savedStateHandle: SavedStateHandle,
+class RetainedStatusContextComponent(
     private val statusInteractor: StatusInteractor,
-    private val exceptionIdentifier: NetworkExceptionIdentifier,
-    routeNavigator: RouteNavigator
-) : BaseViewModel(), RouteNavigator by routeNavigator {
+    private val statusId: String
+) : InstanceKeeper.Instance {
+    private val coroutineScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
 
-    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        errorEventChannel.trySend(exceptionIdentifier.identifyException(throwable))
+    private val exceptionHandler = coroutineExceptionHandler { throwable ->
+        errorEventChannel.trySend(throwable.toErrorModel())
     }
 
     private val errorEventChannel = Channel<ErrorModel>()
     val errorEventFlow = errorEventChannel.receiveAsFlow()
 
-    private val statusId: String by lazy { savedStateHandle.getOrThrow(StatusDetailsRoute.STATUS_ID_ARG) }
-    private val statusIdFlow = savedStateHandle.getStateFlow(StatusDetailsRoute.STATUS_ID_ARG, "")
-    private val statusFlow = statusIdFlow.flatMapLatest {
-        statusInteractor.getStatusFlow(it)
-    }
+    private val _loadingState = MutableStateFlow(false)
+    val loadingState = _loadingState.asStateFlow()
+
+    private val statusFlow = statusInteractor.getStatusFlow(statusId)
+
     private val sensitiveStatusExpanded = MutableStateFlow(setOf<String>())
-    val statusContextFlow =
-        statusIdFlow.flatMapLatest {
-            if (it.isNotEmpty()) {
-                statusInteractor.getStatusContextFlow(it)
-            } else {
-                flowOf()
-            }
-        }.combine(statusFlow) { statusContext, status ->
+    val statusContextFlow = statusInteractor.getStatusContextFlow(statusId)
+        .combine(statusFlow) { statusContext, status ->
             if (status != null) {
                 StatusDetailsState.Ready(
                     StatusInContextItemModel(
@@ -93,10 +87,14 @@ class StatusDetailsViewModel(
                 statusContext
             }
         }.flowOn(Dispatchers.Default)
-            .catch {
-                errorEventChannel.trySend(exceptionIdentifier.identifyException(it))
-            }
-            .stateIn(StatusDetailsState.Loading)
+        .catch {
+            errorEventChannel.trySend(it.toErrorModel())
+        }
+        .stateIn(
+            coroutineScope,
+            SharingStarted.WhileSubscribed(5000),
+            StatusDetailsState.Loading
+        )
 
     private fun setSensitiveAncestorsExpandedState(
         statusContext: StatusDetailsState.Ready,
@@ -127,15 +125,13 @@ class StatusDetailsViewModel(
     }
 
     fun loadStatus() {
-        viewModelScope.launch(exceptionHandler) {
-            loadingTask {
-                val statusDetailsDeffered =
-                    async { statusInteractor.fetchStatusDetails(statusId) }
-                val statusContextDeffered =
-                    async { statusInteractor.getContextTreesForStatus(statusId) }
-                statusContextDeffered.await()
-                statusDetailsDeffered.await()
-            }
+        coroutineScope.launchLoading(_loadingState, exceptionHandler) {
+            val statusDetailsDeffered =
+                async { statusInteractor.fetchStatusDetails(statusId) }
+            val statusContextDeffered =
+                async { statusInteractor.getContextTreesForStatus(statusId) }
+            statusContextDeffered.await()
+            statusDetailsDeffered.await()
         }
     }
 
@@ -179,13 +175,13 @@ class StatusDetailsViewModel(
     }
 
     fun onFavoriteClicked(id: String, action: Boolean) {
-        viewModelScope.launch(exceptionHandler) {
+        coroutineScope.launch(exceptionHandler) {
             statusInteractor.setFavoriteStatus(id, action)
         }
     }
 
     fun onReblogClicked(id: String, action: Boolean) {
-        viewModelScope.launch(exceptionHandler) {
+        coroutineScope.launch(exceptionHandler) {
             statusInteractor.setReblogStatus(id, action)
         }
     }
@@ -196,21 +192,56 @@ class StatusDetailsViewModel(
         }
     }
 
+    override fun onDestroy() {
+        coroutineScope.cancel()
+    }
+}
+
+class StatusContextComponent(
+    componentContext: ComponentContext,
+    private val statusInteractor: StatusInteractor,
+    private val statusId: String,
+    private val navigateToStatusContext: (id: String) -> Unit,
+    private val navigateToAccount: (id: String) -> Unit,
+    private val navigateToStatusAttachments: (statusId: String, attachmentIndex: Int) -> Unit
+) : ComponentContext by componentContext {
+
+    private val retainedStatusContextComponent = instanceKeeper.getOrCreate {
+        RetainedStatusContextComponent(
+            statusInteractor = statusInteractor, statusId = statusId
+        )
+    }
+
+    val errorEvents get() = retainedStatusContextComponent.errorEventFlow
+    val statusContextState get() = retainedStatusContextComponent.statusContextFlow
+    val loadingState get() = retainedStatusContextComponent.loadingState
+
+    fun loadStatus() {
+        retainedStatusContextComponent.loadStatus()
+    }
+
+    fun onFavoriteClicked(id: String, action: Boolean) {
+        retainedStatusContextComponent.onFavoriteClicked(id, action)
+    }
+
+    fun onReblogClicked(id: String, action: Boolean) {
+        retainedStatusContextComponent.onReblogClicked(id, action)
+    }
+
+    fun onSensitiveExpandClicked(id: String) {
+        retainedStatusContextComponent.onSensitiveExpandClicked(id)
+    }
+
     fun onStatusClicked(id: String) {
-        performNavigation {
-            navigate(StatusDetailsRoute.getRoute(id))
-        }
+        navigateToStatusContext(id)
     }
 
     fun onAccountClicked(id: String) {
-        performNavigation {
-            navigate(AccountDetailsRoute.getRoute(id))
-        }
+        navigateToAccount(id)
     }
 
-    fun onAttachmentClicked(statusId: String, index: Int) {
-        performNavigation {
-            navigate(AttachmentDetailsRoute.getRoute(statusId, index))
-        }
+    fun onAttachmentClicked(statusId: String, attachmentIndex: Int) {
+        navigateToStatusAttachments(statusId, attachmentIndex)
     }
+
 }

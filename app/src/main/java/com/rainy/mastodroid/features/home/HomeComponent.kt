@@ -5,27 +5,27 @@
 
 package com.rainy.mastodroid.features.home
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.rainy.mastodroid.core.domain.interactor.TimelineInteractor
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.instancekeeper.InstanceKeeper
+import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.rainy.mastodroid.core.domain.interactor.StatusInteractor
+import com.rainy.mastodroid.core.domain.interactor.TimelineInteractor
 import com.rainy.mastodroid.core.domain.model.status.Status
-import com.rainy.mastodroid.core.navigation.RouteNavigator
-import com.rainy.mastodroid.features.accountDetails.AccountDetailsRoute
-import com.rainy.mastodroid.features.attachmentDetails.AttachmentDetailsRoute
+import com.rainy.mastodroid.extensions.coroutineExceptionHandler
 import com.rainy.mastodroid.features.home.model.CurrentlyPlayingMedia
 import com.rainy.mastodroid.ui.elements.statusListItem.model.StatusListItemModel
 import com.rainy.mastodroid.ui.elements.statusListItem.model.VideoAttachmentItemModel
 import com.rainy.mastodroid.ui.elements.statusListItem.model.toStatusListItemModel
-import com.rainy.mastodroid.features.statusDetails.StatusDetailsRoute
 import com.rainy.mastodroid.util.ErrorModel
 import com.rainy.mastodroid.util.ImmutableWrap
-import com.rainy.mastodroid.util.NetworkExceptionIdentifier
 import com.rainy.mastodroid.util.logi
-import kotlinx.coroutines.CoroutineExceptionHandler
+import com.rainy.mastodroid.util.toErrorModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -35,15 +35,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class HomeViewModel(
+class RetainedHomeComponent(
     private val timelineInteractor: TimelineInteractor,
-    private val statusInteractor: StatusInteractor,
-    private val exceptionIdentifier: NetworkExceptionIdentifier,
-    routeNavigator: RouteNavigator
-) : ViewModel(), RouteNavigator by routeNavigator {
+    private val statusInteractor: StatusInteractor
+) : InstanceKeeper.Instance {
+    private val coroutineScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
 
-    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        errorEventChannel.trySend(exceptionIdentifier.identifyException(throwable))
+    private val exceptionHandler = coroutineExceptionHandler { throwable ->
+        errorEventChannel.trySend(throwable.toErrorModel())
     }
 
     private val errorEventChannel = Channel<ErrorModel>()
@@ -57,7 +56,7 @@ class HomeViewModel(
             statusPagingData.map(Status::toStatusListItemModel)
         }
         .flowOn(Dispatchers.Default)
-        .cachedIn(viewModelScope)
+        .cachedIn(coroutineScope)
         .combine(currentlyPlayingItem) { timeline, currentlyPlaying ->
             timeline.map { status ->
                 if (status.id == currentlyPlaying?.statusId) {
@@ -109,13 +108,13 @@ class HomeViewModel(
     }
 
     fun setFavorite(id: String, action: Boolean) {
-        viewModelScope.launch(exceptionHandler) {
+        coroutineScope.launch(exceptionHandler) {
             statusInteractor.setFavoriteStatus(id, action)
         }
     }
 
-    fun setReblog(id: String,  action: Boolean) {
-        viewModelScope.launch(exceptionHandler) {
+    fun setReblog(id: String, action: Boolean) {
+        coroutineScope.launch(exceptionHandler) {
             statusInteractor.setReblogStatus(id, action)
         }
     }
@@ -128,22 +127,55 @@ class HomeViewModel(
         }
     }
 
+    override fun onDestroy() {
+        coroutineScope.cancel()
+    }
+}
+
+class HomeComponent(
+    componentContext: ComponentContext,
+    private val timelineInteractor: TimelineInteractor,
+    private val statusInteractor: StatusInteractor,
+    private val navigateToStatusContext: (id: String) -> Unit,
+    private val navigateToAccount: (id: String) -> Unit,
+    private val navigateToStatusAttachments: (statusId: String, attachmentIndex: Int) -> Unit
+) : ComponentContext by componentContext {
+
+    private val retainedHomeComponent = instanceKeeper.getOrCreate {
+        RetainedHomeComponent(
+            timelineInteractor,
+            statusInteractor
+        )
+    }
+
+    val homeStatusesFlow get() = retainedHomeComponent.homeStatusesFlow
+    val errorEventFlow get() = retainedHomeComponent.errorEventFlow
+    val currentlyPlayingMedia get() = retainedHomeComponent.currentlyPlayingItem
+
+    fun setFocussedVideoAttachment(status: StatusListItemModel?) {
+        retainedHomeComponent.setFocussedVideoAttachment(status)
+    }
+
+    fun setFavorite(id: String, action: Boolean) {
+        retainedHomeComponent.setFavorite(id, action)
+    }
+
+    fun setReblog(id: String, action: Boolean) {
+        retainedHomeComponent.setReblog(id, action)
+    }
+    fun expandSensitiveStatus(id: String) {
+        retainedHomeComponent.expandSensitiveStatus(id)
+    }
+
     fun onStatusClicked(id: String) {
-        performNavigation {
-            navigate(StatusDetailsRoute.getRoute(id))
-        }
+        navigateToStatusContext(id)
     }
 
     fun onAccountClicked(id: String) {
-        performNavigation {
-            navigate(AccountDetailsRoute.getRoute(id))
-        }
+        navigateToAccount(id)
     }
 
     fun onAttachmentClicked(statusId: String, index: Int) {
-        performNavigation {
-            navigate(AttachmentDetailsRoute.getRoute(statusId, index))
-        }
+        navigateToStatusAttachments(statusId, index)
     }
-
 }
